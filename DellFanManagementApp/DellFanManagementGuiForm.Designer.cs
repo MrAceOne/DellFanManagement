@@ -29,792 +29,832 @@ namespace DellFanManagement.App
         /// </summary>
         private void InitializeComponent()
         {
-            this.components = new System.ComponentModel.Container();
+            components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(DellFanManagementGuiForm));
-            this.fansGroupBox = new System.Windows.Forms.GroupBox();
-            this.fan2RpmLabel = new System.Windows.Forms.Label();
-            this.fan1RpmLabel = new System.Windows.Forms.Label();
-            this.thermalSettingGroupBox = new System.Windows.Forms.GroupBox();
-            this.thermalSettingRadioButtonPerformance = new System.Windows.Forms.RadioButton();
-            this.thermalSettingRadioButtonQuiet = new System.Windows.Forms.RadioButton();
-            this.thermalSettingRadioButtonCool = new System.Windows.Forms.RadioButton();
-            this.thermalSettingRadioButtonOptimized = new System.Windows.Forms.RadioButton();
-            this.temperatureGroupBox = new System.Windows.Forms.GroupBox();
-            this.temperatureLabel18 = new System.Windows.Forms.Label();
-            this.temperatureLabel17 = new System.Windows.Forms.Label();
-            this.temperatureLabel16 = new System.Windows.Forms.Label();
-            this.temperatureLabel15 = new System.Windows.Forms.Label();
-            this.temperatureLabel14 = new System.Windows.Forms.Label();
-            this.temperatureLabel13 = new System.Windows.Forms.Label();
-            this.temperatureLabel12 = new System.Windows.Forms.Label();
-            this.temperatureLabel11 = new System.Windows.Forms.Label();
-            this.temperatureLabel10 = new System.Windows.Forms.Label();
-            this.temperatureLabel9 = new System.Windows.Forms.Label();
-            this.temperatureLabel8 = new System.Windows.Forms.Label();
-            this.temperatureLabel7 = new System.Windows.Forms.Label();
-            this.temperatureLabel6 = new System.Windows.Forms.Label();
-            this.temperatureLabel5 = new System.Windows.Forms.Label();
-            this.temperatureLabel4 = new System.Windows.Forms.Label();
-            this.temperatureLabel3 = new System.Windows.Forms.Label();
-            this.temperatureLabel2 = new System.Windows.Forms.Label();
-            this.temperatureLabel1 = new System.Windows.Forms.Label();
-            this.operationModeGroupBox = new System.Windows.Forms.GroupBox();
-            this.operationModeRadioButtonConsistency = new System.Windows.Forms.RadioButton();
-            this.operationModeRadioButtonManual = new System.Windows.Forms.RadioButton();
-            this.operationModeRadioButtonAutomatic = new System.Windows.Forms.RadioButton();
-            this.manualGroupBox = new System.Windows.Forms.GroupBox();
-            this.manualFan2GroupBox = new System.Windows.Forms.GroupBox();
-            this.manualFan2RadioButtonHigh = new System.Windows.Forms.RadioButton();
-            this.manualFan2RadioButtonMedium = new System.Windows.Forms.RadioButton();
-            this.manualFan2RadioButtonOff = new System.Windows.Forms.RadioButton();
-            this.manualFan1GroupBox = new System.Windows.Forms.GroupBox();
-            this.manualFan1RadioButtonHigh = new System.Windows.Forms.RadioButton();
-            this.manualFan1RadioButtonMedium = new System.Windows.Forms.RadioButton();
-            this.manualFan1RadioButtonOff = new System.Windows.Forms.RadioButton();
-            this.consistencyModeGroupBox = new System.Windows.Forms.GroupBox();
-            this.alertsCheckBox = new System.Windows.Forms.CheckBox();
-            this.consistencyModeApplyChangesButton = new System.Windows.Forms.Button();
-            this.consistencyModeRpmThresholdTextBox = new System.Windows.Forms.TextBox();
-            this.consistencyModeRpmThresholdLabel = new System.Windows.Forms.Label();
-            this.consistencyModeUpperTemperatureThresholdTextBox = new System.Windows.Forms.TextBox();
-            this.consistencyModeUpperTemperatureThresholdLabel = new System.Windows.Forms.Label();
-            this.consistencyModeLowerTemperatureThresholdTextBox = new System.Windows.Forms.TextBox();
-            this.consistencyModeLowerTemperatureThresholdLabel = new System.Windows.Forms.Label();
-            this.ecFanControlRadioButtonOn = new System.Windows.Forms.RadioButton();
-            this.ecFanControlRadioButtonOff = new System.Windows.Forms.RadioButton();
-            this.ecFanControlGroupBox = new System.Windows.Forms.GroupBox();
-            this.restartBackgroundThreadButton = new System.Windows.Forms.Button();
-            this.aboutGroupBox = new System.Windows.Forms.GroupBox();
-            this.richTextBox1 = new System.Windows.Forms.RichTextBox();
-            this.aboutProductLabel = new System.Windows.Forms.Label();
-            this.audioKeepAliveGroupBox = new System.Windows.Forms.GroupBox();
-            this.audioKeepAliveComboBox = new System.Windows.Forms.ComboBox();
-            this.audioKeepAliveCheckbox = new System.Windows.Forms.CheckBox();
-            this.statusStrip = new System.Windows.Forms.StatusStrip();
-            this.consistencyModeStatusLabel = new System.Windows.Forms.ToolStripStatusLabel();
-            this.trayIcon = new System.Windows.Forms.NotifyIcon(this.components);
-            this.trayIconCheckBox = new System.Windows.Forms.CheckBox();
-            this.animatedCheckBox = new System.Windows.Forms.CheckBox();
-            this.fansGroupBox.SuspendLayout();
-            this.thermalSettingGroupBox.SuspendLayout();
-            this.temperatureGroupBox.SuspendLayout();
-            this.operationModeGroupBox.SuspendLayout();
-            this.manualGroupBox.SuspendLayout();
-            this.manualFan2GroupBox.SuspendLayout();
-            this.manualFan1GroupBox.SuspendLayout();
-            this.consistencyModeGroupBox.SuspendLayout();
-            this.ecFanControlGroupBox.SuspendLayout();
-            this.aboutGroupBox.SuspendLayout();
-            this.audioKeepAliveGroupBox.SuspendLayout();
-            this.statusStrip.SuspendLayout();
-            this.SuspendLayout();
+            fansGroupBox = new System.Windows.Forms.GroupBox();
+            fan2RpmLabel = new System.Windows.Forms.Label();
+            fan1RpmLabel = new System.Windows.Forms.Label();
+            thermalSettingGroupBox = new System.Windows.Forms.GroupBox();
+            thermalSettingRadioButtonPerformance = new System.Windows.Forms.RadioButton();
+            thermalSettingRadioButtonQuiet = new System.Windows.Forms.RadioButton();
+            thermalSettingRadioButtonCool = new System.Windows.Forms.RadioButton();
+            thermalSettingRadioButtonOptimized = new System.Windows.Forms.RadioButton();
+            temperatureGroupBox = new System.Windows.Forms.GroupBox();
+            temperatureLabel18 = new System.Windows.Forms.Label();
+            temperatureLabel17 = new System.Windows.Forms.Label();
+            temperatureLabel16 = new System.Windows.Forms.Label();
+            temperatureLabel15 = new System.Windows.Forms.Label();
+            temperatureLabel14 = new System.Windows.Forms.Label();
+            temperatureLabel13 = new System.Windows.Forms.Label();
+            temperatureLabel12 = new System.Windows.Forms.Label();
+            temperatureLabel11 = new System.Windows.Forms.Label();
+            temperatureLabel10 = new System.Windows.Forms.Label();
+            temperatureLabel9 = new System.Windows.Forms.Label();
+            temperatureLabel8 = new System.Windows.Forms.Label();
+            temperatureLabel7 = new System.Windows.Forms.Label();
+            temperatureLabel6 = new System.Windows.Forms.Label();
+            temperatureLabel5 = new System.Windows.Forms.Label();
+            temperatureLabel4 = new System.Windows.Forms.Label();
+            temperatureLabel3 = new System.Windows.Forms.Label();
+            temperatureLabel2 = new System.Windows.Forms.Label();
+            temperatureLabel1 = new System.Windows.Forms.Label();
+            operationModeGroupBox = new System.Windows.Forms.GroupBox();
+            operationModeRadioButtonConsistency = new System.Windows.Forms.RadioButton();
+            operationModeRadioButtonManual = new System.Windows.Forms.RadioButton();
+            operationModeRadioButtonAutomatic = new System.Windows.Forms.RadioButton();
+            manualGroupBox = new System.Windows.Forms.GroupBox();
+            manualFan2GroupBox = new System.Windows.Forms.GroupBox();
+            manualFan2RadioButtonHigh = new System.Windows.Forms.RadioButton();
+            manualFan2RadioButtonMedium = new System.Windows.Forms.RadioButton();
+            manualFan2RadioButtonOff = new System.Windows.Forms.RadioButton();
+            manualFan1GroupBox = new System.Windows.Forms.GroupBox();
+            manualFan1RadioButtonHigh = new System.Windows.Forms.RadioButton();
+            manualFan1RadioButtonMedium = new System.Windows.Forms.RadioButton();
+            manualFan1RadioButtonOff = new System.Windows.Forms.RadioButton();
+            consistencyModeGroupBox = new System.Windows.Forms.GroupBox();
+            alertsCheckBox = new System.Windows.Forms.CheckBox();
+            consistencyModeApplyChangesButton = new System.Windows.Forms.Button();
+            consistencyModeRpmThresholdTextBox = new System.Windows.Forms.TextBox();
+            consistencyModeRpmThresholdLabel = new System.Windows.Forms.Label();
+            consistencyModeUpperTemperatureThresholdTextBox = new System.Windows.Forms.TextBox();
+            consistencyModeUpperTemperatureThresholdLabel = new System.Windows.Forms.Label();
+            consistencyModeLowerTemperatureThresholdTextBox = new System.Windows.Forms.TextBox();
+            consistencyModeLowerTemperatureThresholdLabel = new System.Windows.Forms.Label();
+            ecFanControlRadioButtonOn = new System.Windows.Forms.RadioButton();
+            ecFanControlRadioButtonOff = new System.Windows.Forms.RadioButton();
+            ecFanControlGroupBox = new System.Windows.Forms.GroupBox();
+            restartBackgroundThreadButton = new System.Windows.Forms.Button();
+            audioKeepAliveGroupBox = new System.Windows.Forms.GroupBox();
+            audioKeepAliveComboBox = new System.Windows.Forms.ComboBox();
+            audioKeepAliveCheckbox = new System.Windows.Forms.CheckBox();
+            statusStrip = new System.Windows.Forms.StatusStrip();
+            consistencyModeStatusLabel = new System.Windows.Forms.ToolStripStatusLabel();
+            trayIcon = new System.Windows.Forms.NotifyIcon(components);
+            trayIconCheckBox = new System.Windows.Forms.CheckBox();
+            animatedCheckBox = new System.Windows.Forms.CheckBox();
+            fansGroupBox.SuspendLayout();
+            thermalSettingGroupBox.SuspendLayout();
+            temperatureGroupBox.SuspendLayout();
+            operationModeGroupBox.SuspendLayout();
+            manualGroupBox.SuspendLayout();
+            manualFan2GroupBox.SuspendLayout();
+            manualFan1GroupBox.SuspendLayout();
+            consistencyModeGroupBox.SuspendLayout();
+            ecFanControlGroupBox.SuspendLayout();
+            audioKeepAliveGroupBox.SuspendLayout();
+            statusStrip.SuspendLayout();
+            SuspendLayout();
             // 
             // fansGroupBox
             // 
-            this.fansGroupBox.Controls.Add(this.fan2RpmLabel);
-            this.fansGroupBox.Controls.Add(this.fan1RpmLabel);
-            this.fansGroupBox.Location = new System.Drawing.Point(12, 12);
-            this.fansGroupBox.Name = "fansGroupBox";
-            this.fansGroupBox.Size = new System.Drawing.Size(223, 65);
-            this.fansGroupBox.TabIndex = 1;
-            this.fansGroupBox.TabStop = false;
-            this.fansGroupBox.Text = "Fans:";
+            fansGroupBox.Controls.Add(fan2RpmLabel);
+            fansGroupBox.Controls.Add(fan1RpmLabel);
+            fansGroupBox.Location = new System.Drawing.Point(24, 24);
+            fansGroupBox.Margin = new System.Windows.Forms.Padding(6);
+            fansGroupBox.Name = "fansGroupBox";
+            fansGroupBox.Padding = new System.Windows.Forms.Padding(6);
+            fansGroupBox.Size = new System.Drawing.Size(446, 130);
+            fansGroupBox.TabIndex = 1;
+            fansGroupBox.TabStop = false;
+            fansGroupBox.Text = "风扇:";
             // 
             // fan2RpmLabel
             // 
-            this.fan2RpmLabel.AutoSize = true;
-            this.fan2RpmLabel.Location = new System.Drawing.Point(6, 38);
-            this.fan2RpmLabel.Name = "fan2RpmLabel";
-            this.fan2RpmLabel.Size = new System.Drawing.Size(152, 15);
-            this.fan2RpmLabel.TabIndex = 2;
-            this.fan2RpmLabel.Text = "Fan 2 RPM: (Not measured)";
+            fan2RpmLabel.AutoSize = true;
+            fan2RpmLabel.Location = new System.Drawing.Point(12, 76);
+            fan2RpmLabel.Margin = new System.Windows.Forms.Padding(6, 0, 6, 0);
+            fan2RpmLabel.Name = "fan2RpmLabel";
+            fan2RpmLabel.Size = new System.Drawing.Size(330, 31);
+            fan2RpmLabel.TabIndex = 2;
+            fan2RpmLabel.Text = "Fan 2 RPM: (Not measured)";
             // 
             // fan1RpmLabel
             // 
-            this.fan1RpmLabel.AutoSize = true;
-            this.fan1RpmLabel.Location = new System.Drawing.Point(6, 19);
-            this.fan1RpmLabel.Name = "fan1RpmLabel";
-            this.fan1RpmLabel.Size = new System.Drawing.Size(152, 15);
-            this.fan1RpmLabel.TabIndex = 1;
-            this.fan1RpmLabel.Text = "Fan 1 RPM: (Not measured)";
+            fan1RpmLabel.AutoSize = true;
+            fan1RpmLabel.Location = new System.Drawing.Point(12, 38);
+            fan1RpmLabel.Margin = new System.Windows.Forms.Padding(6, 0, 6, 0);
+            fan1RpmLabel.Name = "fan1RpmLabel";
+            fan1RpmLabel.Size = new System.Drawing.Size(330, 31);
+            fan1RpmLabel.TabIndex = 1;
+            fan1RpmLabel.Text = "Fan 1 RPM: (Not measured)";
             // 
             // thermalSettingGroupBox
             // 
-            this.thermalSettingGroupBox.Controls.Add(this.thermalSettingRadioButtonPerformance);
-            this.thermalSettingGroupBox.Controls.Add(this.thermalSettingRadioButtonQuiet);
-            this.thermalSettingGroupBox.Controls.Add(this.thermalSettingRadioButtonCool);
-            this.thermalSettingGroupBox.Controls.Add(this.thermalSettingRadioButtonOptimized);
-            this.thermalSettingGroupBox.Location = new System.Drawing.Point(350, 117);
-            this.thermalSettingGroupBox.Name = "thermalSettingGroupBox";
-            this.thermalSettingGroupBox.Size = new System.Drawing.Size(111, 124);
-            this.thermalSettingGroupBox.TabIndex = 6;
-            this.thermalSettingGroupBox.TabStop = false;
-            this.thermalSettingGroupBox.Text = "Thermal setting:";
+            thermalSettingGroupBox.Controls.Add(thermalSettingRadioButtonPerformance);
+            thermalSettingGroupBox.Controls.Add(thermalSettingRadioButtonQuiet);
+            thermalSettingGroupBox.Controls.Add(thermalSettingRadioButtonCool);
+            thermalSettingGroupBox.Controls.Add(thermalSettingRadioButtonOptimized);
+            thermalSettingGroupBox.Location = new System.Drawing.Point(700, 234);
+            thermalSettingGroupBox.Margin = new System.Windows.Forms.Padding(6);
+            thermalSettingGroupBox.Name = "thermalSettingGroupBox";
+            thermalSettingGroupBox.Padding = new System.Windows.Forms.Padding(6);
+            thermalSettingGroupBox.Size = new System.Drawing.Size(222, 248);
+            thermalSettingGroupBox.TabIndex = 6;
+            thermalSettingGroupBox.TabStop = false;
+            thermalSettingGroupBox.Text = "散热管理:";
             // 
             // thermalSettingRadioButtonPerformance
             // 
-            this.thermalSettingRadioButtonPerformance.AutoSize = true;
-            this.thermalSettingRadioButtonPerformance.Location = new System.Drawing.Point(6, 97);
-            this.thermalSettingRadioButtonPerformance.Name = "thermalSettingRadioButtonPerformance";
-            this.thermalSettingRadioButtonPerformance.Size = new System.Drawing.Size(93, 19);
-            this.thermalSettingRadioButtonPerformance.TabIndex = 3;
-            this.thermalSettingRadioButtonPerformance.TabStop = true;
-            this.thermalSettingRadioButtonPerformance.Text = "&Performance";
-            this.thermalSettingRadioButtonPerformance.UseVisualStyleBackColor = true;
+            thermalSettingRadioButtonPerformance.AutoSize = true;
+            thermalSettingRadioButtonPerformance.Location = new System.Drawing.Point(12, 194);
+            thermalSettingRadioButtonPerformance.Margin = new System.Windows.Forms.Padding(6);
+            thermalSettingRadioButtonPerformance.Name = "thermalSettingRadioButtonPerformance";
+            thermalSettingRadioButtonPerformance.Size = new System.Drawing.Size(93, 35);
+            thermalSettingRadioButtonPerformance.TabIndex = 3;
+            thermalSettingRadioButtonPerformance.TabStop = true;
+            thermalSettingRadioButtonPerformance.Text = "极速";
+            thermalSettingRadioButtonPerformance.UseVisualStyleBackColor = true;
             // 
             // thermalSettingRadioButtonQuiet
             // 
-            this.thermalSettingRadioButtonQuiet.AutoSize = true;
-            this.thermalSettingRadioButtonQuiet.Location = new System.Drawing.Point(6, 72);
-            this.thermalSettingRadioButtonQuiet.Name = "thermalSettingRadioButtonQuiet";
-            this.thermalSettingRadioButtonQuiet.Size = new System.Drawing.Size(54, 19);
-            this.thermalSettingRadioButtonQuiet.TabIndex = 2;
-            this.thermalSettingRadioButtonQuiet.TabStop = true;
-            this.thermalSettingRadioButtonQuiet.Text = "&Quiet";
-            this.thermalSettingRadioButtonQuiet.UseVisualStyleBackColor = true;
+            thermalSettingRadioButtonQuiet.AutoSize = true;
+            thermalSettingRadioButtonQuiet.Location = new System.Drawing.Point(12, 144);
+            thermalSettingRadioButtonQuiet.Margin = new System.Windows.Forms.Padding(6);
+            thermalSettingRadioButtonQuiet.Name = "thermalSettingRadioButtonQuiet";
+            thermalSettingRadioButtonQuiet.Size = new System.Drawing.Size(93, 35);
+            thermalSettingRadioButtonQuiet.TabIndex = 2;
+            thermalSettingRadioButtonQuiet.TabStop = true;
+            thermalSettingRadioButtonQuiet.Text = "静音";
+            thermalSettingRadioButtonQuiet.UseVisualStyleBackColor = true;
             // 
             // thermalSettingRadioButtonCool
             // 
-            this.thermalSettingRadioButtonCool.AutoSize = true;
-            this.thermalSettingRadioButtonCool.Location = new System.Drawing.Point(6, 47);
-            this.thermalSettingRadioButtonCool.Name = "thermalSettingRadioButtonCool";
-            this.thermalSettingRadioButtonCool.Size = new System.Drawing.Size(50, 19);
-            this.thermalSettingRadioButtonCool.TabIndex = 1;
-            this.thermalSettingRadioButtonCool.TabStop = true;
-            this.thermalSettingRadioButtonCool.Text = "&Cool";
-            this.thermalSettingRadioButtonCool.UseVisualStyleBackColor = true;
+            thermalSettingRadioButtonCool.AutoSize = true;
+            thermalSettingRadioButtonCool.Location = new System.Drawing.Point(12, 94);
+            thermalSettingRadioButtonCool.Margin = new System.Windows.Forms.Padding(6);
+            thermalSettingRadioButtonCool.Name = "thermalSettingRadioButtonCool";
+            thermalSettingRadioButtonCool.Size = new System.Drawing.Size(93, 35);
+            thermalSettingRadioButtonCool.TabIndex = 1;
+            thermalSettingRadioButtonCool.TabStop = true;
+            thermalSettingRadioButtonCool.Text = "酷凉";
+            thermalSettingRadioButtonCool.UseVisualStyleBackColor = true;
             // 
             // thermalSettingRadioButtonOptimized
             // 
-            this.thermalSettingRadioButtonOptimized.AutoSize = true;
-            this.thermalSettingRadioButtonOptimized.Location = new System.Drawing.Point(6, 22);
-            this.thermalSettingRadioButtonOptimized.Name = "thermalSettingRadioButtonOptimized";
-            this.thermalSettingRadioButtonOptimized.Size = new System.Drawing.Size(80, 19);
-            this.thermalSettingRadioButtonOptimized.TabIndex = 0;
-            this.thermalSettingRadioButtonOptimized.TabStop = true;
-            this.thermalSettingRadioButtonOptimized.Text = "&Optimized";
-            this.thermalSettingRadioButtonOptimized.UseVisualStyleBackColor = true;
+            thermalSettingRadioButtonOptimized.AutoSize = true;
+            thermalSettingRadioButtonOptimized.Location = new System.Drawing.Point(12, 44);
+            thermalSettingRadioButtonOptimized.Margin = new System.Windows.Forms.Padding(6);
+            thermalSettingRadioButtonOptimized.Name = "thermalSettingRadioButtonOptimized";
+            thermalSettingRadioButtonOptimized.Size = new System.Drawing.Size(93, 35);
+            thermalSettingRadioButtonOptimized.TabIndex = 0;
+            thermalSettingRadioButtonOptimized.TabStop = true;
+            thermalSettingRadioButtonOptimized.Text = "优化";
+            thermalSettingRadioButtonOptimized.UseVisualStyleBackColor = true;
             // 
             // temperatureGroupBox
             // 
-            this.temperatureGroupBox.Controls.Add(this.temperatureLabel18);
-            this.temperatureGroupBox.Controls.Add(this.temperatureLabel17);
-            this.temperatureGroupBox.Controls.Add(this.temperatureLabel16);
-            this.temperatureGroupBox.Controls.Add(this.temperatureLabel15);
-            this.temperatureGroupBox.Controls.Add(this.temperatureLabel14);
-            this.temperatureGroupBox.Controls.Add(this.temperatureLabel13);
-            this.temperatureGroupBox.Controls.Add(this.temperatureLabel12);
-            this.temperatureGroupBox.Controls.Add(this.temperatureLabel11);
-            this.temperatureGroupBox.Controls.Add(this.temperatureLabel10);
-            this.temperatureGroupBox.Controls.Add(this.temperatureLabel9);
-            this.temperatureGroupBox.Controls.Add(this.temperatureLabel8);
-            this.temperatureGroupBox.Controls.Add(this.temperatureLabel7);
-            this.temperatureGroupBox.Controls.Add(this.temperatureLabel6);
-            this.temperatureGroupBox.Controls.Add(this.temperatureLabel5);
-            this.temperatureGroupBox.Controls.Add(this.temperatureLabel4);
-            this.temperatureGroupBox.Controls.Add(this.temperatureLabel3);
-            this.temperatureGroupBox.Controls.Add(this.temperatureLabel2);
-            this.temperatureGroupBox.Controls.Add(this.temperatureLabel1);
-            this.temperatureGroupBox.Location = new System.Drawing.Point(12, 83);
-            this.temperatureGroupBox.Name = "temperatureGroupBox";
-            this.temperatureGroupBox.Size = new System.Drawing.Size(332, 199);
-            this.temperatureGroupBox.TabIndex = 4;
-            this.temperatureGroupBox.TabStop = false;
-            this.temperatureGroupBox.Text = "Temperatures:";
+            temperatureGroupBox.Controls.Add(temperatureLabel18);
+            temperatureGroupBox.Controls.Add(temperatureLabel17);
+            temperatureGroupBox.Controls.Add(temperatureLabel16);
+            temperatureGroupBox.Controls.Add(temperatureLabel15);
+            temperatureGroupBox.Controls.Add(temperatureLabel14);
+            temperatureGroupBox.Controls.Add(temperatureLabel13);
+            temperatureGroupBox.Controls.Add(temperatureLabel12);
+            temperatureGroupBox.Controls.Add(temperatureLabel11);
+            temperatureGroupBox.Controls.Add(temperatureLabel10);
+            temperatureGroupBox.Controls.Add(temperatureLabel9);
+            temperatureGroupBox.Controls.Add(temperatureLabel8);
+            temperatureGroupBox.Controls.Add(temperatureLabel7);
+            temperatureGroupBox.Controls.Add(temperatureLabel6);
+            temperatureGroupBox.Controls.Add(temperatureLabel5);
+            temperatureGroupBox.Controls.Add(temperatureLabel4);
+            temperatureGroupBox.Controls.Add(temperatureLabel3);
+            temperatureGroupBox.Controls.Add(temperatureLabel2);
+            temperatureGroupBox.Controls.Add(temperatureLabel1);
+            temperatureGroupBox.Location = new System.Drawing.Point(24, 166);
+            temperatureGroupBox.Margin = new System.Windows.Forms.Padding(6);
+            temperatureGroupBox.Name = "temperatureGroupBox";
+            temperatureGroupBox.Padding = new System.Windows.Forms.Padding(6);
+            temperatureGroupBox.Size = new System.Drawing.Size(664, 398);
+            temperatureGroupBox.TabIndex = 4;
+            temperatureGroupBox.TabStop = false;
+            temperatureGroupBox.Text = "温度:";
             // 
             // temperatureLabel18
             // 
-            this.temperatureLabel18.AutoSize = true;
-            this.temperatureLabel18.Location = new System.Drawing.Point(167, 175);
-            this.temperatureLabel18.Name = "temperatureLabel18";
-            this.temperatureLabel18.Size = new System.Drawing.Size(160, 15);
-            this.temperatureLabel18.TabIndex = 3;
-            this.temperatureLabel18.Text = "Quadro RTX 5000: 50 (50-100)";
+            temperatureLabel18.AutoSize = true;
+            temperatureLabel18.Location = new System.Drawing.Point(334, 350);
+            temperatureLabel18.Margin = new System.Windows.Forms.Padding(6, 0, 6, 0);
+            temperatureLabel18.Name = "temperatureLabel18";
+            temperatureLabel18.Size = new System.Drawing.Size(360, 31);
+            temperatureLabel18.TabIndex = 3;
+            temperatureLabel18.Text = "Quadro RTX 5000: 50 (50-100)";
             // 
             // temperatureLabel17
             // 
-            this.temperatureLabel17.AutoSize = true;
-            this.temperatureLabel17.Location = new System.Drawing.Point(167, 156);
-            this.temperatureLabel17.Name = "temperatureLabel17";
-            this.temperatureLabel17.Size = new System.Drawing.Size(141, 15);
-            this.temperatureLabel17.TabIndex = 3;
-            this.temperatureLabel17.Text = "CPU Package: 50 (50-100)";
+            temperatureLabel17.AutoSize = true;
+            temperatureLabel17.Location = new System.Drawing.Point(334, 312);
+            temperatureLabel17.Margin = new System.Windows.Forms.Padding(6, 0, 6, 0);
+            temperatureLabel17.Name = "temperatureLabel17";
+            temperatureLabel17.Size = new System.Drawing.Size(309, 31);
+            temperatureLabel17.TabIndex = 3;
+            temperatureLabel17.Text = "CPU Package: 50 (50-100)";
             // 
             // temperatureLabel16
             // 
-            this.temperatureLabel16.AutoSize = true;
-            this.temperatureLabel16.Location = new System.Drawing.Point(167, 137);
-            this.temperatureLabel16.Name = "temperatureLabel16";
-            this.temperatureLabel16.Size = new System.Drawing.Size(144, 15);
-            this.temperatureLabel16.TabIndex = 15;
-            this.temperatureLabel16.Text = "CPU Core #16: 50 (50-100)";
+            temperatureLabel16.AutoSize = true;
+            temperatureLabel16.Location = new System.Drawing.Point(334, 274);
+            temperatureLabel16.Margin = new System.Windows.Forms.Padding(6, 0, 6, 0);
+            temperatureLabel16.Name = "temperatureLabel16";
+            temperatureLabel16.Size = new System.Drawing.Size(318, 31);
+            temperatureLabel16.TabIndex = 15;
+            temperatureLabel16.Text = "CPU Core #16: 50 (50-100)";
             // 
             // temperatureLabel15
             // 
-            this.temperatureLabel15.AutoSize = true;
-            this.temperatureLabel15.Location = new System.Drawing.Point(167, 118);
-            this.temperatureLabel15.Name = "temperatureLabel15";
-            this.temperatureLabel15.Size = new System.Drawing.Size(144, 15);
-            this.temperatureLabel15.TabIndex = 14;
-            this.temperatureLabel15.Text = "CPU Core #15: 50 (50-100)";
+            temperatureLabel15.AutoSize = true;
+            temperatureLabel15.Location = new System.Drawing.Point(334, 236);
+            temperatureLabel15.Margin = new System.Windows.Forms.Padding(6, 0, 6, 0);
+            temperatureLabel15.Name = "temperatureLabel15";
+            temperatureLabel15.Size = new System.Drawing.Size(318, 31);
+            temperatureLabel15.TabIndex = 14;
+            temperatureLabel15.Text = "CPU Core #15: 50 (50-100)";
             // 
             // temperatureLabel14
             // 
-            this.temperatureLabel14.AutoSize = true;
-            this.temperatureLabel14.Location = new System.Drawing.Point(167, 99);
-            this.temperatureLabel14.Name = "temperatureLabel14";
-            this.temperatureLabel14.Size = new System.Drawing.Size(144, 15);
-            this.temperatureLabel14.TabIndex = 13;
-            this.temperatureLabel14.Text = "CPU Core #14: 50 (50-100)";
+            temperatureLabel14.AutoSize = true;
+            temperatureLabel14.Location = new System.Drawing.Point(334, 198);
+            temperatureLabel14.Margin = new System.Windows.Forms.Padding(6, 0, 6, 0);
+            temperatureLabel14.Name = "temperatureLabel14";
+            temperatureLabel14.Size = new System.Drawing.Size(318, 31);
+            temperatureLabel14.TabIndex = 13;
+            temperatureLabel14.Text = "CPU Core #14: 50 (50-100)";
             // 
             // temperatureLabel13
             // 
-            this.temperatureLabel13.AutoSize = true;
-            this.temperatureLabel13.Location = new System.Drawing.Point(167, 80);
-            this.temperatureLabel13.Name = "temperatureLabel13";
-            this.temperatureLabel13.Size = new System.Drawing.Size(144, 15);
-            this.temperatureLabel13.TabIndex = 12;
-            this.temperatureLabel13.Text = "CPU Core #13: 50 (50-100)";
+            temperatureLabel13.AutoSize = true;
+            temperatureLabel13.Location = new System.Drawing.Point(334, 160);
+            temperatureLabel13.Margin = new System.Windows.Forms.Padding(6, 0, 6, 0);
+            temperatureLabel13.Name = "temperatureLabel13";
+            temperatureLabel13.Size = new System.Drawing.Size(318, 31);
+            temperatureLabel13.TabIndex = 12;
+            temperatureLabel13.Text = "CPU Core #13: 50 (50-100)";
             // 
             // temperatureLabel12
             // 
-            this.temperatureLabel12.AutoSize = true;
-            this.temperatureLabel12.Location = new System.Drawing.Point(167, 61);
-            this.temperatureLabel12.Name = "temperatureLabel12";
-            this.temperatureLabel12.Size = new System.Drawing.Size(144, 15);
-            this.temperatureLabel12.TabIndex = 11;
-            this.temperatureLabel12.Text = "CPU Core #12: 50 (50-100)";
+            temperatureLabel12.AutoSize = true;
+            temperatureLabel12.Location = new System.Drawing.Point(334, 122);
+            temperatureLabel12.Margin = new System.Windows.Forms.Padding(6, 0, 6, 0);
+            temperatureLabel12.Name = "temperatureLabel12";
+            temperatureLabel12.Size = new System.Drawing.Size(318, 31);
+            temperatureLabel12.TabIndex = 11;
+            temperatureLabel12.Text = "CPU Core #12: 50 (50-100)";
             // 
             // temperatureLabel11
             // 
-            this.temperatureLabel11.AutoSize = true;
-            this.temperatureLabel11.Location = new System.Drawing.Point(167, 42);
-            this.temperatureLabel11.Name = "temperatureLabel11";
-            this.temperatureLabel11.Size = new System.Drawing.Size(144, 15);
-            this.temperatureLabel11.TabIndex = 10;
-            this.temperatureLabel11.Text = "CPU Core #11: 50 (50-100)";
+            temperatureLabel11.AutoSize = true;
+            temperatureLabel11.Location = new System.Drawing.Point(334, 84);
+            temperatureLabel11.Margin = new System.Windows.Forms.Padding(6, 0, 6, 0);
+            temperatureLabel11.Name = "temperatureLabel11";
+            temperatureLabel11.Size = new System.Drawing.Size(318, 31);
+            temperatureLabel11.TabIndex = 10;
+            temperatureLabel11.Text = "CPU Core #11: 50 (50-100)";
             // 
             // temperatureLabel10
             // 
-            this.temperatureLabel10.AutoSize = true;
-            this.temperatureLabel10.Location = new System.Drawing.Point(167, 23);
-            this.temperatureLabel10.Name = "temperatureLabel10";
-            this.temperatureLabel10.Size = new System.Drawing.Size(144, 15);
-            this.temperatureLabel10.TabIndex = 9;
-            this.temperatureLabel10.Text = "CPU Core #10: 50 (50-100)";
+            temperatureLabel10.AutoSize = true;
+            temperatureLabel10.Location = new System.Drawing.Point(334, 46);
+            temperatureLabel10.Margin = new System.Windows.Forms.Padding(6, 0, 6, 0);
+            temperatureLabel10.Name = "temperatureLabel10";
+            temperatureLabel10.Size = new System.Drawing.Size(318, 31);
+            temperatureLabel10.TabIndex = 9;
+            temperatureLabel10.Text = "CPU Core #10: 50 (50-100)";
             // 
             // temperatureLabel9
             // 
-            this.temperatureLabel9.AutoSize = true;
-            this.temperatureLabel9.Location = new System.Drawing.Point(6, 175);
-            this.temperatureLabel9.Name = "temperatureLabel9";
-            this.temperatureLabel9.Size = new System.Drawing.Size(138, 15);
-            this.temperatureLabel9.TabIndex = 8;
-            this.temperatureLabel9.Text = "CPU Core #9: 50 (50-100)";
+            temperatureLabel9.AutoSize = true;
+            temperatureLabel9.Location = new System.Drawing.Point(12, 350);
+            temperatureLabel9.Margin = new System.Windows.Forms.Padding(6, 0, 6, 0);
+            temperatureLabel9.Name = "temperatureLabel9";
+            temperatureLabel9.Size = new System.Drawing.Size(304, 31);
+            temperatureLabel9.TabIndex = 8;
+            temperatureLabel9.Text = "CPU Core #9: 50 (50-100)";
             // 
             // temperatureLabel8
             // 
-            this.temperatureLabel8.AutoSize = true;
-            this.temperatureLabel8.Location = new System.Drawing.Point(6, 156);
-            this.temperatureLabel8.Name = "temperatureLabel8";
-            this.temperatureLabel8.Size = new System.Drawing.Size(138, 15);
-            this.temperatureLabel8.TabIndex = 7;
-            this.temperatureLabel8.Text = "CPU Core #8: 50 (50-100)";
+            temperatureLabel8.AutoSize = true;
+            temperatureLabel8.Location = new System.Drawing.Point(12, 312);
+            temperatureLabel8.Margin = new System.Windows.Forms.Padding(6, 0, 6, 0);
+            temperatureLabel8.Name = "temperatureLabel8";
+            temperatureLabel8.Size = new System.Drawing.Size(304, 31);
+            temperatureLabel8.TabIndex = 7;
+            temperatureLabel8.Text = "CPU Core #8: 50 (50-100)";
             // 
             // temperatureLabel7
             // 
-            this.temperatureLabel7.AutoSize = true;
-            this.temperatureLabel7.Location = new System.Drawing.Point(6, 137);
-            this.temperatureLabel7.Name = "temperatureLabel7";
-            this.temperatureLabel7.Size = new System.Drawing.Size(138, 15);
-            this.temperatureLabel7.TabIndex = 6;
-            this.temperatureLabel7.Text = "CPU Core #7: 50 (50-100)";
+            temperatureLabel7.AutoSize = true;
+            temperatureLabel7.Location = new System.Drawing.Point(12, 274);
+            temperatureLabel7.Margin = new System.Windows.Forms.Padding(6, 0, 6, 0);
+            temperatureLabel7.Name = "temperatureLabel7";
+            temperatureLabel7.Size = new System.Drawing.Size(304, 31);
+            temperatureLabel7.TabIndex = 6;
+            temperatureLabel7.Text = "CPU Core #7: 50 (50-100)";
             // 
             // temperatureLabel6
             // 
-            this.temperatureLabel6.AutoSize = true;
-            this.temperatureLabel6.Location = new System.Drawing.Point(6, 118);
-            this.temperatureLabel6.Name = "temperatureLabel6";
-            this.temperatureLabel6.Size = new System.Drawing.Size(138, 15);
-            this.temperatureLabel6.TabIndex = 5;
-            this.temperatureLabel6.Text = "CPU Core #6: 50 (50-100)";
+            temperatureLabel6.AutoSize = true;
+            temperatureLabel6.Location = new System.Drawing.Point(12, 236);
+            temperatureLabel6.Margin = new System.Windows.Forms.Padding(6, 0, 6, 0);
+            temperatureLabel6.Name = "temperatureLabel6";
+            temperatureLabel6.Size = new System.Drawing.Size(304, 31);
+            temperatureLabel6.TabIndex = 5;
+            temperatureLabel6.Text = "CPU Core #6: 50 (50-100)";
             // 
             // temperatureLabel5
             // 
-            this.temperatureLabel5.AutoSize = true;
-            this.temperatureLabel5.Location = new System.Drawing.Point(6, 99);
-            this.temperatureLabel5.Name = "temperatureLabel5";
-            this.temperatureLabel5.Size = new System.Drawing.Size(138, 15);
-            this.temperatureLabel5.TabIndex = 4;
-            this.temperatureLabel5.Text = "CPU Core #5: 50 (50-100)";
+            temperatureLabel5.AutoSize = true;
+            temperatureLabel5.Location = new System.Drawing.Point(12, 198);
+            temperatureLabel5.Margin = new System.Windows.Forms.Padding(6, 0, 6, 0);
+            temperatureLabel5.Name = "temperatureLabel5";
+            temperatureLabel5.Size = new System.Drawing.Size(304, 31);
+            temperatureLabel5.TabIndex = 4;
+            temperatureLabel5.Text = "CPU Core #5: 50 (50-100)";
             // 
             // temperatureLabel4
             // 
-            this.temperatureLabel4.AutoSize = true;
-            this.temperatureLabel4.Location = new System.Drawing.Point(6, 80);
-            this.temperatureLabel4.Name = "temperatureLabel4";
-            this.temperatureLabel4.Size = new System.Drawing.Size(138, 15);
-            this.temperatureLabel4.TabIndex = 3;
-            this.temperatureLabel4.Text = "CPU Core #4: 50 (50-100)";
+            temperatureLabel4.AutoSize = true;
+            temperatureLabel4.Location = new System.Drawing.Point(12, 160);
+            temperatureLabel4.Margin = new System.Windows.Forms.Padding(6, 0, 6, 0);
+            temperatureLabel4.Name = "temperatureLabel4";
+            temperatureLabel4.Size = new System.Drawing.Size(304, 31);
+            temperatureLabel4.TabIndex = 3;
+            temperatureLabel4.Text = "CPU Core #4: 50 (50-100)";
             // 
             // temperatureLabel3
             // 
-            this.temperatureLabel3.AutoSize = true;
-            this.temperatureLabel3.Location = new System.Drawing.Point(6, 61);
-            this.temperatureLabel3.Name = "temperatureLabel3";
-            this.temperatureLabel3.Size = new System.Drawing.Size(138, 15);
-            this.temperatureLabel3.TabIndex = 2;
-            this.temperatureLabel3.Text = "CPU Core #3: 50 (50-100)";
+            temperatureLabel3.AutoSize = true;
+            temperatureLabel3.Location = new System.Drawing.Point(12, 122);
+            temperatureLabel3.Margin = new System.Windows.Forms.Padding(6, 0, 6, 0);
+            temperatureLabel3.Name = "temperatureLabel3";
+            temperatureLabel3.Size = new System.Drawing.Size(304, 31);
+            temperatureLabel3.TabIndex = 2;
+            temperatureLabel3.Text = "CPU Core #3: 50 (50-100)";
             // 
             // temperatureLabel2
             // 
-            this.temperatureLabel2.AutoSize = true;
-            this.temperatureLabel2.Location = new System.Drawing.Point(6, 42);
-            this.temperatureLabel2.Name = "temperatureLabel2";
-            this.temperatureLabel2.Size = new System.Drawing.Size(138, 15);
-            this.temperatureLabel2.TabIndex = 1;
-            this.temperatureLabel2.Text = "CPU Core #2: 50 (50-100)";
+            temperatureLabel2.AutoSize = true;
+            temperatureLabel2.Location = new System.Drawing.Point(12, 84);
+            temperatureLabel2.Margin = new System.Windows.Forms.Padding(6, 0, 6, 0);
+            temperatureLabel2.Name = "temperatureLabel2";
+            temperatureLabel2.Size = new System.Drawing.Size(304, 31);
+            temperatureLabel2.TabIndex = 1;
+            temperatureLabel2.Text = "CPU Core #2: 50 (50-100)";
             // 
             // temperatureLabel1
             // 
-            this.temperatureLabel1.AutoSize = true;
-            this.temperatureLabel1.Location = new System.Drawing.Point(6, 23);
-            this.temperatureLabel1.Name = "temperatureLabel1";
-            this.temperatureLabel1.Size = new System.Drawing.Size(138, 15);
-            this.temperatureLabel1.TabIndex = 0;
-            this.temperatureLabel1.Text = "CPU Core #1: 50 (50-100)";
+            temperatureLabel1.AutoSize = true;
+            temperatureLabel1.Location = new System.Drawing.Point(12, 46);
+            temperatureLabel1.Margin = new System.Windows.Forms.Padding(6, 0, 6, 0);
+            temperatureLabel1.Name = "temperatureLabel1";
+            temperatureLabel1.Size = new System.Drawing.Size(304, 31);
+            temperatureLabel1.TabIndex = 0;
+            temperatureLabel1.Text = "CPU Core #1: 50 (50-100)";
             // 
             // operationModeGroupBox
             // 
-            this.operationModeGroupBox.Controls.Add(this.operationModeRadioButtonConsistency);
-            this.operationModeGroupBox.Controls.Add(this.operationModeRadioButtonManual);
-            this.operationModeGroupBox.Controls.Add(this.operationModeRadioButtonAutomatic);
-            this.operationModeGroupBox.Location = new System.Drawing.Point(350, 12);
-            this.operationModeGroupBox.Name = "operationModeGroupBox";
-            this.operationModeGroupBox.Size = new System.Drawing.Size(111, 99);
-            this.operationModeGroupBox.TabIndex = 5;
-            this.operationModeGroupBox.TabStop = false;
-            this.operationModeGroupBox.Text = "Operation mode:";
+            operationModeGroupBox.Controls.Add(operationModeRadioButtonConsistency);
+            operationModeGroupBox.Controls.Add(operationModeRadioButtonManual);
+            operationModeGroupBox.Controls.Add(operationModeRadioButtonAutomatic);
+            operationModeGroupBox.Location = new System.Drawing.Point(700, 24);
+            operationModeGroupBox.Margin = new System.Windows.Forms.Padding(6);
+            operationModeGroupBox.Name = "operationModeGroupBox";
+            operationModeGroupBox.Padding = new System.Windows.Forms.Padding(6);
+            operationModeGroupBox.Size = new System.Drawing.Size(222, 198);
+            operationModeGroupBox.TabIndex = 5;
+            operationModeGroupBox.TabStop = false;
+            operationModeGroupBox.Text = "操作模式:";
             // 
             // operationModeRadioButtonConsistency
             // 
-            this.operationModeRadioButtonConsistency.AutoSize = true;
-            this.operationModeRadioButtonConsistency.Location = new System.Drawing.Point(6, 72);
-            this.operationModeRadioButtonConsistency.Name = "operationModeRadioButtonConsistency";
-            this.operationModeRadioButtonConsistency.Size = new System.Drawing.Size(89, 19);
-            this.operationModeRadioButtonConsistency.TabIndex = 2;
-            this.operationModeRadioButtonConsistency.TabStop = true;
-            this.operationModeRadioButtonConsistency.Text = "Con&sistency";
-            this.operationModeRadioButtonConsistency.UseVisualStyleBackColor = true;
+            operationModeRadioButtonConsistency.AutoSize = true;
+            operationModeRadioButtonConsistency.Location = new System.Drawing.Point(12, 144);
+            operationModeRadioButtonConsistency.Margin = new System.Windows.Forms.Padding(6);
+            operationModeRadioButtonConsistency.Name = "operationModeRadioButtonConsistency";
+            operationModeRadioButtonConsistency.Size = new System.Drawing.Size(117, 35);
+            operationModeRadioButtonConsistency.TabIndex = 2;
+            operationModeRadioButtonConsistency.TabStop = true;
+            operationModeRadioButtonConsistency.Text = "一致性";
+            operationModeRadioButtonConsistency.UseVisualStyleBackColor = true;
             // 
             // operationModeRadioButtonManual
             // 
-            this.operationModeRadioButtonManual.AutoSize = true;
-            this.operationModeRadioButtonManual.Location = new System.Drawing.Point(6, 47);
-            this.operationModeRadioButtonManual.Name = "operationModeRadioButtonManual";
-            this.operationModeRadioButtonManual.Size = new System.Drawing.Size(65, 19);
-            this.operationModeRadioButtonManual.TabIndex = 1;
-            this.operationModeRadioButtonManual.TabStop = true;
-            this.operationModeRadioButtonManual.Text = "&Manual";
-            this.operationModeRadioButtonManual.UseVisualStyleBackColor = true;
+            operationModeRadioButtonManual.AutoSize = true;
+            operationModeRadioButtonManual.Location = new System.Drawing.Point(12, 94);
+            operationModeRadioButtonManual.Margin = new System.Windows.Forms.Padding(6);
+            operationModeRadioButtonManual.Name = "operationModeRadioButtonManual";
+            operationModeRadioButtonManual.Size = new System.Drawing.Size(93, 35);
+            operationModeRadioButtonManual.TabIndex = 1;
+            operationModeRadioButtonManual.TabStop = true;
+            operationModeRadioButtonManual.Text = "手动";
+            operationModeRadioButtonManual.UseVisualStyleBackColor = true;
             // 
             // operationModeRadioButtonAutomatic
             // 
-            this.operationModeRadioButtonAutomatic.AutoSize = true;
-            this.operationModeRadioButtonAutomatic.Location = new System.Drawing.Point(6, 22);
-            this.operationModeRadioButtonAutomatic.Name = "operationModeRadioButtonAutomatic";
-            this.operationModeRadioButtonAutomatic.Size = new System.Drawing.Size(81, 19);
-            this.operationModeRadioButtonAutomatic.TabIndex = 0;
-            this.operationModeRadioButtonAutomatic.TabStop = true;
-            this.operationModeRadioButtonAutomatic.Text = "&Automatic";
-            this.operationModeRadioButtonAutomatic.UseVisualStyleBackColor = true;
+            operationModeRadioButtonAutomatic.AutoSize = true;
+            operationModeRadioButtonAutomatic.Location = new System.Drawing.Point(12, 44);
+            operationModeRadioButtonAutomatic.Margin = new System.Windows.Forms.Padding(6);
+            operationModeRadioButtonAutomatic.Name = "operationModeRadioButtonAutomatic";
+            operationModeRadioButtonAutomatic.Size = new System.Drawing.Size(93, 35);
+            operationModeRadioButtonAutomatic.TabIndex = 0;
+            operationModeRadioButtonAutomatic.TabStop = true;
+            operationModeRadioButtonAutomatic.Text = "自动";
+            operationModeRadioButtonAutomatic.UseVisualStyleBackColor = true;
+            operationModeRadioButtonAutomatic.CheckedChanged += operationModeRadioButtonAutomatic_CheckedChanged;
             // 
             // manualGroupBox
             // 
-            this.manualGroupBox.Controls.Add(this.manualFan2GroupBox);
-            this.manualGroupBox.Controls.Add(this.manualFan1GroupBox);
-            this.manualGroupBox.Location = new System.Drawing.Point(467, 12);
-            this.manualGroupBox.Name = "manualGroupBox";
-            this.manualGroupBox.Size = new System.Drawing.Size(194, 126);
-            this.manualGroupBox.TabIndex = 9;
-            this.manualGroupBox.TabStop = false;
-            this.manualGroupBox.Text = "Manual control:";
+            manualGroupBox.Controls.Add(manualFan2GroupBox);
+            manualGroupBox.Controls.Add(manualFan1GroupBox);
+            manualGroupBox.Location = new System.Drawing.Point(934, 24);
+            manualGroupBox.Margin = new System.Windows.Forms.Padding(6);
+            manualGroupBox.Name = "manualGroupBox";
+            manualGroupBox.Padding = new System.Windows.Forms.Padding(6);
+            manualGroupBox.Size = new System.Drawing.Size(388, 252);
+            manualGroupBox.TabIndex = 9;
+            manualGroupBox.TabStop = false;
+            manualGroupBox.Text = "手动控制:";
             // 
             // manualFan2GroupBox
             // 
-            this.manualFan2GroupBox.Controls.Add(this.manualFan2RadioButtonHigh);
-            this.manualFan2GroupBox.Controls.Add(this.manualFan2RadioButtonMedium);
-            this.manualFan2GroupBox.Controls.Add(this.manualFan2RadioButtonOff);
-            this.manualFan2GroupBox.Location = new System.Drawing.Point(100, 21);
-            this.manualFan2GroupBox.Name = "manualFan2GroupBox";
-            this.manualFan2GroupBox.Size = new System.Drawing.Size(88, 99);
-            this.manualFan2GroupBox.TabIndex = 1;
-            this.manualFan2GroupBox.TabStop = false;
-            this.manualFan2GroupBox.Text = "Fan 2:";
+            manualFan2GroupBox.Controls.Add(manualFan2RadioButtonHigh);
+            manualFan2GroupBox.Controls.Add(manualFan2RadioButtonMedium);
+            manualFan2GroupBox.Controls.Add(manualFan2RadioButtonOff);
+            manualFan2GroupBox.Location = new System.Drawing.Point(200, 42);
+            manualFan2GroupBox.Margin = new System.Windows.Forms.Padding(6);
+            manualFan2GroupBox.Name = "manualFan2GroupBox";
+            manualFan2GroupBox.Padding = new System.Windows.Forms.Padding(6);
+            manualFan2GroupBox.Size = new System.Drawing.Size(176, 198);
+            manualFan2GroupBox.TabIndex = 1;
+            manualFan2GroupBox.TabStop = false;
+            manualFan2GroupBox.Text = "风扇 2:";
+            manualFan2GroupBox.Enter += manualFan2GroupBox_Enter;
             // 
             // manualFan2RadioButtonHigh
             // 
-            this.manualFan2RadioButtonHigh.AutoSize = true;
-            this.manualFan2RadioButtonHigh.Location = new System.Drawing.Point(6, 72);
-            this.manualFan2RadioButtonHigh.Name = "manualFan2RadioButtonHigh";
-            this.manualFan2RadioButtonHigh.Size = new System.Drawing.Size(51, 19);
-            this.manualFan2RadioButtonHigh.TabIndex = 5;
-            this.manualFan2RadioButtonHigh.TabStop = true;
-            this.manualFan2RadioButtonHigh.Text = "High";
-            this.manualFan2RadioButtonHigh.UseVisualStyleBackColor = true;
+            manualFan2RadioButtonHigh.AutoSize = true;
+            manualFan2RadioButtonHigh.Location = new System.Drawing.Point(12, 144);
+            manualFan2RadioButtonHigh.Margin = new System.Windows.Forms.Padding(6);
+            manualFan2RadioButtonHigh.Name = "manualFan2RadioButtonHigh";
+            manualFan2RadioButtonHigh.Size = new System.Drawing.Size(69, 35);
+            manualFan2RadioButtonHigh.TabIndex = 5;
+            manualFan2RadioButtonHigh.TabStop = true;
+            manualFan2RadioButtonHigh.Text = "高";
+            manualFan2RadioButtonHigh.UseVisualStyleBackColor = true;
             // 
             // manualFan2RadioButtonMedium
             // 
-            this.manualFan2RadioButtonMedium.AutoSize = true;
-            this.manualFan2RadioButtonMedium.Location = new System.Drawing.Point(6, 47);
-            this.manualFan2RadioButtonMedium.Name = "manualFan2RadioButtonMedium";
-            this.manualFan2RadioButtonMedium.Size = new System.Drawing.Size(70, 19);
-            this.manualFan2RadioButtonMedium.TabIndex = 5;
-            this.manualFan2RadioButtonMedium.TabStop = true;
-            this.manualFan2RadioButtonMedium.Text = "Medium";
-            this.manualFan2RadioButtonMedium.UseVisualStyleBackColor = true;
+            manualFan2RadioButtonMedium.AutoSize = true;
+            manualFan2RadioButtonMedium.Location = new System.Drawing.Point(12, 94);
+            manualFan2RadioButtonMedium.Margin = new System.Windows.Forms.Padding(6);
+            manualFan2RadioButtonMedium.Name = "manualFan2RadioButtonMedium";
+            manualFan2RadioButtonMedium.Size = new System.Drawing.Size(69, 35);
+            manualFan2RadioButtonMedium.TabIndex = 5;
+            manualFan2RadioButtonMedium.TabStop = true;
+            manualFan2RadioButtonMedium.Text = "中";
+            manualFan2RadioButtonMedium.UseVisualStyleBackColor = true;
             // 
             // manualFan2RadioButtonOff
             // 
-            this.manualFan2RadioButtonOff.AutoSize = true;
-            this.manualFan2RadioButtonOff.Location = new System.Drawing.Point(6, 22);
-            this.manualFan2RadioButtonOff.Name = "manualFan2RadioButtonOff";
-            this.manualFan2RadioButtonOff.Size = new System.Drawing.Size(42, 19);
-            this.manualFan2RadioButtonOff.TabIndex = 5;
-            this.manualFan2RadioButtonOff.TabStop = true;
-            this.manualFan2RadioButtonOff.Text = "Off";
-            this.manualFan2RadioButtonOff.UseVisualStyleBackColor = true;
+            manualFan2RadioButtonOff.AutoSize = true;
+            manualFan2RadioButtonOff.Location = new System.Drawing.Point(12, 44);
+            manualFan2RadioButtonOff.Margin = new System.Windows.Forms.Padding(6);
+            manualFan2RadioButtonOff.Name = "manualFan2RadioButtonOff";
+            manualFan2RadioButtonOff.Size = new System.Drawing.Size(69, 35);
+            manualFan2RadioButtonOff.TabIndex = 5;
+            manualFan2RadioButtonOff.TabStop = true;
+            manualFan2RadioButtonOff.Text = "关";
+            manualFan2RadioButtonOff.UseVisualStyleBackColor = true;
             // 
             // manualFan1GroupBox
             // 
-            this.manualFan1GroupBox.Controls.Add(this.manualFan1RadioButtonHigh);
-            this.manualFan1GroupBox.Controls.Add(this.manualFan1RadioButtonMedium);
-            this.manualFan1GroupBox.Controls.Add(this.manualFan1RadioButtonOff);
-            this.manualFan1GroupBox.Location = new System.Drawing.Point(6, 21);
-            this.manualFan1GroupBox.Name = "manualFan1GroupBox";
-            this.manualFan1GroupBox.Size = new System.Drawing.Size(88, 99);
-            this.manualFan1GroupBox.TabIndex = 0;
-            this.manualFan1GroupBox.TabStop = false;
-            this.manualFan1GroupBox.Text = "Fan 1:";
+            manualFan1GroupBox.Controls.Add(manualFan1RadioButtonHigh);
+            manualFan1GroupBox.Controls.Add(manualFan1RadioButtonMedium);
+            manualFan1GroupBox.Controls.Add(manualFan1RadioButtonOff);
+            manualFan1GroupBox.Location = new System.Drawing.Point(12, 42);
+            manualFan1GroupBox.Margin = new System.Windows.Forms.Padding(6);
+            manualFan1GroupBox.Name = "manualFan1GroupBox";
+            manualFan1GroupBox.Padding = new System.Windows.Forms.Padding(6);
+            manualFan1GroupBox.Size = new System.Drawing.Size(176, 198);
+            manualFan1GroupBox.TabIndex = 0;
+            manualFan1GroupBox.TabStop = false;
+            manualFan1GroupBox.Text = "风扇 1:";
             // 
             // manualFan1RadioButtonHigh
             // 
-            this.manualFan1RadioButtonHigh.AutoSize = true;
-            this.manualFan1RadioButtonHigh.Location = new System.Drawing.Point(6, 72);
-            this.manualFan1RadioButtonHigh.Name = "manualFan1RadioButtonHigh";
-            this.manualFan1RadioButtonHigh.Size = new System.Drawing.Size(51, 19);
-            this.manualFan1RadioButtonHigh.TabIndex = 2;
-            this.manualFan1RadioButtonHigh.TabStop = true;
-            this.manualFan1RadioButtonHigh.Text = "High";
-            this.manualFan1RadioButtonHigh.UseVisualStyleBackColor = true;
+            manualFan1RadioButtonHigh.AutoSize = true;
+            manualFan1RadioButtonHigh.Location = new System.Drawing.Point(12, 144);
+            manualFan1RadioButtonHigh.Margin = new System.Windows.Forms.Padding(6);
+            manualFan1RadioButtonHigh.Name = "manualFan1RadioButtonHigh";
+            manualFan1RadioButtonHigh.Size = new System.Drawing.Size(69, 35);
+            manualFan1RadioButtonHigh.TabIndex = 2;
+            manualFan1RadioButtonHigh.TabStop = true;
+            manualFan1RadioButtonHigh.Text = "高";
+            manualFan1RadioButtonHigh.UseVisualStyleBackColor = true;
             // 
             // manualFan1RadioButtonMedium
             // 
-            this.manualFan1RadioButtonMedium.AutoSize = true;
-            this.manualFan1RadioButtonMedium.Location = new System.Drawing.Point(6, 47);
-            this.manualFan1RadioButtonMedium.Name = "manualFan1RadioButtonMedium";
-            this.manualFan1RadioButtonMedium.Size = new System.Drawing.Size(70, 19);
-            this.manualFan1RadioButtonMedium.TabIndex = 1;
-            this.manualFan1RadioButtonMedium.TabStop = true;
-            this.manualFan1RadioButtonMedium.Text = "Medium";
-            this.manualFan1RadioButtonMedium.UseVisualStyleBackColor = true;
+            manualFan1RadioButtonMedium.AutoSize = true;
+            manualFan1RadioButtonMedium.Location = new System.Drawing.Point(12, 94);
+            manualFan1RadioButtonMedium.Margin = new System.Windows.Forms.Padding(6);
+            manualFan1RadioButtonMedium.Name = "manualFan1RadioButtonMedium";
+            manualFan1RadioButtonMedium.Size = new System.Drawing.Size(69, 35);
+            manualFan1RadioButtonMedium.TabIndex = 1;
+            manualFan1RadioButtonMedium.TabStop = true;
+            manualFan1RadioButtonMedium.Text = "中";
+            manualFan1RadioButtonMedium.UseVisualStyleBackColor = true;
             // 
             // manualFan1RadioButtonOff
             // 
-            this.manualFan1RadioButtonOff.AutoSize = true;
-            this.manualFan1RadioButtonOff.Location = new System.Drawing.Point(6, 22);
-            this.manualFan1RadioButtonOff.Name = "manualFan1RadioButtonOff";
-            this.manualFan1RadioButtonOff.Size = new System.Drawing.Size(42, 19);
-            this.manualFan1RadioButtonOff.TabIndex = 0;
-            this.manualFan1RadioButtonOff.TabStop = true;
-            this.manualFan1RadioButtonOff.Text = "Off";
-            this.manualFan1RadioButtonOff.UseVisualStyleBackColor = true;
+            manualFan1RadioButtonOff.AutoSize = true;
+            manualFan1RadioButtonOff.Location = new System.Drawing.Point(12, 44);
+            manualFan1RadioButtonOff.Margin = new System.Windows.Forms.Padding(6);
+            manualFan1RadioButtonOff.Name = "manualFan1RadioButtonOff";
+            manualFan1RadioButtonOff.Size = new System.Drawing.Size(69, 35);
+            manualFan1RadioButtonOff.TabIndex = 0;
+            manualFan1RadioButtonOff.TabStop = true;
+            manualFan1RadioButtonOff.Text = "关";
+            manualFan1RadioButtonOff.UseVisualStyleBackColor = true;
             // 
             // consistencyModeGroupBox
             // 
-            this.consistencyModeGroupBox.Controls.Add(this.alertsCheckBox);
-            this.consistencyModeGroupBox.Controls.Add(this.consistencyModeApplyChangesButton);
-            this.consistencyModeGroupBox.Controls.Add(this.consistencyModeRpmThresholdTextBox);
-            this.consistencyModeGroupBox.Controls.Add(this.consistencyModeRpmThresholdLabel);
-            this.consistencyModeGroupBox.Controls.Add(this.consistencyModeUpperTemperatureThresholdTextBox);
-            this.consistencyModeGroupBox.Controls.Add(this.consistencyModeUpperTemperatureThresholdLabel);
-            this.consistencyModeGroupBox.Controls.Add(this.consistencyModeLowerTemperatureThresholdTextBox);
-            this.consistencyModeGroupBox.Controls.Add(this.consistencyModeLowerTemperatureThresholdLabel);
-            this.consistencyModeGroupBox.Location = new System.Drawing.Point(467, 144);
-            this.consistencyModeGroupBox.Name = "consistencyModeGroupBox";
-            this.consistencyModeGroupBox.Size = new System.Drawing.Size(194, 138);
-            this.consistencyModeGroupBox.TabIndex = 10;
-            this.consistencyModeGroupBox.TabStop = false;
-            this.consistencyModeGroupBox.Text = "Consistency mode options:";
+            consistencyModeGroupBox.Controls.Add(alertsCheckBox);
+            consistencyModeGroupBox.Controls.Add(consistencyModeApplyChangesButton);
+            consistencyModeGroupBox.Controls.Add(consistencyModeRpmThresholdTextBox);
+            consistencyModeGroupBox.Controls.Add(consistencyModeRpmThresholdLabel);
+            consistencyModeGroupBox.Controls.Add(consistencyModeUpperTemperatureThresholdTextBox);
+            consistencyModeGroupBox.Controls.Add(consistencyModeUpperTemperatureThresholdLabel);
+            consistencyModeGroupBox.Controls.Add(consistencyModeLowerTemperatureThresholdTextBox);
+            consistencyModeGroupBox.Controls.Add(consistencyModeLowerTemperatureThresholdLabel);
+            consistencyModeGroupBox.Location = new System.Drawing.Point(934, 288);
+            consistencyModeGroupBox.Margin = new System.Windows.Forms.Padding(6);
+            consistencyModeGroupBox.Name = "consistencyModeGroupBox";
+            consistencyModeGroupBox.Padding = new System.Windows.Forms.Padding(6);
+            consistencyModeGroupBox.Size = new System.Drawing.Size(388, 276);
+            consistencyModeGroupBox.TabIndex = 10;
+            consistencyModeGroupBox.TabStop = false;
+            consistencyModeGroupBox.Text = "一致性选项:";
             // 
             // alertsCheckBox
             // 
-            this.alertsCheckBox.AutoSize = true;
-            this.alertsCheckBox.Enabled = false;
-            this.alertsCheckBox.Location = new System.Drawing.Point(137, 80);
-            this.alertsCheckBox.Name = "alertsCheckBox";
-            this.alertsCheckBox.Size = new System.Drawing.Size(56, 19);
-            this.alertsCheckBox.TabIndex = 13;
-            this.alertsCheckBox.Text = "A&lerts";
-            this.alertsCheckBox.UseVisualStyleBackColor = true;
+            alertsCheckBox.AutoSize = true;
+            alertsCheckBox.Enabled = false;
+            alertsCheckBox.Location = new System.Drawing.Point(274, 160);
+            alertsCheckBox.Margin = new System.Windows.Forms.Padding(6);
+            alertsCheckBox.Name = "alertsCheckBox";
+            alertsCheckBox.Size = new System.Drawing.Size(94, 35);
+            alertsCheckBox.TabIndex = 13;
+            alertsCheckBox.Text = "警告";
+            alertsCheckBox.UseVisualStyleBackColor = true;
+            alertsCheckBox.CheckedChanged += alertsCheckBox_CheckedChanged;
             // 
             // consistencyModeApplyChangesButton
             // 
-            this.consistencyModeApplyChangesButton.Location = new System.Drawing.Point(5, 107);
-            this.consistencyModeApplyChangesButton.Name = "consistencyModeApplyChangesButton";
-            this.consistencyModeApplyChangesButton.Size = new System.Drawing.Size(184, 25);
-            this.consistencyModeApplyChangesButton.TabIndex = 14;
-            this.consistencyModeApplyChangesButton.Text = "Appl&y changes";
-            this.consistencyModeApplyChangesButton.UseVisualStyleBackColor = true;
+            consistencyModeApplyChangesButton.Location = new System.Drawing.Point(10, 214);
+            consistencyModeApplyChangesButton.Margin = new System.Windows.Forms.Padding(6);
+            consistencyModeApplyChangesButton.Name = "consistencyModeApplyChangesButton";
+            consistencyModeApplyChangesButton.Size = new System.Drawing.Size(368, 50);
+            consistencyModeApplyChangesButton.TabIndex = 14;
+            consistencyModeApplyChangesButton.Text = "应用";
+            consistencyModeApplyChangesButton.UseVisualStyleBackColor = true;
             // 
             // consistencyModeRpmThresholdTextBox
             // 
-            this.consistencyModeRpmThresholdTextBox.Location = new System.Drawing.Point(96, 78);
-            this.consistencyModeRpmThresholdTextBox.MaxLength = 4;
-            this.consistencyModeRpmThresholdTextBox.Name = "consistencyModeRpmThresholdTextBox";
-            this.consistencyModeRpmThresholdTextBox.Size = new System.Drawing.Size(30, 23);
-            this.consistencyModeRpmThresholdTextBox.TabIndex = 5;
-            this.consistencyModeRpmThresholdTextBox.Text = "2400";
+            consistencyModeRpmThresholdTextBox.Location = new System.Drawing.Point(142, 156);
+            consistencyModeRpmThresholdTextBox.Margin = new System.Windows.Forms.Padding(6);
+            consistencyModeRpmThresholdTextBox.MaxLength = 4;
+            consistencyModeRpmThresholdTextBox.Name = "consistencyModeRpmThresholdTextBox";
+            consistencyModeRpmThresholdTextBox.Size = new System.Drawing.Size(106, 38);
+            consistencyModeRpmThresholdTextBox.TabIndex = 5;
+            consistencyModeRpmThresholdTextBox.Text = "2400";
             // 
             // consistencyModeRpmThresholdLabel
             // 
-            this.consistencyModeRpmThresholdLabel.AutoSize = true;
-            this.consistencyModeRpmThresholdLabel.Location = new System.Drawing.Point(7, 81);
-            this.consistencyModeRpmThresholdLabel.Name = "consistencyModeRpmThresholdLabel";
-            this.consistencyModeRpmThresholdLabel.Size = new System.Drawing.Size(88, 15);
-            this.consistencyModeRpmThresholdLabel.TabIndex = 4;
-            this.consistencyModeRpmThresholdLabel.Text = "RPM threshold:";
+            consistencyModeRpmThresholdLabel.AutoSize = true;
+            consistencyModeRpmThresholdLabel.Location = new System.Drawing.Point(14, 162);
+            consistencyModeRpmThresholdLabel.Margin = new System.Windows.Forms.Padding(6, 0, 6, 0);
+            consistencyModeRpmThresholdLabel.Name = "consistencyModeRpmThresholdLabel";
+            consistencyModeRpmThresholdLabel.Size = new System.Drawing.Size(116, 31);
+            consistencyModeRpmThresholdLabel.TabIndex = 4;
+            consistencyModeRpmThresholdLabel.Text = "转速阈值:";
             // 
             // consistencyModeUpperTemperatureThresholdTextBox
             // 
-            this.consistencyModeUpperTemperatureThresholdTextBox.Location = new System.Drawing.Point(170, 49);
-            this.consistencyModeUpperTemperatureThresholdTextBox.MaxLength = 2;
-            this.consistencyModeUpperTemperatureThresholdTextBox.Name = "consistencyModeUpperTemperatureThresholdTextBox";
-            this.consistencyModeUpperTemperatureThresholdTextBox.Size = new System.Drawing.Size(18, 23);
-            this.consistencyModeUpperTemperatureThresholdTextBox.TabIndex = 3;
-            this.consistencyModeUpperTemperatureThresholdTextBox.Text = "85";
+            consistencyModeUpperTemperatureThresholdTextBox.Location = new System.Drawing.Point(212, 98);
+            consistencyModeUpperTemperatureThresholdTextBox.Margin = new System.Windows.Forms.Padding(6);
+            consistencyModeUpperTemperatureThresholdTextBox.MaxLength = 2;
+            consistencyModeUpperTemperatureThresholdTextBox.Name = "consistencyModeUpperTemperatureThresholdTextBox";
+            consistencyModeUpperTemperatureThresholdTextBox.Size = new System.Drawing.Size(160, 38);
+            consistencyModeUpperTemperatureThresholdTextBox.TabIndex = 3;
+            consistencyModeUpperTemperatureThresholdTextBox.Text = "85";
             // 
             // consistencyModeUpperTemperatureThresholdLabel
             // 
-            this.consistencyModeUpperTemperatureThresholdLabel.AutoSize = true;
-            this.consistencyModeUpperTemperatureThresholdLabel.Location = new System.Drawing.Point(6, 52);
-            this.consistencyModeUpperTemperatureThresholdLabel.Name = "consistencyModeUpperTemperatureThresholdLabel";
-            this.consistencyModeUpperTemperatureThresholdLabel.Size = new System.Drawing.Size(163, 15);
-            this.consistencyModeUpperTemperatureThresholdLabel.TabIndex = 2;
-            this.consistencyModeUpperTemperatureThresholdLabel.Text = "Upper temperature threshold:";
+            consistencyModeUpperTemperatureThresholdLabel.AutoSize = true;
+            consistencyModeUpperTemperatureThresholdLabel.Location = new System.Drawing.Point(12, 104);
+            consistencyModeUpperTemperatureThresholdLabel.Margin = new System.Windows.Forms.Padding(6, 0, 6, 0);
+            consistencyModeUpperTemperatureThresholdLabel.Name = "consistencyModeUpperTemperatureThresholdLabel";
+            consistencyModeUpperTemperatureThresholdLabel.Size = new System.Drawing.Size(116, 31);
+            consistencyModeUpperTemperatureThresholdLabel.TabIndex = 2;
+            consistencyModeUpperTemperatureThresholdLabel.Text = "温度上限:";
             // 
             // consistencyModeLowerTemperatureThresholdTextBox
             // 
-            this.consistencyModeLowerTemperatureThresholdTextBox.Location = new System.Drawing.Point(170, 20);
-            this.consistencyModeLowerTemperatureThresholdTextBox.MaxLength = 2;
-            this.consistencyModeLowerTemperatureThresholdTextBox.Name = "consistencyModeLowerTemperatureThresholdTextBox";
-            this.consistencyModeLowerTemperatureThresholdTextBox.Size = new System.Drawing.Size(18, 23);
-            this.consistencyModeLowerTemperatureThresholdTextBox.TabIndex = 1;
-            this.consistencyModeLowerTemperatureThresholdTextBox.Text = "65";
+            consistencyModeLowerTemperatureThresholdTextBox.Location = new System.Drawing.Point(212, 40);
+            consistencyModeLowerTemperatureThresholdTextBox.Margin = new System.Windows.Forms.Padding(6);
+            consistencyModeLowerTemperatureThresholdTextBox.MaxLength = 2;
+            consistencyModeLowerTemperatureThresholdTextBox.Name = "consistencyModeLowerTemperatureThresholdTextBox";
+            consistencyModeLowerTemperatureThresholdTextBox.Size = new System.Drawing.Size(160, 38);
+            consistencyModeLowerTemperatureThresholdTextBox.TabIndex = 1;
+            consistencyModeLowerTemperatureThresholdTextBox.Text = "65";
+            consistencyModeLowerTemperatureThresholdTextBox.TextChanged += consistencyModeLowerTemperatureThresholdTextBox_TextChanged;
             // 
             // consistencyModeLowerTemperatureThresholdLabel
             // 
-            this.consistencyModeLowerTemperatureThresholdLabel.AutoSize = true;
-            this.consistencyModeLowerTemperatureThresholdLabel.Location = new System.Drawing.Point(6, 23);
-            this.consistencyModeLowerTemperatureThresholdLabel.Name = "consistencyModeLowerTemperatureThresholdLabel";
-            this.consistencyModeLowerTemperatureThresholdLabel.Size = new System.Drawing.Size(163, 15);
-            this.consistencyModeLowerTemperatureThresholdLabel.TabIndex = 0;
-            this.consistencyModeLowerTemperatureThresholdLabel.Text = "Lower temperature threshold:";
+            consistencyModeLowerTemperatureThresholdLabel.AutoSize = true;
+            consistencyModeLowerTemperatureThresholdLabel.Location = new System.Drawing.Point(12, 46);
+            consistencyModeLowerTemperatureThresholdLabel.Margin = new System.Windows.Forms.Padding(6, 0, 6, 0);
+            consistencyModeLowerTemperatureThresholdLabel.Name = "consistencyModeLowerTemperatureThresholdLabel";
+            consistencyModeLowerTemperatureThresholdLabel.Size = new System.Drawing.Size(116, 31);
+            consistencyModeLowerTemperatureThresholdLabel.TabIndex = 0;
+            consistencyModeLowerTemperatureThresholdLabel.Text = "温度下限:";
+            consistencyModeLowerTemperatureThresholdLabel.Click += consistencyModeLowerTemperatureThresholdLabel_Click;
             // 
             // ecFanControlRadioButtonOn
             // 
-            this.ecFanControlRadioButtonOn.AutoSize = true;
-            this.ecFanControlRadioButtonOn.Location = new System.Drawing.Point(6, 22);
-            this.ecFanControlRadioButtonOn.Name = "ecFanControlRadioButtonOn";
-            this.ecFanControlRadioButtonOn.Size = new System.Drawing.Size(41, 19);
-            this.ecFanControlRadioButtonOn.TabIndex = 2;
-            this.ecFanControlRadioButtonOn.TabStop = true;
-            this.ecFanControlRadioButtonOn.Text = "O&n";
-            this.ecFanControlRadioButtonOn.UseVisualStyleBackColor = true;
+            ecFanControlRadioButtonOn.AutoSize = true;
+            ecFanControlRadioButtonOn.Location = new System.Drawing.Point(12, 44);
+            ecFanControlRadioButtonOn.Margin = new System.Windows.Forms.Padding(6);
+            ecFanControlRadioButtonOn.Name = "ecFanControlRadioButtonOn";
+            ecFanControlRadioButtonOn.Size = new System.Drawing.Size(69, 35);
+            ecFanControlRadioButtonOn.TabIndex = 2;
+            ecFanControlRadioButtonOn.TabStop = true;
+            ecFanControlRadioButtonOn.Text = "开";
+            ecFanControlRadioButtonOn.UseVisualStyleBackColor = true;
             // 
             // ecFanControlRadioButtonOff
             // 
-            this.ecFanControlRadioButtonOff.AutoSize = true;
-            this.ecFanControlRadioButtonOff.Location = new System.Drawing.Point(53, 22);
-            this.ecFanControlRadioButtonOff.Name = "ecFanControlRadioButtonOff";
-            this.ecFanControlRadioButtonOff.Size = new System.Drawing.Size(42, 19);
-            this.ecFanControlRadioButtonOff.TabIndex = 3;
-            this.ecFanControlRadioButtonOff.TabStop = true;
-            this.ecFanControlRadioButtonOff.Text = "O&ff";
-            this.ecFanControlRadioButtonOff.UseVisualStyleBackColor = true;
+            ecFanControlRadioButtonOff.AutoSize = true;
+            ecFanControlRadioButtonOff.Location = new System.Drawing.Point(106, 44);
+            ecFanControlRadioButtonOff.Margin = new System.Windows.Forms.Padding(6);
+            ecFanControlRadioButtonOff.Name = "ecFanControlRadioButtonOff";
+            ecFanControlRadioButtonOff.Size = new System.Drawing.Size(69, 35);
+            ecFanControlRadioButtonOff.TabIndex = 3;
+            ecFanControlRadioButtonOff.TabStop = true;
+            ecFanControlRadioButtonOff.Text = "关";
+            ecFanControlRadioButtonOff.UseVisualStyleBackColor = true;
             // 
             // ecFanControlGroupBox
             // 
-            this.ecFanControlGroupBox.Controls.Add(this.ecFanControlRadioButtonOn);
-            this.ecFanControlGroupBox.Controls.Add(this.ecFanControlRadioButtonOff);
-            this.ecFanControlGroupBox.Location = new System.Drawing.Point(241, 12);
-            this.ecFanControlGroupBox.Name = "ecFanControlGroupBox";
-            this.ecFanControlGroupBox.Size = new System.Drawing.Size(103, 48);
-            this.ecFanControlGroupBox.TabIndex = 2;
-            this.ecFanControlGroupBox.TabStop = false;
-            this.ecFanControlGroupBox.Text = "EC fan control:";
+            ecFanControlGroupBox.Controls.Add(ecFanControlRadioButtonOn);
+            ecFanControlGroupBox.Controls.Add(ecFanControlRadioButtonOff);
+            ecFanControlGroupBox.Location = new System.Drawing.Point(482, 24);
+            ecFanControlGroupBox.Margin = new System.Windows.Forms.Padding(6);
+            ecFanControlGroupBox.Name = "ecFanControlGroupBox";
+            ecFanControlGroupBox.Padding = new System.Windows.Forms.Padding(6);
+            ecFanControlGroupBox.Size = new System.Drawing.Size(206, 96);
+            ecFanControlGroupBox.TabIndex = 2;
+            ecFanControlGroupBox.TabStop = false;
+            ecFanControlGroupBox.Text = "EC 风扇控制:";
             // 
             // restartBackgroundThreadButton
             // 
-            this.restartBackgroundThreadButton.Font = new System.Drawing.Font("Segoe UI", 7F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-            this.restartBackgroundThreadButton.Location = new System.Drawing.Point(240, 66);
-            this.restartBackgroundThreadButton.Name = "restartBackgroundThreadButton";
-            this.restartBackgroundThreadButton.Size = new System.Drawing.Size(105, 21);
-            this.restartBackgroundThreadButton.TabIndex = 3;
-            this.restartBackgroundThreadButton.Text = "&Restart BG thread";
-            this.restartBackgroundThreadButton.UseVisualStyleBackColor = true;
-            // 
-            // aboutGroupBox
-            // 
-            this.aboutGroupBox.Controls.Add(this.richTextBox1);
-            this.aboutGroupBox.Controls.Add(this.aboutProductLabel);
-            this.aboutGroupBox.Location = new System.Drawing.Point(667, 12);
-            this.aboutGroupBox.Name = "aboutGroupBox";
-            this.aboutGroupBox.Size = new System.Drawing.Size(334, 185);
-            this.aboutGroupBox.TabIndex = 11;
-            this.aboutGroupBox.TabStop = false;
-            this.aboutGroupBox.Text = "About:";
-            // 
-            // richTextBox1
-            // 
-            this.richTextBox1.Location = new System.Drawing.Point(6, 37);
-            this.richTextBox1.Name = "richTextBox1";
-            this.richTextBox1.ReadOnly = true;
-            this.richTextBox1.Size = new System.Drawing.Size(322, 141);
-            this.richTextBox1.TabIndex = 2;
-            this.richTextBox1.Text = resources.GetString("richTextBox1.Text");
-            // 
-            // aboutProductLabel
-            // 
-            this.aboutProductLabel.AutoSize = true;
-            this.aboutProductLabel.Location = new System.Drawing.Point(6, 19);
-            this.aboutProductLabel.Name = "aboutProductLabel";
-            this.aboutProductLabel.Size = new System.Drawing.Size(191, 15);
-            this.aboutProductLabel.TabIndex = 0;
-            this.aboutProductLabel.Text = "Dell Fan Management, version DEV";
+            restartBackgroundThreadButton.Font = new System.Drawing.Font("Segoe UI", 7F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            restartBackgroundThreadButton.Location = new System.Drawing.Point(480, 132);
+            restartBackgroundThreadButton.Margin = new System.Windows.Forms.Padding(6);
+            restartBackgroundThreadButton.Name = "restartBackgroundThreadButton";
+            restartBackgroundThreadButton.Size = new System.Drawing.Size(210, 42);
+            restartBackgroundThreadButton.TabIndex = 3;
+            restartBackgroundThreadButton.Text = "重置线程";
+            restartBackgroundThreadButton.UseVisualStyleBackColor = true;
             // 
             // audioKeepAliveGroupBox
             // 
-            this.audioKeepAliveGroupBox.Controls.Add(this.audioKeepAliveComboBox);
-            this.audioKeepAliveGroupBox.Controls.Add(this.audioKeepAliveCheckbox);
-            this.audioKeepAliveGroupBox.Location = new System.Drawing.Point(667, 203);
-            this.audioKeepAliveGroupBox.Name = "audioKeepAliveGroupBox";
-            this.audioKeepAliveGroupBox.Size = new System.Drawing.Size(334, 79);
-            this.audioKeepAliveGroupBox.TabIndex = 12;
-            this.audioKeepAliveGroupBox.TabStop = false;
-            this.audioKeepAliveGroupBox.Text = "Audio keep alive:";
+            audioKeepAliveGroupBox.Controls.Add(audioKeepAliveComboBox);
+            audioKeepAliveGroupBox.Controls.Add(audioKeepAliveCheckbox);
+            audioKeepAliveGroupBox.Location = new System.Drawing.Point(1334, 43);
+            audioKeepAliveGroupBox.Margin = new System.Windows.Forms.Padding(6);
+            audioKeepAliveGroupBox.Name = "audioKeepAliveGroupBox";
+            audioKeepAliveGroupBox.Padding = new System.Windows.Forms.Padding(6);
+            audioKeepAliveGroupBox.Size = new System.Drawing.Size(668, 160);
+            audioKeepAliveGroupBox.TabIndex = 12;
+            audioKeepAliveGroupBox.TabStop = false;
+            audioKeepAliveGroupBox.Text = "保持音频设备活跃:";
             // 
             // audioKeepAliveComboBox
             // 
-            this.audioKeepAliveComboBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.audioKeepAliveComboBox.FormattingEnabled = true;
-            this.audioKeepAliveComboBox.Location = new System.Drawing.Point(6, 49);
-            this.audioKeepAliveComboBox.Name = "audioKeepAliveComboBox";
-            this.audioKeepAliveComboBox.Size = new System.Drawing.Size(322, 23);
-            this.audioKeepAliveComboBox.TabIndex = 1;
+            audioKeepAliveComboBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            audioKeepAliveComboBox.FormattingEnabled = true;
+            audioKeepAliveComboBox.Location = new System.Drawing.Point(12, 98);
+            audioKeepAliveComboBox.Margin = new System.Windows.Forms.Padding(6);
+            audioKeepAliveComboBox.Name = "audioKeepAliveComboBox";
+            audioKeepAliveComboBox.Size = new System.Drawing.Size(640, 39);
+            audioKeepAliveComboBox.TabIndex = 1;
             // 
             // audioKeepAliveCheckbox
             // 
-            this.audioKeepAliveCheckbox.AutoSize = true;
-            this.audioKeepAliveCheckbox.Location = new System.Drawing.Point(6, 23);
-            this.audioKeepAliveCheckbox.Name = "audioKeepAliveCheckbox";
-            this.audioKeepAliveCheckbox.Size = new System.Drawing.Size(322, 19);
-            this.audioKeepAliveCheckbox.TabIndex = 0;
-            this.audioKeepAliveCheckbox.Text = "&Keep this audio device active to prevent pops and clicks:";
-            this.audioKeepAliveCheckbox.UseVisualStyleBackColor = true;
+            audioKeepAliveCheckbox.AutoSize = true;
+            audioKeepAliveCheckbox.Location = new System.Drawing.Point(12, 46);
+            audioKeepAliveCheckbox.Margin = new System.Windows.Forms.Padding(6);
+            audioKeepAliveCheckbox.Name = "audioKeepAliveCheckbox";
+            audioKeepAliveCheckbox.Size = new System.Drawing.Size(574, 35);
+            audioKeepAliveCheckbox.TabIndex = 0;
+            audioKeepAliveCheckbox.Text = "保持此音频设备处于活动状态，以防止爆音和卡顿";
+            audioKeepAliveCheckbox.UseVisualStyleBackColor = true;
+            audioKeepAliveCheckbox.CheckedChanged += audioKeepAliveCheckbox_CheckedChanged;
             // 
             // statusStrip
             // 
-            this.statusStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.consistencyModeStatusLabel});
-            this.statusStrip.Location = new System.Drawing.Point(0, 293);
-            this.statusStrip.Name = "statusStrip";
-            this.statusStrip.Size = new System.Drawing.Size(1013, 22);
-            this.statusStrip.SizingGrip = false;
-            this.statusStrip.TabIndex = 13;
+            statusStrip.ImageScalingSize = new System.Drawing.Size(32, 32);
+            statusStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] { consistencyModeStatusLabel });
+            statusStrip.Location = new System.Drawing.Point(0, 589);
+            statusStrip.Name = "statusStrip";
+            statusStrip.Padding = new System.Windows.Forms.Padding(2, 0, 28, 0);
+            statusStrip.Size = new System.Drawing.Size(2026, 41);
+            statusStrip.SizingGrip = false;
+            statusStrip.TabIndex = 13;
             // 
             // consistencyModeStatusLabel
             // 
-            this.consistencyModeStatusLabel.Name = "consistencyModeStatusLabel";
-            this.consistencyModeStatusLabel.Size = new System.Drawing.Size(109, 17);
-            this.consistencyModeStatusLabel.Text = "Fan speed is locked";
+            consistencyModeStatusLabel.Name = "consistencyModeStatusLabel";
+            consistencyModeStatusLabel.Size = new System.Drawing.Size(237, 31);
+            consistencyModeStatusLabel.Text = "Fan speed is locked";
             // 
             // trayIcon
             // 
-            this.trayIcon.Text = "Dell Fan Management";
+            trayIcon.Text = "Dell Fan Management";
             // 
             // trayIconCheckBox
             // 
-            this.trayIconCheckBox.AutoSize = true;
-            this.trayIconCheckBox.Checked = true;
-            this.trayIconCheckBox.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.trayIconCheckBox.Location = new System.Drawing.Point(356, 246);
-            this.trayIconCheckBox.Name = "trayIconCheckBox";
-            this.trayIconCheckBox.Size = new System.Drawing.Size(73, 19);
-            this.trayIconCheckBox.TabIndex = 7;
-            this.trayIconCheckBox.Text = "&Tray icon";
-            this.trayIconCheckBox.UseVisualStyleBackColor = true;
+            trayIconCheckBox.AutoSize = true;
+            trayIconCheckBox.Checked = true;
+            trayIconCheckBox.CheckState = System.Windows.Forms.CheckState.Checked;
+            trayIconCheckBox.Location = new System.Drawing.Point(712, 492);
+            trayIconCheckBox.Margin = new System.Windows.Forms.Padding(6);
+            trayIconCheckBox.Name = "trayIconCheckBox";
+            trayIconCheckBox.Size = new System.Drawing.Size(142, 35);
+            trayIconCheckBox.TabIndex = 7;
+            trayIconCheckBox.Text = "托盘图标";
+            trayIconCheckBox.UseVisualStyleBackColor = true;
             // 
             // animatedCheckBox
             // 
-            this.animatedCheckBox.AutoSize = true;
-            this.animatedCheckBox.Checked = true;
-            this.animatedCheckBox.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.animatedCheckBox.Location = new System.Drawing.Point(356, 266);
-            this.animatedCheckBox.Name = "animatedCheckBox";
-            this.animatedCheckBox.Size = new System.Drawing.Size(78, 19);
-            this.animatedCheckBox.TabIndex = 8;
-            this.animatedCheckBox.Text = "An&imated";
-            this.animatedCheckBox.UseVisualStyleBackColor = true;
+            animatedCheckBox.AutoSize = true;
+            animatedCheckBox.Checked = true;
+            animatedCheckBox.CheckState = System.Windows.Forms.CheckState.Checked;
+            animatedCheckBox.Location = new System.Drawing.Point(712, 532);
+            animatedCheckBox.Margin = new System.Windows.Forms.Padding(6);
+            animatedCheckBox.Name = "animatedCheckBox";
+            animatedCheckBox.Size = new System.Drawing.Size(94, 35);
+            animatedCheckBox.TabIndex = 8;
+            animatedCheckBox.Text = "动画";
+            animatedCheckBox.UseVisualStyleBackColor = true;
             // 
             // DellFanManagementGuiForm
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
-            this.ClientSize = new System.Drawing.Size(1013, 315);
-            this.Controls.Add(this.animatedCheckBox);
-            this.Controls.Add(this.trayIconCheckBox);
-            this.Controls.Add(this.statusStrip);
-            this.Controls.Add(this.audioKeepAliveGroupBox);
-            this.Controls.Add(this.aboutGroupBox);
-            this.Controls.Add(this.restartBackgroundThreadButton);
-            this.Controls.Add(this.ecFanControlGroupBox);
-            this.Controls.Add(this.consistencyModeGroupBox);
-            this.Controls.Add(this.manualGroupBox);
-            this.Controls.Add(this.operationModeGroupBox);
-            this.Controls.Add(this.temperatureGroupBox);
-            this.Controls.Add(this.thermalSettingGroupBox);
-            this.Controls.Add(this.fansGroupBox);
-            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
-            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
-            this.MaximizeBox = false;
-            this.Name = "DellFanManagementGuiForm";
-            this.Text = "Dell Fan Management";
-            this.fansGroupBox.ResumeLayout(false);
-            this.fansGroupBox.PerformLayout();
-            this.thermalSettingGroupBox.ResumeLayout(false);
-            this.thermalSettingGroupBox.PerformLayout();
-            this.temperatureGroupBox.ResumeLayout(false);
-            this.temperatureGroupBox.PerformLayout();
-            this.operationModeGroupBox.ResumeLayout(false);
-            this.operationModeGroupBox.PerformLayout();
-            this.manualGroupBox.ResumeLayout(false);
-            this.manualFan2GroupBox.ResumeLayout(false);
-            this.manualFan2GroupBox.PerformLayout();
-            this.manualFan1GroupBox.ResumeLayout(false);
-            this.manualFan1GroupBox.PerformLayout();
-            this.consistencyModeGroupBox.ResumeLayout(false);
-            this.consistencyModeGroupBox.PerformLayout();
-            this.ecFanControlGroupBox.ResumeLayout(false);
-            this.ecFanControlGroupBox.PerformLayout();
-            this.aboutGroupBox.ResumeLayout(false);
-            this.aboutGroupBox.PerformLayout();
-            this.audioKeepAliveGroupBox.ResumeLayout(false);
-            this.audioKeepAliveGroupBox.PerformLayout();
-            this.statusStrip.ResumeLayout(false);
-            this.statusStrip.PerformLayout();
-            this.ResumeLayout(false);
-            this.PerformLayout();
+            AutoScaleDimensions = new System.Drawing.SizeF(192F, 192F);
+            AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
+            ClientSize = new System.Drawing.Size(2026, 630);
+            Controls.Add(animatedCheckBox);
+            Controls.Add(trayIconCheckBox);
+            Controls.Add(statusStrip);
+            Controls.Add(audioKeepAliveGroupBox);
+            Controls.Add(restartBackgroundThreadButton);
+            Controls.Add(ecFanControlGroupBox);
+            Controls.Add(consistencyModeGroupBox);
+            Controls.Add(manualGroupBox);
+            Controls.Add(operationModeGroupBox);
+            Controls.Add(temperatureGroupBox);
+            Controls.Add(thermalSettingGroupBox);
+            Controls.Add(fansGroupBox);
+            FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
+            Icon = (System.Drawing.Icon)resources.GetObject("$this.Icon");
+            Margin = new System.Windows.Forms.Padding(6);
+            MaximizeBox = false;
+            Name = "DellFanManagementGuiForm";
+            Text = "Dell Fan Management";
+            fansGroupBox.ResumeLayout(false);
+            fansGroupBox.PerformLayout();
+            thermalSettingGroupBox.ResumeLayout(false);
+            thermalSettingGroupBox.PerformLayout();
+            temperatureGroupBox.ResumeLayout(false);
+            temperatureGroupBox.PerformLayout();
+            operationModeGroupBox.ResumeLayout(false);
+            operationModeGroupBox.PerformLayout();
+            manualGroupBox.ResumeLayout(false);
+            manualFan2GroupBox.ResumeLayout(false);
+            manualFan2GroupBox.PerformLayout();
+            manualFan1GroupBox.ResumeLayout(false);
+            manualFan1GroupBox.PerformLayout();
+            consistencyModeGroupBox.ResumeLayout(false);
+            consistencyModeGroupBox.PerformLayout();
+            ecFanControlGroupBox.ResumeLayout(false);
+            ecFanControlGroupBox.PerformLayout();
+            audioKeepAliveGroupBox.ResumeLayout(false);
+            audioKeepAliveGroupBox.PerformLayout();
+            statusStrip.ResumeLayout(false);
+            statusStrip.PerformLayout();
+            ResumeLayout(false);
+            PerformLayout();
 
         }
 
@@ -872,9 +912,6 @@ namespace DellFanManagement.App
         private System.Windows.Forms.RadioButton ecFanControlRadioButtonOff;
         private System.Windows.Forms.GroupBox ecFanControlGroupBox;
         private System.Windows.Forms.Button restartBackgroundThreadButton;
-        private System.Windows.Forms.GroupBox aboutGroupBox;
-        private System.Windows.Forms.Label aboutProductLabel;
-        private System.Windows.Forms.RichTextBox richTextBox1;
         private System.Windows.Forms.GroupBox audioKeepAliveGroupBox;
         private System.Windows.Forms.ComboBox audioKeepAliveComboBox;
         private System.Windows.Forms.CheckBox audioKeepAliveCheckbox;

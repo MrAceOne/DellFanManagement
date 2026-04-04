@@ -81,7 +81,7 @@ namespace DellFanManagement.App
             }
 
             // Version number in the about box.
-            aboutProductLabel.Text = string.Format("Dell Fan Management, version {0}", DellFanManagementApp.Version);
+            //aboutProductLabel.Text = string.Format("Dell Fan Management, version {0}", DellFanManagementApp.Version);
 
             // Set event handlers.
             FormClosed += new FormClosedEventHandler(FormClosedEventHandler);
@@ -549,7 +549,7 @@ namespace DellFanManagement.App
                         ThermalSetting? thermalSettingOverride = _configurationStore.GetThermalSettingOverride((Guid)_state.ActivePowerProfile);
                         if (thermalSettingOverride != null)
                         {
-                            _core.RequestThermalSetting((ThermalSetting) thermalSettingOverride);
+                            _core.RequestThermalSetting((ThermalSetting)thermalSettingOverride);
                             Log.Write(string.Format("Thermal setting override: {0}", thermalSettingOverride));
                         }
 
@@ -1153,6 +1153,36 @@ namespace DellFanManagement.App
         private static void ShowDisclaimer()
         {
             MessageBox.Show("Note: While every has been made to make this program safe to use, it does interact with the embedded controller and system BIOS using undocumented methods and may have adverse effects on your system.  Use at your own risk.  If you experience odd behavior, a full system shutdown should restore everything back to the original state.  This program is not created by or affiliated with Dell Inc. or Dell Technologies Inc.", "Dell Fan Management – Disclaimer");
+        }
+
+        private void audioKeepAliveCheckbox_CheckedChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void alertsCheckBox_CheckedChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void manualFan2GroupBox_Enter(object sender, EventArgs e)
+        {
+
+        }
+
+        private void consistencyModeLowerTemperatureThresholdTextBox_TextChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void consistencyModeLowerTemperatureThresholdLabel_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void operationModeRadioButtonAutomatic_CheckedChanged(object sender, EventArgs e)
+        {
+
         }
     }
 }
