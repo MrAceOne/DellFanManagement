@@ -395,69 +395,11 @@ namespace DellFanManagement.App
         }
 
         /// <summary>
-        /// Start up the "audio thread", which streams silence to a particular audio device.
-        /// </summary>
-        public void StartAudioThread()
-        {
-            new Thread(new ThreadStart(AudioThread)).Start();
-        }
-
-        /// <summary>
         /// Request that the audio thread be terminated.
         /// </summary>
         public void StopAudioThread()
         {
             _soundPlayer?.RequestTermination();
-        }
-
-        /// <summary>
-        /// The audio thread streams silence to a particular audio output device.
-        /// </summary>
-        private void AudioThread()
-        {
-            bool audioKeepAliveEnabled = false;
-            AudioDevice selectedAudioDevice = null;
-
-            try
-            {
-                _state.WaitOne();
-
-                if (!_state.AudioThreadRunning)
-                {
-                    audioKeepAliveEnabled = true;
-                    selectedAudioDevice = _state.SelectedAudioDevice;
-                    _state.AudioThreadRunning = true;
-                }
-                else
-                {
-                    // Somehow, there was an attempt to start the audio thread when it was running already?
-                }
-
-                _state.Release();
-
-                if (audioKeepAliveEnabled && selectedAudioDevice != null)
-                {
-                    _soundPlayer = new(selectedAudioDevice);
-                    _soundPlayer.PlaySound(@"Resources\Silence.wav", true);
-                }
-            }
-            catch (Exception exception)
-            {
-                // Take no action, just allow the thread to terminate without error.
-                Log.Write(exception);
-            }
-
-            _soundPlayer = null;
-
-            // Audio thread terminating.
-            if (audioKeepAliveEnabled)
-            {
-                _state.WaitOne();
-                _state.AudioThreadRunning = false;
-                _state.Release();
-
-                UpdateForm();
-            }
         }
 
         /// <summary>

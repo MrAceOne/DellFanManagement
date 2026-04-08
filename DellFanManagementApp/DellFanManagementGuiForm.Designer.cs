@@ -84,9 +84,6 @@ namespace DellFanManagement.App
             ecFanControlRadioButtonOff = new System.Windows.Forms.RadioButton();
             ecFanControlGroupBox = new System.Windows.Forms.GroupBox();
             restartBackgroundThreadButton = new System.Windows.Forms.Button();
-            audioKeepAliveGroupBox = new System.Windows.Forms.GroupBox();
-            audioKeepAliveComboBox = new System.Windows.Forms.ComboBox();
-            audioKeepAliveCheckbox = new System.Windows.Forms.CheckBox();
             statusStrip = new System.Windows.Forms.StatusStrip();
             consistencyModeStatusLabel = new System.Windows.Forms.ToolStripStatusLabel();
             trayIcon = new System.Windows.Forms.NotifyIcon(components);
@@ -101,7 +98,6 @@ namespace DellFanManagement.App
             manualFan1GroupBox.SuspendLayout();
             consistencyModeGroupBox.SuspendLayout();
             ecFanControlGroupBox.SuspendLayout();
-            audioKeepAliveGroupBox.SuspendLayout();
             statusStrip.SuspendLayout();
             SuspendLayout();
             // 
@@ -727,41 +723,6 @@ namespace DellFanManagement.App
             restartBackgroundThreadButton.Text = "重置线程";
             restartBackgroundThreadButton.UseVisualStyleBackColor = true;
             // 
-            // audioKeepAliveGroupBox
-            // 
-            audioKeepAliveGroupBox.Controls.Add(audioKeepAliveComboBox);
-            audioKeepAliveGroupBox.Controls.Add(audioKeepAliveCheckbox);
-            audioKeepAliveGroupBox.Location = new System.Drawing.Point(1334, 43);
-            audioKeepAliveGroupBox.Margin = new System.Windows.Forms.Padding(6);
-            audioKeepAliveGroupBox.Name = "audioKeepAliveGroupBox";
-            audioKeepAliveGroupBox.Padding = new System.Windows.Forms.Padding(6);
-            audioKeepAliveGroupBox.Size = new System.Drawing.Size(668, 160);
-            audioKeepAliveGroupBox.TabIndex = 12;
-            audioKeepAliveGroupBox.TabStop = false;
-            audioKeepAliveGroupBox.Text = "保持音频设备活跃:";
-            // 
-            // audioKeepAliveComboBox
-            // 
-            audioKeepAliveComboBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            audioKeepAliveComboBox.FormattingEnabled = true;
-            audioKeepAliveComboBox.Location = new System.Drawing.Point(12, 98);
-            audioKeepAliveComboBox.Margin = new System.Windows.Forms.Padding(6);
-            audioKeepAliveComboBox.Name = "audioKeepAliveComboBox";
-            audioKeepAliveComboBox.Size = new System.Drawing.Size(640, 39);
-            audioKeepAliveComboBox.TabIndex = 1;
-            // 
-            // audioKeepAliveCheckbox
-            // 
-            audioKeepAliveCheckbox.AutoSize = true;
-            audioKeepAliveCheckbox.Location = new System.Drawing.Point(12, 46);
-            audioKeepAliveCheckbox.Margin = new System.Windows.Forms.Padding(6);
-            audioKeepAliveCheckbox.Name = "audioKeepAliveCheckbox";
-            audioKeepAliveCheckbox.Size = new System.Drawing.Size(574, 35);
-            audioKeepAliveCheckbox.TabIndex = 0;
-            audioKeepAliveCheckbox.Text = "保持此音频设备处于活动状态，以防止爆音和卡顿";
-            audioKeepAliveCheckbox.UseVisualStyleBackColor = true;
-            audioKeepAliveCheckbox.CheckedChanged += audioKeepAliveCheckbox_CheckedChanged;
-            // 
             // statusStrip
             // 
             statusStrip.ImageScalingSize = new System.Drawing.Size(32, 32);
@@ -769,7 +730,7 @@ namespace DellFanManagement.App
             statusStrip.Location = new System.Drawing.Point(0, 589);
             statusStrip.Name = "statusStrip";
             statusStrip.Padding = new System.Windows.Forms.Padding(2, 0, 28, 0);
-            statusStrip.Size = new System.Drawing.Size(2026, 41);
+            statusStrip.Size = new System.Drawing.Size(1348, 41);
             statusStrip.SizingGrip = false;
             statusStrip.TabIndex = 13;
             // 
@@ -813,11 +774,10 @@ namespace DellFanManagement.App
             // 
             AutoScaleDimensions = new System.Drawing.SizeF(192F, 192F);
             AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
-            ClientSize = new System.Drawing.Size(2026, 630);
+            ClientSize = new System.Drawing.Size(1348, 630);
             Controls.Add(animatedCheckBox);
             Controls.Add(trayIconCheckBox);
             Controls.Add(statusStrip);
-            Controls.Add(audioKeepAliveGroupBox);
             Controls.Add(restartBackgroundThreadButton);
             Controls.Add(ecFanControlGroupBox);
             Controls.Add(consistencyModeGroupBox);
@@ -849,8 +809,6 @@ namespace DellFanManagement.App
             consistencyModeGroupBox.PerformLayout();
             ecFanControlGroupBox.ResumeLayout(false);
             ecFanControlGroupBox.PerformLayout();
-            audioKeepAliveGroupBox.ResumeLayout(false);
-            audioKeepAliveGroupBox.PerformLayout();
             statusStrip.ResumeLayout(false);
             statusStrip.PerformLayout();
             ResumeLayout(false);
@@ -912,9 +870,6 @@ namespace DellFanManagement.App
         private System.Windows.Forms.RadioButton ecFanControlRadioButtonOff;
         private System.Windows.Forms.GroupBox ecFanControlGroupBox;
         private System.Windows.Forms.Button restartBackgroundThreadButton;
-        private System.Windows.Forms.GroupBox audioKeepAliveGroupBox;
-        private System.Windows.Forms.ComboBox audioKeepAliveComboBox;
-        private System.Windows.Forms.CheckBox audioKeepAliveCheckbox;
         private System.Windows.Forms.StatusStrip statusStrip;
         private System.Windows.Forms.ToolStripStatusLabel consistencyModeStatusLabel;
         private System.Windows.Forms.NotifyIcon trayIcon;

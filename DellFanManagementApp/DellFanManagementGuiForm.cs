@@ -120,10 +120,6 @@ namespace DellFanManagement.App
             consistencyModeRpmThresholdTextBox.TextChanged += new EventHandler(ConsistencyModeTextBoxesChangedEventHandler);
             consistencyModeApplyChangesButton.Click += new EventHandler(ConsistencyApplyChangesButtonClickedEventHandler);
 
-            // ...Audio keep alive controls...
-            audioKeepAliveComboBox.SelectedValueChanged += new EventHandler(AudioDeviceChangedEventHandler);
-            audioKeepAliveCheckbox.CheckedChanged += new EventHandler(AudioKeepAliveCheckboxChangedEventHandler);
-
             // ...Tray icon checkboxes...
             trayIconCheckBox.CheckedChanged += new EventHandler(TrayIconCheckBoxChangedEventHandler);
             animatedCheckBox.CheckedChanged += new EventHandler(AnimatedCheckBoxChangedEventHandler);
@@ -132,22 +128,6 @@ namespace DellFanManagement.App
             // (There are so many to allow support for lots of CPU cores, which many systems will not have.)
             temperatureLabel1.Text = string.Empty;
             temperatureLabel2.Text = string.Empty;
-            temperatureLabel3.Text = string.Empty;
-            temperatureLabel4.Text = string.Empty;
-            temperatureLabel5.Text = string.Empty;
-            temperatureLabel6.Text = string.Empty;
-            temperatureLabel7.Text = string.Empty;
-            temperatureLabel8.Text = string.Empty;
-            temperatureLabel9.Text = string.Empty;
-            temperatureLabel10.Text = string.Empty;
-            temperatureLabel11.Text = string.Empty;
-            temperatureLabel12.Text = string.Empty;
-            temperatureLabel13.Text = string.Empty;
-            temperatureLabel14.Text = string.Empty;
-            temperatureLabel15.Text = string.Empty;
-            temperatureLabel16.Text = string.Empty;
-            temperatureLabel17.Text = string.Empty;
-            temperatureLabel18.Text = string.Empty;
 
             // Disable some options depending on fan control capability.
             if (!_core.IsAutomaticFanControlDisableSupported)
@@ -175,9 +155,6 @@ namespace DellFanManagement.App
 
             // Update form with default state values.
             UpdateForm();
-
-            // Apply audio keep alive configuration from registry.
-            ApplyAudioKeepAliveConfiguration();
 
             // Apply manual fan control configuration from registry.
             ApplyManualModeConfiguration();
@@ -254,36 +231,6 @@ namespace DellFanManagement.App
             {
                 // Default to automatic mode.
                 operationModeRadioButtonAutomatic.Checked = true;
-            }
-        }
-
-        /// <summary>
-        /// Apply audio keep alive configuration using values from the registry.
-        /// </summary>
-        private void ApplyAudioKeepAliveConfiguration()
-        {
-            if (_configurationStore.GetIntOption(ConfigurationOption.AudioKeepAliveEnabled) == 1)
-            {
-                // Audio keep alive should be enabled.  Let's see if the audio device is present.
-                string storedAudioDeviceId = _configurationStore.GetStringOption(ConfigurationOption.AudioKeepAliveSelectedDevice);
-
-                foreach (object deviceObject in audioKeepAliveComboBox.Items)
-                {
-                    AudioDevice device = (AudioDevice)deviceObject;
-                    if (device.DeviceId == storedAudioDeviceId)
-                    {
-                        // Found it!
-                        audioKeepAliveComboBox.SelectedItem = deviceObject;
-                        audioKeepAliveCheckbox.Checked = true; // This will kick off the audio thread.
-                        break;
-                    }
-                }
-
-                // If we get down here and the checkbox is not checked, then the device was not in the list.
-                if (!audioKeepAliveCheckbox.Checked)
-                {
-                    _configurationStore.SetOption(ConfigurationOption.AudioKeepAliveEnabled, 0);
-                }
             }
         }
 
@@ -396,22 +343,6 @@ namespace DellFanManagement.App
                     {
                         case 0: temperatureLabel1.Text = labelValue; break;
                         case 1: temperatureLabel2.Text = labelValue; break;
-                        case 2: temperatureLabel3.Text = labelValue; break;
-                        case 3: temperatureLabel4.Text = labelValue; break;
-                        case 4: temperatureLabel5.Text = labelValue; break;
-                        case 5: temperatureLabel6.Text = labelValue; break;
-                        case 6: temperatureLabel7.Text = labelValue; break;
-                        case 7: temperatureLabel8.Text = labelValue; break;
-                        case 8: temperatureLabel9.Text = labelValue; break;
-                        case 9: temperatureLabel10.Text = labelValue; break;
-                        case 10: temperatureLabel11.Text = labelValue; break;
-                        case 11: temperatureLabel12.Text = labelValue; break;
-                        case 12: temperatureLabel13.Text = labelValue; break;
-                        case 13: temperatureLabel14.Text = labelValue; break;
-                        case 14: temperatureLabel15.Text = labelValue; break;
-                        case 15: temperatureLabel16.Text = labelValue; break;
-                        case 16: temperatureLabel17.Text = labelValue; break;
-                        case 17: temperatureLabel18.Text = labelValue; break;
                     }
 
                     labelIndex++;
@@ -463,55 +394,6 @@ namespace DellFanManagement.App
 
             // Restart background thread button.
             restartBackgroundThreadButton.Enabled = !_state.BackgroundThreadRunning;
-
-            // Sync up audio devices list.
-            List<AudioDevice> devicesToAdd = new();
-            List<AudioDevice> devicesToRemove = new();
-
-            // Items to add.
-            foreach (AudioDevice audioDevice in _state.AudioDevices)
-            {
-                if (!audioKeepAliveComboBox.Items.Contains(audioDevice))
-                {
-                    devicesToAdd.Add(audioDevice);
-                }
-            }
-
-            // Items to remove.
-            foreach (AudioDevice audioDevice in audioKeepAliveComboBox.Items)
-            {
-                if (!_state.AudioDevices.Contains(audioDevice))
-                {
-                    devicesToRemove.Add(audioDevice);
-                }
-            }
-
-            // Perform additions and removals.
-            foreach (AudioDevice audioDevice in devicesToAdd)
-            {
-                audioKeepAliveComboBox.Items.Add(audioDevice);
-
-                // ...If this happens to be the previously selected audio device that disappeared, set it back and start
-                // the thread.
-                if (audioDevice == _state.BringBackAudioDevice || audioDevice.DeviceId == _configurationStore.GetStringOption(ConfigurationOption.AudioKeepAliveBringBackDevice))
-                {
-                    bringBackAudioDevice = audioDevice;
-                }
-            }
-            foreach (AudioDevice audioDevice in devicesToRemove)
-            {
-                audioKeepAliveComboBox.Items.Remove(audioDevice);
-            }
-
-            if (audioKeepAliveComboBox.SelectedItem == null)
-            {
-                audioKeepAliveCheckbox.Enabled = false;
-            }
-
-            if (audioKeepAliveCheckbox.Checked && !_state.AudioThreadRunning)
-            {
-                audioKeepAliveCheckbox.Checked = false;
-            }
 
             // Tray icon hover text.
             if (_state.Fan2Present)
@@ -578,12 +460,6 @@ namespace DellFanManagement.App
             }
 
             _state.Release();
-
-            if (bringBackAudioDevice != null)
-            {
-                audioKeepAliveComboBox.SelectedItem = bringBackAudioDevice;
-                audioKeepAliveCheckbox.Checked = true;
-            }
         }
 
         /// <summary>
@@ -702,14 +578,6 @@ namespace DellFanManagement.App
                 thermalSettingRadioButtonQuiet.Checked = false;
                 thermalSettingRadioButtonPerformance.Checked = false;
             }
-        }
-
-        /// <summary>
-        /// If the audio thread terminates, the checkbox should be unchecked to indicate as much.
-        /// </summary>
-        public void UncheckAudioKeepAlive()
-        {
-            audioKeepAliveCheckbox.Checked = false;
         }
 
         /// <summary>
@@ -841,53 +709,6 @@ namespace DellFanManagement.App
             {
                 _core.RequestFan2Level(fan2LevelRequested);
                 _configurationStore.SetOption(ConfigurationOption.ManualModeFan2Level, fan2LevelRequested);
-            }
-        }
-
-        /// <summary>
-        /// Called when the audio device drop-down selection is changed.
-        /// </summary>
-        private void AudioDeviceChangedEventHandler(Object sender, EventArgs e)
-        {
-            _core.RequestAudioDevice((AudioDevice)audioKeepAliveComboBox.SelectedItem);
-
-            if (audioKeepAliveComboBox.SelectedItem != null)
-            {
-                audioKeepAliveCheckbox.Enabled = true;
-                _configurationStore.SetOption(ConfigurationOption.AudioKeepAliveBringBackDevice, null);
-            }
-            else
-            {
-                audioKeepAliveCheckbox.Enabled = false;
-            }
-        }
-
-        /// <summary>
-        /// Called when the "audio keep alive" checkbox is checked or unchecked.
-        /// </summary>
-        private void AudioKeepAliveCheckboxChangedEventHandler(Object sender, EventArgs e)
-        {
-            if (audioKeepAliveCheckbox.Checked)
-            {
-                _core.StartAudioThread();
-                _configurationStore.SetOption(ConfigurationOption.AudioKeepAliveEnabled, 1);
-                _configurationStore.SetOption(ConfigurationOption.AudioKeepAliveSelectedDevice, ((AudioDevice)audioKeepAliveComboBox.SelectedItem).DeviceId);
-                _configurationStore.SetOption(ConfigurationOption.AudioKeepAliveBringBackDevice, null);
-            }
-            else
-            {
-                _core.StopAudioThread();
-
-                if (!_formClosed)
-                {
-                    _configurationStore.SetOption(ConfigurationOption.AudioKeepAliveEnabled, 0);
-                    _configurationStore.SetOption(ConfigurationOption.AudioKeepAliveSelectedDevice, null);
-
-                    if (_state.BringBackAudioDevice != null)
-                    {
-                        _configurationStore.SetOption(ConfigurationOption.AudioKeepAliveBringBackDevice, _state.BringBackAudioDevice.DeviceId);
-                    }
-                }
             }
         }
 
@@ -1155,11 +976,6 @@ namespace DellFanManagement.App
             MessageBox.Show("Note: While every has been made to make this program safe to use, it does interact with the embedded controller and system BIOS using undocumented methods and may have adverse effects on your system.  Use at your own risk.  If you experience odd behavior, a full system shutdown should restore everything back to the original state.  This program is not created by or affiliated with Dell Inc. or Dell Technologies Inc.", "Dell Fan Management – Disclaimer");
         }
 
-        private void audioKeepAliveCheckbox_CheckedChanged(object sender, EventArgs e)
-        {
-
-        }
-
         private void alertsCheckBox_CheckedChanged(object sender, EventArgs e)
         {
 
@@ -1184,5 +1000,46 @@ namespace DellFanManagement.App
         {
 
         }
+
+        private void consistencyModeRpmThresholdTextBox_TextChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void temperatureLabel1_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void restartBackgroundThreadButton_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void temperatureLabel17_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void temperatureLabel2_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void groupBox1_Enter(object sender, EventArgs e)
+        {
+
+        }
+
+        private void powerButton_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void trackBar1_Scroll(object sender, EventArgs e)
+        {
+
+        }
+
     }
 }

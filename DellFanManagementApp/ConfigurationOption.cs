@@ -56,21 +56,6 @@
         public static readonly ConfigurationOption ConsistencyModeRpmThreshold = new(ConfigurationOptionType.Integer, "ConsistencyModeRpmThreshold");
 
         /// <summary>
-        /// Store the state of the "Keep this audio device active..." checkbox.
-        /// </summary>
-        public static readonly ConfigurationOption AudioKeepAliveEnabled = new(ConfigurationOptionType.Integer, "AudioKeepAliveEnabled");
-
-        /// <summary>
-        /// Which device is selected from the drop-down for audio keep alive.
-        /// </summary>
-        public static readonly ConfigurationOption AudioKeepAliveSelectedDevice = new(ConfigurationOptionType.String, "AudioKeepAliveSelectedDevice");
-
-        /// <summary>
-        /// If the selected audio device disappears and returns, we want to automatically select it again.
-        /// </summary>
-        public static readonly ConfigurationOption AudioKeepAliveBringBackDevice = new(ConfigurationOptionType.String, "AudioKeepAliveBringBackDevice");
-
-        /// <summary>
         /// Path to NVIDIA Inspector or an application that can manipulate the NVIDIA GPU P-state.
         /// </summary>
         public static readonly ConfigurationOption NVPStateApplicationPath = new(ConfigurationOptionType.String, "NVPState");
