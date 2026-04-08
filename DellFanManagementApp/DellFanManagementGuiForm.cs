@@ -1040,6 +1040,5 @@ namespace DellFanManagement.App
         {
 
         }
-
     }
 }

@@ -37,7 +37,7 @@ namespace DellFanManagement.App.TemperatureReaders
 
                     foreach (GPUThermalSensor sensor in gpu.ThermalInformation.ThermalSensors)
                     {
-                        temperatures.Add(name, sensor.CurrentTemperature);
+                        temperatures.Add("GPU", sensor.CurrentTemperature);
                     }
                 }
             }

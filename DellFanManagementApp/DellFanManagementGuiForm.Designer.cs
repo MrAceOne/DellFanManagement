@@ -40,22 +40,6 @@ namespace DellFanManagement.App
             thermalSettingRadioButtonCool = new System.Windows.Forms.RadioButton();
             thermalSettingRadioButtonOptimized = new System.Windows.Forms.RadioButton();
             temperatureGroupBox = new System.Windows.Forms.GroupBox();
-            temperatureLabel18 = new System.Windows.Forms.Label();
-            temperatureLabel17 = new System.Windows.Forms.Label();
-            temperatureLabel16 = new System.Windows.Forms.Label();
-            temperatureLabel15 = new System.Windows.Forms.Label();
-            temperatureLabel14 = new System.Windows.Forms.Label();
-            temperatureLabel13 = new System.Windows.Forms.Label();
-            temperatureLabel12 = new System.Windows.Forms.Label();
-            temperatureLabel11 = new System.Windows.Forms.Label();
-            temperatureLabel10 = new System.Windows.Forms.Label();
-            temperatureLabel9 = new System.Windows.Forms.Label();
-            temperatureLabel8 = new System.Windows.Forms.Label();
-            temperatureLabel7 = new System.Windows.Forms.Label();
-            temperatureLabel6 = new System.Windows.Forms.Label();
-            temperatureLabel5 = new System.Windows.Forms.Label();
-            temperatureLabel4 = new System.Windows.Forms.Label();
-            temperatureLabel3 = new System.Windows.Forms.Label();
             temperatureLabel2 = new System.Windows.Forms.Label();
             temperatureLabel1 = new System.Windows.Forms.Label();
             operationModeGroupBox = new System.Windows.Forms.GroupBox();
@@ -199,22 +183,6 @@ namespace DellFanManagement.App
             // 
             // temperatureGroupBox
             // 
-            temperatureGroupBox.Controls.Add(temperatureLabel18);
-            temperatureGroupBox.Controls.Add(temperatureLabel17);
-            temperatureGroupBox.Controls.Add(temperatureLabel16);
-            temperatureGroupBox.Controls.Add(temperatureLabel15);
-            temperatureGroupBox.Controls.Add(temperatureLabel14);
-            temperatureGroupBox.Controls.Add(temperatureLabel13);
-            temperatureGroupBox.Controls.Add(temperatureLabel12);
-            temperatureGroupBox.Controls.Add(temperatureLabel11);
-            temperatureGroupBox.Controls.Add(temperatureLabel10);
-            temperatureGroupBox.Controls.Add(temperatureLabel9);
-            temperatureGroupBox.Controls.Add(temperatureLabel8);
-            temperatureGroupBox.Controls.Add(temperatureLabel7);
-            temperatureGroupBox.Controls.Add(temperatureLabel6);
-            temperatureGroupBox.Controls.Add(temperatureLabel5);
-            temperatureGroupBox.Controls.Add(temperatureLabel4);
-            temperatureGroupBox.Controls.Add(temperatureLabel3);
             temperatureGroupBox.Controls.Add(temperatureLabel2);
             temperatureGroupBox.Controls.Add(temperatureLabel1);
             temperatureGroupBox.Location = new System.Drawing.Point(24, 166);
@@ -226,175 +194,15 @@ namespace DellFanManagement.App
             temperatureGroupBox.TabStop = false;
             temperatureGroupBox.Text = "温度:";
             // 
-            // temperatureLabel18
-            // 
-            temperatureLabel18.AutoSize = true;
-            temperatureLabel18.Location = new System.Drawing.Point(334, 350);
-            temperatureLabel18.Margin = new System.Windows.Forms.Padding(6, 0, 6, 0);
-            temperatureLabel18.Name = "temperatureLabel18";
-            temperatureLabel18.Size = new System.Drawing.Size(360, 31);
-            temperatureLabel18.TabIndex = 3;
-            temperatureLabel18.Text = "Quadro RTX 5000: 50 (50-100)";
-            // 
-            // temperatureLabel17
-            // 
-            temperatureLabel17.AutoSize = true;
-            temperatureLabel17.Location = new System.Drawing.Point(334, 312);
-            temperatureLabel17.Margin = new System.Windows.Forms.Padding(6, 0, 6, 0);
-            temperatureLabel17.Name = "temperatureLabel17";
-            temperatureLabel17.Size = new System.Drawing.Size(309, 31);
-            temperatureLabel17.TabIndex = 3;
-            temperatureLabel17.Text = "CPU Package: 50 (50-100)";
-            // 
-            // temperatureLabel16
-            // 
-            temperatureLabel16.AutoSize = true;
-            temperatureLabel16.Location = new System.Drawing.Point(334, 274);
-            temperatureLabel16.Margin = new System.Windows.Forms.Padding(6, 0, 6, 0);
-            temperatureLabel16.Name = "temperatureLabel16";
-            temperatureLabel16.Size = new System.Drawing.Size(318, 31);
-            temperatureLabel16.TabIndex = 15;
-            temperatureLabel16.Text = "CPU Core #16: 50 (50-100)";
-            // 
-            // temperatureLabel15
-            // 
-            temperatureLabel15.AutoSize = true;
-            temperatureLabel15.Location = new System.Drawing.Point(334, 236);
-            temperatureLabel15.Margin = new System.Windows.Forms.Padding(6, 0, 6, 0);
-            temperatureLabel15.Name = "temperatureLabel15";
-            temperatureLabel15.Size = new System.Drawing.Size(318, 31);
-            temperatureLabel15.TabIndex = 14;
-            temperatureLabel15.Text = "CPU Core #15: 50 (50-100)";
-            // 
-            // temperatureLabel14
-            // 
-            temperatureLabel14.AutoSize = true;
-            temperatureLabel14.Location = new System.Drawing.Point(334, 198);
-            temperatureLabel14.Margin = new System.Windows.Forms.Padding(6, 0, 6, 0);
-            temperatureLabel14.Name = "temperatureLabel14";
-            temperatureLabel14.Size = new System.Drawing.Size(318, 31);
-            temperatureLabel14.TabIndex = 13;
-            temperatureLabel14.Text = "CPU Core #14: 50 (50-100)";
-            // 
-            // temperatureLabel13
-            // 
-            temperatureLabel13.AutoSize = true;
-            temperatureLabel13.Location = new System.Drawing.Point(334, 160);
-            temperatureLabel13.Margin = new System.Windows.Forms.Padding(6, 0, 6, 0);
-            temperatureLabel13.Name = "temperatureLabel13";
-            temperatureLabel13.Size = new System.Drawing.Size(318, 31);
-            temperatureLabel13.TabIndex = 12;
-            temperatureLabel13.Text = "CPU Core #13: 50 (50-100)";
-            // 
-            // temperatureLabel12
-            // 
-            temperatureLabel12.AutoSize = true;
-            temperatureLabel12.Location = new System.Drawing.Point(334, 122);
-            temperatureLabel12.Margin = new System.Windows.Forms.Padding(6, 0, 6, 0);
-            temperatureLabel12.Name = "temperatureLabel12";
-            temperatureLabel12.Size = new System.Drawing.Size(318, 31);
-            temperatureLabel12.TabIndex = 11;
-            temperatureLabel12.Text = "CPU Core #12: 50 (50-100)";
-            // 
-            // temperatureLabel11
-            // 
-            temperatureLabel11.AutoSize = true;
-            temperatureLabel11.Location = new System.Drawing.Point(334, 84);
-            temperatureLabel11.Margin = new System.Windows.Forms.Padding(6, 0, 6, 0);
-            temperatureLabel11.Name = "temperatureLabel11";
-            temperatureLabel11.Size = new System.Drawing.Size(318, 31);
-            temperatureLabel11.TabIndex = 10;
-            temperatureLabel11.Text = "CPU Core #11: 50 (50-100)";
-            // 
-            // temperatureLabel10
-            // 
-            temperatureLabel10.AutoSize = true;
-            temperatureLabel10.Location = new System.Drawing.Point(334, 46);
-            temperatureLabel10.Margin = new System.Windows.Forms.Padding(6, 0, 6, 0);
-            temperatureLabel10.Name = "temperatureLabel10";
-            temperatureLabel10.Size = new System.Drawing.Size(318, 31);
-            temperatureLabel10.TabIndex = 9;
-            temperatureLabel10.Text = "CPU Core #10: 50 (50-100)";
-            // 
-            // temperatureLabel9
-            // 
-            temperatureLabel9.AutoSize = true;
-            temperatureLabel9.Location = new System.Drawing.Point(12, 350);
-            temperatureLabel9.Margin = new System.Windows.Forms.Padding(6, 0, 6, 0);
-            temperatureLabel9.Name = "temperatureLabel9";
-            temperatureLabel9.Size = new System.Drawing.Size(304, 31);
-            temperatureLabel9.TabIndex = 8;
-            temperatureLabel9.Text = "CPU Core #9: 50 (50-100)";
-            // 
-            // temperatureLabel8
-            // 
-            temperatureLabel8.AutoSize = true;
-            temperatureLabel8.Location = new System.Drawing.Point(12, 312);
-            temperatureLabel8.Margin = new System.Windows.Forms.Padding(6, 0, 6, 0);
-            temperatureLabel8.Name = "temperatureLabel8";
-            temperatureLabel8.Size = new System.Drawing.Size(304, 31);
-            temperatureLabel8.TabIndex = 7;
-            temperatureLabel8.Text = "CPU Core #8: 50 (50-100)";
-            // 
-            // temperatureLabel7
-            // 
-            temperatureLabel7.AutoSize = true;
-            temperatureLabel7.Location = new System.Drawing.Point(12, 274);
-            temperatureLabel7.Margin = new System.Windows.Forms.Padding(6, 0, 6, 0);
-            temperatureLabel7.Name = "temperatureLabel7";
-            temperatureLabel7.Size = new System.Drawing.Size(304, 31);
-            temperatureLabel7.TabIndex = 6;
-            temperatureLabel7.Text = "CPU Core #7: 50 (50-100)";
-            // 
-            // temperatureLabel6
-            // 
-            temperatureLabel6.AutoSize = true;
-            temperatureLabel6.Location = new System.Drawing.Point(12, 236);
-            temperatureLabel6.Margin = new System.Windows.Forms.Padding(6, 0, 6, 0);
-            temperatureLabel6.Name = "temperatureLabel6";
-            temperatureLabel6.Size = new System.Drawing.Size(304, 31);
-            temperatureLabel6.TabIndex = 5;
-            temperatureLabel6.Text = "CPU Core #6: 50 (50-100)";
-            // 
-            // temperatureLabel5
-            // 
-            temperatureLabel5.AutoSize = true;
-            temperatureLabel5.Location = new System.Drawing.Point(12, 198);
-            temperatureLabel5.Margin = new System.Windows.Forms.Padding(6, 0, 6, 0);
-            temperatureLabel5.Name = "temperatureLabel5";
-            temperatureLabel5.Size = new System.Drawing.Size(304, 31);
-            temperatureLabel5.TabIndex = 4;
-            temperatureLabel5.Text = "CPU Core #5: 50 (50-100)";
-            // 
-            // temperatureLabel4
-            // 
-            temperatureLabel4.AutoSize = true;
-            temperatureLabel4.Location = new System.Drawing.Point(12, 160);
-            temperatureLabel4.Margin = new System.Windows.Forms.Padding(6, 0, 6, 0);
-            temperatureLabel4.Name = "temperatureLabel4";
-            temperatureLabel4.Size = new System.Drawing.Size(304, 31);
-            temperatureLabel4.TabIndex = 3;
-            temperatureLabel4.Text = "CPU Core #4: 50 (50-100)";
-            // 
-            // temperatureLabel3
-            // 
-            temperatureLabel3.AutoSize = true;
-            temperatureLabel3.Location = new System.Drawing.Point(12, 122);
-            temperatureLabel3.Margin = new System.Windows.Forms.Padding(6, 0, 6, 0);
-            temperatureLabel3.Name = "temperatureLabel3";
-            temperatureLabel3.Size = new System.Drawing.Size(304, 31);
-            temperatureLabel3.TabIndex = 2;
-            temperatureLabel3.Text = "CPU Core #3: 50 (50-100)";
-            // 
             // temperatureLabel2
             // 
             temperatureLabel2.AutoSize = true;
             temperatureLabel2.Location = new System.Drawing.Point(12, 84);
             temperatureLabel2.Margin = new System.Windows.Forms.Padding(6, 0, 6, 0);
             temperatureLabel2.Name = "temperatureLabel2";
-            temperatureLabel2.Size = new System.Drawing.Size(304, 31);
+            temperatureLabel2.Size = new System.Drawing.Size(209, 31);
             temperatureLabel2.TabIndex = 1;
-            temperatureLabel2.Text = "CPU Core #2: 50 (50-100)";
+            temperatureLabel2.Text = "GPU: 50 (50-100)";
             // 
             // temperatureLabel1
             // 
@@ -402,9 +210,9 @@ namespace DellFanManagement.App
             temperatureLabel1.Location = new System.Drawing.Point(12, 46);
             temperatureLabel1.Margin = new System.Windows.Forms.Padding(6, 0, 6, 0);
             temperatureLabel1.Name = "temperatureLabel1";
-            temperatureLabel1.Size = new System.Drawing.Size(304, 31);
+            temperatureLabel1.Size = new System.Drawing.Size(207, 31);
             temperatureLabel1.TabIndex = 0;
-            temperatureLabel1.Text = "CPU Core #1: 50 (50-100)";
+            temperatureLabel1.Text = "CPU: 50 (50-100)";
             // 
             // operationModeGroupBox
             // 
@@ -730,7 +538,7 @@ namespace DellFanManagement.App
             statusStrip.Location = new System.Drawing.Point(0, 589);
             statusStrip.Name = "statusStrip";
             statusStrip.Padding = new System.Windows.Forms.Padding(2, 0, 28, 0);
-            statusStrip.Size = new System.Drawing.Size(1348, 41);
+            statusStrip.Size = new System.Drawing.Size(1345, 41);
             statusStrip.SizingGrip = false;
             statusStrip.TabIndex = 13;
             // 
@@ -774,7 +582,7 @@ namespace DellFanManagement.App
             // 
             AutoScaleDimensions = new System.Drawing.SizeF(192F, 192F);
             AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
-            ClientSize = new System.Drawing.Size(1348, 630);
+            ClientSize = new System.Drawing.Size(1345, 630);
             Controls.Add(animatedCheckBox);
             Controls.Add(trayIconCheckBox);
             Controls.Add(statusStrip);
@@ -827,22 +635,6 @@ namespace DellFanManagement.App
         private System.Windows.Forms.RadioButton thermalSettingRadioButtonCool;
         private System.Windows.Forms.RadioButton thermalSettingRadioButtonOptimized;
         private System.Windows.Forms.GroupBox temperatureGroupBox;
-        private System.Windows.Forms.Label temperatureLabel18;
-        private System.Windows.Forms.Label temperatureLabel17;
-        private System.Windows.Forms.Label temperatureLabel16;
-        private System.Windows.Forms.Label temperatureLabel15;
-        private System.Windows.Forms.Label temperatureLabel14;
-        private System.Windows.Forms.Label temperatureLabel13;
-        private System.Windows.Forms.Label temperatureLabel12;
-        private System.Windows.Forms.Label temperatureLabel11;
-        private System.Windows.Forms.Label temperatureLabel10;
-        private System.Windows.Forms.Label temperatureLabel9;
-        private System.Windows.Forms.Label temperatureLabel8;
-        private System.Windows.Forms.Label temperatureLabel7;
-        private System.Windows.Forms.Label temperatureLabel6;
-        private System.Windows.Forms.Label temperatureLabel5;
-        private System.Windows.Forms.Label temperatureLabel4;
-        private System.Windows.Forms.Label temperatureLabel3;
         private System.Windows.Forms.Label temperatureLabel2;
         private System.Windows.Forms.Label temperatureLabel1;
         private System.Windows.Forms.GroupBox operationModeGroupBox;
