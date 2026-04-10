@@ -89,11 +89,9 @@ namespace DellFanManagement.App
             // 
             fansGroupBox.Controls.Add(fan2RpmLabel);
             fansGroupBox.Controls.Add(fan1RpmLabel);
-            fansGroupBox.Location = new System.Drawing.Point(24, 24);
-            fansGroupBox.Margin = new System.Windows.Forms.Padding(6);
+            fansGroupBox.Location = new System.Drawing.Point(12, 12);
             fansGroupBox.Name = "fansGroupBox";
-            fansGroupBox.Padding = new System.Windows.Forms.Padding(6);
-            fansGroupBox.Size = new System.Drawing.Size(446, 130);
+            fansGroupBox.Size = new System.Drawing.Size(223, 64);
             fansGroupBox.TabIndex = 1;
             fansGroupBox.TabStop = false;
             fansGroupBox.Text = "风扇:";
@@ -101,20 +99,18 @@ namespace DellFanManagement.App
             // fan2RpmLabel
             // 
             fan2RpmLabel.AutoSize = true;
-            fan2RpmLabel.Location = new System.Drawing.Point(12, 76);
-            fan2RpmLabel.Margin = new System.Windows.Forms.Padding(6, 0, 6, 0);
+            fan2RpmLabel.Location = new System.Drawing.Point(6, 38);
             fan2RpmLabel.Name = "fan2RpmLabel";
-            fan2RpmLabel.Size = new System.Drawing.Size(330, 31);
+            fan2RpmLabel.Size = new System.Drawing.Size(169, 17);
             fan2RpmLabel.TabIndex = 2;
             fan2RpmLabel.Text = "Fan 2 RPM: (Not measured)";
             // 
             // fan1RpmLabel
             // 
             fan1RpmLabel.AutoSize = true;
-            fan1RpmLabel.Location = new System.Drawing.Point(12, 38);
-            fan1RpmLabel.Margin = new System.Windows.Forms.Padding(6, 0, 6, 0);
+            fan1RpmLabel.Location = new System.Drawing.Point(6, 19);
             fan1RpmLabel.Name = "fan1RpmLabel";
-            fan1RpmLabel.Size = new System.Drawing.Size(330, 31);
+            fan1RpmLabel.Size = new System.Drawing.Size(169, 17);
             fan1RpmLabel.TabIndex = 1;
             fan1RpmLabel.Text = "Fan 1 RPM: (Not measured)";
             // 
@@ -124,11 +120,9 @@ namespace DellFanManagement.App
             thermalSettingGroupBox.Controls.Add(thermalSettingRadioButtonQuiet);
             thermalSettingGroupBox.Controls.Add(thermalSettingRadioButtonCool);
             thermalSettingGroupBox.Controls.Add(thermalSettingRadioButtonOptimized);
-            thermalSettingGroupBox.Location = new System.Drawing.Point(700, 234);
-            thermalSettingGroupBox.Margin = new System.Windows.Forms.Padding(6);
+            thermalSettingGroupBox.Location = new System.Drawing.Point(350, 117);
             thermalSettingGroupBox.Name = "thermalSettingGroupBox";
-            thermalSettingGroupBox.Padding = new System.Windows.Forms.Padding(6);
-            thermalSettingGroupBox.Size = new System.Drawing.Size(222, 248);
+            thermalSettingGroupBox.Size = new System.Drawing.Size(111, 124);
             thermalSettingGroupBox.TabIndex = 6;
             thermalSettingGroupBox.TabStop = false;
             thermalSettingGroupBox.Text = "散热管理:";
@@ -136,10 +130,10 @@ namespace DellFanManagement.App
             // thermalSettingRadioButtonPerformance
             // 
             thermalSettingRadioButtonPerformance.AutoSize = true;
-            thermalSettingRadioButtonPerformance.Location = new System.Drawing.Point(12, 194);
-            thermalSettingRadioButtonPerformance.Margin = new System.Windows.Forms.Padding(6);
+            thermalSettingRadioButtonPerformance.Font = new System.Drawing.Font("Microsoft YaHei UI", 8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            thermalSettingRadioButtonPerformance.Location = new System.Drawing.Point(6, 97);
             thermalSettingRadioButtonPerformance.Name = "thermalSettingRadioButtonPerformance";
-            thermalSettingRadioButtonPerformance.Size = new System.Drawing.Size(93, 35);
+            thermalSettingRadioButtonPerformance.Size = new System.Drawing.Size(47, 20);
             thermalSettingRadioButtonPerformance.TabIndex = 3;
             thermalSettingRadioButtonPerformance.TabStop = true;
             thermalSettingRadioButtonPerformance.Text = "极速";
@@ -148,10 +142,10 @@ namespace DellFanManagement.App
             // thermalSettingRadioButtonQuiet
             // 
             thermalSettingRadioButtonQuiet.AutoSize = true;
-            thermalSettingRadioButtonQuiet.Location = new System.Drawing.Point(12, 144);
-            thermalSettingRadioButtonQuiet.Margin = new System.Windows.Forms.Padding(6);
+            thermalSettingRadioButtonQuiet.Font = new System.Drawing.Font("Microsoft YaHei UI", 8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            thermalSettingRadioButtonQuiet.Location = new System.Drawing.Point(6, 72);
             thermalSettingRadioButtonQuiet.Name = "thermalSettingRadioButtonQuiet";
-            thermalSettingRadioButtonQuiet.Size = new System.Drawing.Size(93, 35);
+            thermalSettingRadioButtonQuiet.Size = new System.Drawing.Size(47, 20);
             thermalSettingRadioButtonQuiet.TabIndex = 2;
             thermalSettingRadioButtonQuiet.TabStop = true;
             thermalSettingRadioButtonQuiet.Text = "静音";
@@ -160,10 +154,10 @@ namespace DellFanManagement.App
             // thermalSettingRadioButtonCool
             // 
             thermalSettingRadioButtonCool.AutoSize = true;
-            thermalSettingRadioButtonCool.Location = new System.Drawing.Point(12, 94);
-            thermalSettingRadioButtonCool.Margin = new System.Windows.Forms.Padding(6);
+            thermalSettingRadioButtonCool.Font = new System.Drawing.Font("Microsoft YaHei UI", 8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            thermalSettingRadioButtonCool.Location = new System.Drawing.Point(6, 47);
             thermalSettingRadioButtonCool.Name = "thermalSettingRadioButtonCool";
-            thermalSettingRadioButtonCool.Size = new System.Drawing.Size(93, 35);
+            thermalSettingRadioButtonCool.Size = new System.Drawing.Size(47, 20);
             thermalSettingRadioButtonCool.TabIndex = 1;
             thermalSettingRadioButtonCool.TabStop = true;
             thermalSettingRadioButtonCool.Text = "酷凉";
@@ -172,10 +166,10 @@ namespace DellFanManagement.App
             // thermalSettingRadioButtonOptimized
             // 
             thermalSettingRadioButtonOptimized.AutoSize = true;
-            thermalSettingRadioButtonOptimized.Location = new System.Drawing.Point(12, 44);
-            thermalSettingRadioButtonOptimized.Margin = new System.Windows.Forms.Padding(6);
+            thermalSettingRadioButtonOptimized.Font = new System.Drawing.Font("Microsoft YaHei UI", 8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            thermalSettingRadioButtonOptimized.Location = new System.Drawing.Point(6, 22);
             thermalSettingRadioButtonOptimized.Name = "thermalSettingRadioButtonOptimized";
-            thermalSettingRadioButtonOptimized.Size = new System.Drawing.Size(93, 35);
+            thermalSettingRadioButtonOptimized.Size = new System.Drawing.Size(47, 20);
             thermalSettingRadioButtonOptimized.TabIndex = 0;
             thermalSettingRadioButtonOptimized.TabStop = true;
             thermalSettingRadioButtonOptimized.Text = "优化";
@@ -185,11 +179,9 @@ namespace DellFanManagement.App
             // 
             temperatureGroupBox.Controls.Add(temperatureLabel2);
             temperatureGroupBox.Controls.Add(temperatureLabel1);
-            temperatureGroupBox.Location = new System.Drawing.Point(24, 166);
-            temperatureGroupBox.Margin = new System.Windows.Forms.Padding(6);
+            temperatureGroupBox.Location = new System.Drawing.Point(12, 83);
             temperatureGroupBox.Name = "temperatureGroupBox";
-            temperatureGroupBox.Padding = new System.Windows.Forms.Padding(6);
-            temperatureGroupBox.Size = new System.Drawing.Size(664, 398);
+            temperatureGroupBox.Size = new System.Drawing.Size(223, 77);
             temperatureGroupBox.TabIndex = 4;
             temperatureGroupBox.TabStop = false;
             temperatureGroupBox.Text = "温度:";
@@ -197,20 +189,18 @@ namespace DellFanManagement.App
             // temperatureLabel2
             // 
             temperatureLabel2.AutoSize = true;
-            temperatureLabel2.Location = new System.Drawing.Point(12, 84);
-            temperatureLabel2.Margin = new System.Windows.Forms.Padding(6, 0, 6, 0);
+            temperatureLabel2.Location = new System.Drawing.Point(6, 42);
             temperatureLabel2.Name = "temperatureLabel2";
-            temperatureLabel2.Size = new System.Drawing.Size(209, 31);
+            temperatureLabel2.Size = new System.Drawing.Size(106, 17);
             temperatureLabel2.TabIndex = 1;
             temperatureLabel2.Text = "GPU: 50 (50-100)";
             // 
             // temperatureLabel1
             // 
             temperatureLabel1.AutoSize = true;
-            temperatureLabel1.Location = new System.Drawing.Point(12, 46);
-            temperatureLabel1.Margin = new System.Windows.Forms.Padding(6, 0, 6, 0);
+            temperatureLabel1.Location = new System.Drawing.Point(6, 23);
             temperatureLabel1.Name = "temperatureLabel1";
-            temperatureLabel1.Size = new System.Drawing.Size(207, 31);
+            temperatureLabel1.Size = new System.Drawing.Size(105, 17);
             temperatureLabel1.TabIndex = 0;
             temperatureLabel1.Text = "CPU: 50 (50-100)";
             // 
@@ -219,11 +209,9 @@ namespace DellFanManagement.App
             operationModeGroupBox.Controls.Add(operationModeRadioButtonConsistency);
             operationModeGroupBox.Controls.Add(operationModeRadioButtonManual);
             operationModeGroupBox.Controls.Add(operationModeRadioButtonAutomatic);
-            operationModeGroupBox.Location = new System.Drawing.Point(700, 24);
-            operationModeGroupBox.Margin = new System.Windows.Forms.Padding(6);
+            operationModeGroupBox.Location = new System.Drawing.Point(350, 12);
             operationModeGroupBox.Name = "operationModeGroupBox";
-            operationModeGroupBox.Padding = new System.Windows.Forms.Padding(6);
-            operationModeGroupBox.Size = new System.Drawing.Size(222, 198);
+            operationModeGroupBox.Size = new System.Drawing.Size(111, 99);
             operationModeGroupBox.TabIndex = 5;
             operationModeGroupBox.TabStop = false;
             operationModeGroupBox.Text = "操作模式:";
@@ -231,10 +219,10 @@ namespace DellFanManagement.App
             // operationModeRadioButtonConsistency
             // 
             operationModeRadioButtonConsistency.AutoSize = true;
-            operationModeRadioButtonConsistency.Location = new System.Drawing.Point(12, 144);
-            operationModeRadioButtonConsistency.Margin = new System.Windows.Forms.Padding(6);
+            operationModeRadioButtonConsistency.Font = new System.Drawing.Font("Microsoft YaHei UI", 8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            operationModeRadioButtonConsistency.Location = new System.Drawing.Point(6, 72);
             operationModeRadioButtonConsistency.Name = "operationModeRadioButtonConsistency";
-            operationModeRadioButtonConsistency.Size = new System.Drawing.Size(117, 35);
+            operationModeRadioButtonConsistency.Size = new System.Drawing.Size(58, 20);
             operationModeRadioButtonConsistency.TabIndex = 2;
             operationModeRadioButtonConsistency.TabStop = true;
             operationModeRadioButtonConsistency.Text = "一致性";
@@ -243,10 +231,10 @@ namespace DellFanManagement.App
             // operationModeRadioButtonManual
             // 
             operationModeRadioButtonManual.AutoSize = true;
-            operationModeRadioButtonManual.Location = new System.Drawing.Point(12, 94);
-            operationModeRadioButtonManual.Margin = new System.Windows.Forms.Padding(6);
+            operationModeRadioButtonManual.Font = new System.Drawing.Font("Microsoft YaHei UI", 8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            operationModeRadioButtonManual.Location = new System.Drawing.Point(6, 47);
             operationModeRadioButtonManual.Name = "operationModeRadioButtonManual";
-            operationModeRadioButtonManual.Size = new System.Drawing.Size(93, 35);
+            operationModeRadioButtonManual.Size = new System.Drawing.Size(47, 20);
             operationModeRadioButtonManual.TabIndex = 1;
             operationModeRadioButtonManual.TabStop = true;
             operationModeRadioButtonManual.Text = "手动";
@@ -255,10 +243,10 @@ namespace DellFanManagement.App
             // operationModeRadioButtonAutomatic
             // 
             operationModeRadioButtonAutomatic.AutoSize = true;
-            operationModeRadioButtonAutomatic.Location = new System.Drawing.Point(12, 44);
-            operationModeRadioButtonAutomatic.Margin = new System.Windows.Forms.Padding(6);
+            operationModeRadioButtonAutomatic.Font = new System.Drawing.Font("Microsoft YaHei UI", 8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            operationModeRadioButtonAutomatic.Location = new System.Drawing.Point(6, 22);
             operationModeRadioButtonAutomatic.Name = "operationModeRadioButtonAutomatic";
-            operationModeRadioButtonAutomatic.Size = new System.Drawing.Size(93, 35);
+            operationModeRadioButtonAutomatic.Size = new System.Drawing.Size(47, 20);
             operationModeRadioButtonAutomatic.TabIndex = 0;
             operationModeRadioButtonAutomatic.TabStop = true;
             operationModeRadioButtonAutomatic.Text = "自动";
@@ -269,11 +257,9 @@ namespace DellFanManagement.App
             // 
             manualGroupBox.Controls.Add(manualFan2GroupBox);
             manualGroupBox.Controls.Add(manualFan1GroupBox);
-            manualGroupBox.Location = new System.Drawing.Point(934, 24);
-            manualGroupBox.Margin = new System.Windows.Forms.Padding(6);
+            manualGroupBox.Location = new System.Drawing.Point(467, 12);
             manualGroupBox.Name = "manualGroupBox";
-            manualGroupBox.Padding = new System.Windows.Forms.Padding(6);
-            manualGroupBox.Size = new System.Drawing.Size(388, 252);
+            manualGroupBox.Size = new System.Drawing.Size(194, 126);
             manualGroupBox.TabIndex = 9;
             manualGroupBox.TabStop = false;
             manualGroupBox.Text = "手动控制:";
@@ -283,11 +269,9 @@ namespace DellFanManagement.App
             manualFan2GroupBox.Controls.Add(manualFan2RadioButtonHigh);
             manualFan2GroupBox.Controls.Add(manualFan2RadioButtonMedium);
             manualFan2GroupBox.Controls.Add(manualFan2RadioButtonOff);
-            manualFan2GroupBox.Location = new System.Drawing.Point(200, 42);
-            manualFan2GroupBox.Margin = new System.Windows.Forms.Padding(6);
+            manualFan2GroupBox.Location = new System.Drawing.Point(100, 21);
             manualFan2GroupBox.Name = "manualFan2GroupBox";
-            manualFan2GroupBox.Padding = new System.Windows.Forms.Padding(6);
-            manualFan2GroupBox.Size = new System.Drawing.Size(176, 198);
+            manualFan2GroupBox.Size = new System.Drawing.Size(88, 99);
             manualFan2GroupBox.TabIndex = 1;
             manualFan2GroupBox.TabStop = false;
             manualFan2GroupBox.Text = "风扇 2:";
@@ -296,10 +280,10 @@ namespace DellFanManagement.App
             // manualFan2RadioButtonHigh
             // 
             manualFan2RadioButtonHigh.AutoSize = true;
-            manualFan2RadioButtonHigh.Location = new System.Drawing.Point(12, 144);
-            manualFan2RadioButtonHigh.Margin = new System.Windows.Forms.Padding(6);
+            manualFan2RadioButtonHigh.Font = new System.Drawing.Font("Microsoft YaHei UI", 8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            manualFan2RadioButtonHigh.Location = new System.Drawing.Point(6, 72);
             manualFan2RadioButtonHigh.Name = "manualFan2RadioButtonHigh";
-            manualFan2RadioButtonHigh.Size = new System.Drawing.Size(69, 35);
+            manualFan2RadioButtonHigh.Size = new System.Drawing.Size(36, 20);
             manualFan2RadioButtonHigh.TabIndex = 5;
             manualFan2RadioButtonHigh.TabStop = true;
             manualFan2RadioButtonHigh.Text = "高";
@@ -308,10 +292,10 @@ namespace DellFanManagement.App
             // manualFan2RadioButtonMedium
             // 
             manualFan2RadioButtonMedium.AutoSize = true;
-            manualFan2RadioButtonMedium.Location = new System.Drawing.Point(12, 94);
-            manualFan2RadioButtonMedium.Margin = new System.Windows.Forms.Padding(6);
+            manualFan2RadioButtonMedium.Font = new System.Drawing.Font("Microsoft YaHei UI", 8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            manualFan2RadioButtonMedium.Location = new System.Drawing.Point(6, 47);
             manualFan2RadioButtonMedium.Name = "manualFan2RadioButtonMedium";
-            manualFan2RadioButtonMedium.Size = new System.Drawing.Size(69, 35);
+            manualFan2RadioButtonMedium.Size = new System.Drawing.Size(36, 20);
             manualFan2RadioButtonMedium.TabIndex = 5;
             manualFan2RadioButtonMedium.TabStop = true;
             manualFan2RadioButtonMedium.Text = "中";
@@ -320,10 +304,10 @@ namespace DellFanManagement.App
             // manualFan2RadioButtonOff
             // 
             manualFan2RadioButtonOff.AutoSize = true;
-            manualFan2RadioButtonOff.Location = new System.Drawing.Point(12, 44);
-            manualFan2RadioButtonOff.Margin = new System.Windows.Forms.Padding(6);
+            manualFan2RadioButtonOff.Font = new System.Drawing.Font("Microsoft YaHei UI", 8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            manualFan2RadioButtonOff.Location = new System.Drawing.Point(6, 22);
             manualFan2RadioButtonOff.Name = "manualFan2RadioButtonOff";
-            manualFan2RadioButtonOff.Size = new System.Drawing.Size(69, 35);
+            manualFan2RadioButtonOff.Size = new System.Drawing.Size(36, 20);
             manualFan2RadioButtonOff.TabIndex = 5;
             manualFan2RadioButtonOff.TabStop = true;
             manualFan2RadioButtonOff.Text = "关";
@@ -334,11 +318,9 @@ namespace DellFanManagement.App
             manualFan1GroupBox.Controls.Add(manualFan1RadioButtonHigh);
             manualFan1GroupBox.Controls.Add(manualFan1RadioButtonMedium);
             manualFan1GroupBox.Controls.Add(manualFan1RadioButtonOff);
-            manualFan1GroupBox.Location = new System.Drawing.Point(12, 42);
-            manualFan1GroupBox.Margin = new System.Windows.Forms.Padding(6);
+            manualFan1GroupBox.Location = new System.Drawing.Point(6, 21);
             manualFan1GroupBox.Name = "manualFan1GroupBox";
-            manualFan1GroupBox.Padding = new System.Windows.Forms.Padding(6);
-            manualFan1GroupBox.Size = new System.Drawing.Size(176, 198);
+            manualFan1GroupBox.Size = new System.Drawing.Size(88, 99);
             manualFan1GroupBox.TabIndex = 0;
             manualFan1GroupBox.TabStop = false;
             manualFan1GroupBox.Text = "风扇 1:";
@@ -346,10 +328,10 @@ namespace DellFanManagement.App
             // manualFan1RadioButtonHigh
             // 
             manualFan1RadioButtonHigh.AutoSize = true;
-            manualFan1RadioButtonHigh.Location = new System.Drawing.Point(12, 144);
-            manualFan1RadioButtonHigh.Margin = new System.Windows.Forms.Padding(6);
+            manualFan1RadioButtonHigh.Font = new System.Drawing.Font("Microsoft YaHei UI", 8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            manualFan1RadioButtonHigh.Location = new System.Drawing.Point(6, 72);
             manualFan1RadioButtonHigh.Name = "manualFan1RadioButtonHigh";
-            manualFan1RadioButtonHigh.Size = new System.Drawing.Size(69, 35);
+            manualFan1RadioButtonHigh.Size = new System.Drawing.Size(36, 20);
             manualFan1RadioButtonHigh.TabIndex = 2;
             manualFan1RadioButtonHigh.TabStop = true;
             manualFan1RadioButtonHigh.Text = "高";
@@ -358,10 +340,10 @@ namespace DellFanManagement.App
             // manualFan1RadioButtonMedium
             // 
             manualFan1RadioButtonMedium.AutoSize = true;
-            manualFan1RadioButtonMedium.Location = new System.Drawing.Point(12, 94);
-            manualFan1RadioButtonMedium.Margin = new System.Windows.Forms.Padding(6);
+            manualFan1RadioButtonMedium.Font = new System.Drawing.Font("Microsoft YaHei UI", 8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            manualFan1RadioButtonMedium.Location = new System.Drawing.Point(6, 47);
             manualFan1RadioButtonMedium.Name = "manualFan1RadioButtonMedium";
-            manualFan1RadioButtonMedium.Size = new System.Drawing.Size(69, 35);
+            manualFan1RadioButtonMedium.Size = new System.Drawing.Size(36, 20);
             manualFan1RadioButtonMedium.TabIndex = 1;
             manualFan1RadioButtonMedium.TabStop = true;
             manualFan1RadioButtonMedium.Text = "中";
@@ -370,10 +352,10 @@ namespace DellFanManagement.App
             // manualFan1RadioButtonOff
             // 
             manualFan1RadioButtonOff.AutoSize = true;
-            manualFan1RadioButtonOff.Location = new System.Drawing.Point(12, 44);
-            manualFan1RadioButtonOff.Margin = new System.Windows.Forms.Padding(6);
+            manualFan1RadioButtonOff.Font = new System.Drawing.Font("Microsoft YaHei UI", 8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            manualFan1RadioButtonOff.Location = new System.Drawing.Point(6, 22);
             manualFan1RadioButtonOff.Name = "manualFan1RadioButtonOff";
-            manualFan1RadioButtonOff.Size = new System.Drawing.Size(69, 35);
+            manualFan1RadioButtonOff.Size = new System.Drawing.Size(36, 20);
             manualFan1RadioButtonOff.TabIndex = 0;
             manualFan1RadioButtonOff.TabStop = true;
             manualFan1RadioButtonOff.Text = "关";
@@ -389,11 +371,9 @@ namespace DellFanManagement.App
             consistencyModeGroupBox.Controls.Add(consistencyModeUpperTemperatureThresholdLabel);
             consistencyModeGroupBox.Controls.Add(consistencyModeLowerTemperatureThresholdTextBox);
             consistencyModeGroupBox.Controls.Add(consistencyModeLowerTemperatureThresholdLabel);
-            consistencyModeGroupBox.Location = new System.Drawing.Point(934, 288);
-            consistencyModeGroupBox.Margin = new System.Windows.Forms.Padding(6);
+            consistencyModeGroupBox.Location = new System.Drawing.Point(467, 144);
             consistencyModeGroupBox.Name = "consistencyModeGroupBox";
-            consistencyModeGroupBox.Padding = new System.Windows.Forms.Padding(6);
-            consistencyModeGroupBox.Size = new System.Drawing.Size(388, 276);
+            consistencyModeGroupBox.Size = new System.Drawing.Size(194, 138);
             consistencyModeGroupBox.TabIndex = 10;
             consistencyModeGroupBox.TabStop = false;
             consistencyModeGroupBox.Text = "一致性选项:";
@@ -402,10 +382,9 @@ namespace DellFanManagement.App
             // 
             alertsCheckBox.AutoSize = true;
             alertsCheckBox.Enabled = false;
-            alertsCheckBox.Location = new System.Drawing.Point(274, 160);
-            alertsCheckBox.Margin = new System.Windows.Forms.Padding(6);
+            alertsCheckBox.Location = new System.Drawing.Point(137, 80);
             alertsCheckBox.Name = "alertsCheckBox";
-            alertsCheckBox.Size = new System.Drawing.Size(94, 35);
+            alertsCheckBox.Size = new System.Drawing.Size(51, 21);
             alertsCheckBox.TabIndex = 13;
             alertsCheckBox.Text = "警告";
             alertsCheckBox.UseVisualStyleBackColor = true;
@@ -413,61 +392,55 @@ namespace DellFanManagement.App
             // 
             // consistencyModeApplyChangesButton
             // 
-            consistencyModeApplyChangesButton.Location = new System.Drawing.Point(10, 214);
-            consistencyModeApplyChangesButton.Margin = new System.Windows.Forms.Padding(6);
+            consistencyModeApplyChangesButton.Location = new System.Drawing.Point(5, 107);
             consistencyModeApplyChangesButton.Name = "consistencyModeApplyChangesButton";
-            consistencyModeApplyChangesButton.Size = new System.Drawing.Size(368, 50);
+            consistencyModeApplyChangesButton.Size = new System.Drawing.Size(184, 25);
             consistencyModeApplyChangesButton.TabIndex = 14;
             consistencyModeApplyChangesButton.Text = "应用";
             consistencyModeApplyChangesButton.UseVisualStyleBackColor = true;
             // 
             // consistencyModeRpmThresholdTextBox
             // 
-            consistencyModeRpmThresholdTextBox.Location = new System.Drawing.Point(142, 156);
-            consistencyModeRpmThresholdTextBox.Margin = new System.Windows.Forms.Padding(6);
+            consistencyModeRpmThresholdTextBox.Location = new System.Drawing.Point(71, 78);
             consistencyModeRpmThresholdTextBox.MaxLength = 4;
             consistencyModeRpmThresholdTextBox.Name = "consistencyModeRpmThresholdTextBox";
-            consistencyModeRpmThresholdTextBox.Size = new System.Drawing.Size(106, 38);
+            consistencyModeRpmThresholdTextBox.Size = new System.Drawing.Size(55, 23);
             consistencyModeRpmThresholdTextBox.TabIndex = 5;
             consistencyModeRpmThresholdTextBox.Text = "2400";
             // 
             // consistencyModeRpmThresholdLabel
             // 
             consistencyModeRpmThresholdLabel.AutoSize = true;
-            consistencyModeRpmThresholdLabel.Location = new System.Drawing.Point(14, 162);
-            consistencyModeRpmThresholdLabel.Margin = new System.Windows.Forms.Padding(6, 0, 6, 0);
+            consistencyModeRpmThresholdLabel.Location = new System.Drawing.Point(7, 81);
             consistencyModeRpmThresholdLabel.Name = "consistencyModeRpmThresholdLabel";
-            consistencyModeRpmThresholdLabel.Size = new System.Drawing.Size(116, 31);
+            consistencyModeRpmThresholdLabel.Size = new System.Drawing.Size(59, 17);
             consistencyModeRpmThresholdLabel.TabIndex = 4;
             consistencyModeRpmThresholdLabel.Text = "转速阈值:";
             // 
             // consistencyModeUpperTemperatureThresholdTextBox
             // 
-            consistencyModeUpperTemperatureThresholdTextBox.Location = new System.Drawing.Point(212, 98);
-            consistencyModeUpperTemperatureThresholdTextBox.Margin = new System.Windows.Forms.Padding(6);
+            consistencyModeUpperTemperatureThresholdTextBox.Location = new System.Drawing.Point(106, 49);
             consistencyModeUpperTemperatureThresholdTextBox.MaxLength = 2;
             consistencyModeUpperTemperatureThresholdTextBox.Name = "consistencyModeUpperTemperatureThresholdTextBox";
-            consistencyModeUpperTemperatureThresholdTextBox.Size = new System.Drawing.Size(160, 38);
+            consistencyModeUpperTemperatureThresholdTextBox.Size = new System.Drawing.Size(82, 23);
             consistencyModeUpperTemperatureThresholdTextBox.TabIndex = 3;
             consistencyModeUpperTemperatureThresholdTextBox.Text = "85";
             // 
             // consistencyModeUpperTemperatureThresholdLabel
             // 
             consistencyModeUpperTemperatureThresholdLabel.AutoSize = true;
-            consistencyModeUpperTemperatureThresholdLabel.Location = new System.Drawing.Point(12, 104);
-            consistencyModeUpperTemperatureThresholdLabel.Margin = new System.Windows.Forms.Padding(6, 0, 6, 0);
+            consistencyModeUpperTemperatureThresholdLabel.Location = new System.Drawing.Point(6, 52);
             consistencyModeUpperTemperatureThresholdLabel.Name = "consistencyModeUpperTemperatureThresholdLabel";
-            consistencyModeUpperTemperatureThresholdLabel.Size = new System.Drawing.Size(116, 31);
+            consistencyModeUpperTemperatureThresholdLabel.Size = new System.Drawing.Size(59, 17);
             consistencyModeUpperTemperatureThresholdLabel.TabIndex = 2;
             consistencyModeUpperTemperatureThresholdLabel.Text = "温度上限:";
             // 
             // consistencyModeLowerTemperatureThresholdTextBox
             // 
-            consistencyModeLowerTemperatureThresholdTextBox.Location = new System.Drawing.Point(212, 40);
-            consistencyModeLowerTemperatureThresholdTextBox.Margin = new System.Windows.Forms.Padding(6);
+            consistencyModeLowerTemperatureThresholdTextBox.Location = new System.Drawing.Point(106, 20);
             consistencyModeLowerTemperatureThresholdTextBox.MaxLength = 2;
             consistencyModeLowerTemperatureThresholdTextBox.Name = "consistencyModeLowerTemperatureThresholdTextBox";
-            consistencyModeLowerTemperatureThresholdTextBox.Size = new System.Drawing.Size(160, 38);
+            consistencyModeLowerTemperatureThresholdTextBox.Size = new System.Drawing.Size(82, 23);
             consistencyModeLowerTemperatureThresholdTextBox.TabIndex = 1;
             consistencyModeLowerTemperatureThresholdTextBox.Text = "65";
             consistencyModeLowerTemperatureThresholdTextBox.TextChanged += consistencyModeLowerTemperatureThresholdTextBox_TextChanged;
@@ -475,10 +448,9 @@ namespace DellFanManagement.App
             // consistencyModeLowerTemperatureThresholdLabel
             // 
             consistencyModeLowerTemperatureThresholdLabel.AutoSize = true;
-            consistencyModeLowerTemperatureThresholdLabel.Location = new System.Drawing.Point(12, 46);
-            consistencyModeLowerTemperatureThresholdLabel.Margin = new System.Windows.Forms.Padding(6, 0, 6, 0);
+            consistencyModeLowerTemperatureThresholdLabel.Location = new System.Drawing.Point(6, 23);
             consistencyModeLowerTemperatureThresholdLabel.Name = "consistencyModeLowerTemperatureThresholdLabel";
-            consistencyModeLowerTemperatureThresholdLabel.Size = new System.Drawing.Size(116, 31);
+            consistencyModeLowerTemperatureThresholdLabel.Size = new System.Drawing.Size(59, 17);
             consistencyModeLowerTemperatureThresholdLabel.TabIndex = 0;
             consistencyModeLowerTemperatureThresholdLabel.Text = "温度下限:";
             consistencyModeLowerTemperatureThresholdLabel.Click += consistencyModeLowerTemperatureThresholdLabel_Click;
@@ -486,10 +458,10 @@ namespace DellFanManagement.App
             // ecFanControlRadioButtonOn
             // 
             ecFanControlRadioButtonOn.AutoSize = true;
-            ecFanControlRadioButtonOn.Location = new System.Drawing.Point(12, 44);
-            ecFanControlRadioButtonOn.Margin = new System.Windows.Forms.Padding(6);
+            ecFanControlRadioButtonOn.Font = new System.Drawing.Font("Microsoft YaHei UI", 8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            ecFanControlRadioButtonOn.Location = new System.Drawing.Point(6, 22);
             ecFanControlRadioButtonOn.Name = "ecFanControlRadioButtonOn";
-            ecFanControlRadioButtonOn.Size = new System.Drawing.Size(69, 35);
+            ecFanControlRadioButtonOn.Size = new System.Drawing.Size(36, 20);
             ecFanControlRadioButtonOn.TabIndex = 2;
             ecFanControlRadioButtonOn.TabStop = true;
             ecFanControlRadioButtonOn.Text = "开";
@@ -498,10 +470,10 @@ namespace DellFanManagement.App
             // ecFanControlRadioButtonOff
             // 
             ecFanControlRadioButtonOff.AutoSize = true;
-            ecFanControlRadioButtonOff.Location = new System.Drawing.Point(106, 44);
-            ecFanControlRadioButtonOff.Margin = new System.Windows.Forms.Padding(6);
+            ecFanControlRadioButtonOff.Font = new System.Drawing.Font("Microsoft YaHei UI", 8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            ecFanControlRadioButtonOff.Location = new System.Drawing.Point(53, 22);
             ecFanControlRadioButtonOff.Name = "ecFanControlRadioButtonOff";
-            ecFanControlRadioButtonOff.Size = new System.Drawing.Size(69, 35);
+            ecFanControlRadioButtonOff.Size = new System.Drawing.Size(36, 20);
             ecFanControlRadioButtonOff.TabIndex = 3;
             ecFanControlRadioButtonOff.TabStop = true;
             ecFanControlRadioButtonOff.Text = "关";
@@ -511,11 +483,9 @@ namespace DellFanManagement.App
             // 
             ecFanControlGroupBox.Controls.Add(ecFanControlRadioButtonOn);
             ecFanControlGroupBox.Controls.Add(ecFanControlRadioButtonOff);
-            ecFanControlGroupBox.Location = new System.Drawing.Point(482, 24);
-            ecFanControlGroupBox.Margin = new System.Windows.Forms.Padding(6);
+            ecFanControlGroupBox.Location = new System.Drawing.Point(241, 12);
             ecFanControlGroupBox.Name = "ecFanControlGroupBox";
-            ecFanControlGroupBox.Padding = new System.Windows.Forms.Padding(6);
-            ecFanControlGroupBox.Size = new System.Drawing.Size(206, 96);
+            ecFanControlGroupBox.Size = new System.Drawing.Size(103, 48);
             ecFanControlGroupBox.TabIndex = 2;
             ecFanControlGroupBox.TabStop = false;
             ecFanControlGroupBox.Text = "EC 风扇控制:";
@@ -523,10 +493,9 @@ namespace DellFanManagement.App
             // restartBackgroundThreadButton
             // 
             restartBackgroundThreadButton.Font = new System.Drawing.Font("Segoe UI", 7F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-            restartBackgroundThreadButton.Location = new System.Drawing.Point(480, 132);
-            restartBackgroundThreadButton.Margin = new System.Windows.Forms.Padding(6);
+            restartBackgroundThreadButton.Location = new System.Drawing.Point(241, 66);
             restartBackgroundThreadButton.Name = "restartBackgroundThreadButton";
-            restartBackgroundThreadButton.Size = new System.Drawing.Size(210, 42);
+            restartBackgroundThreadButton.Size = new System.Drawing.Size(105, 21);
             restartBackgroundThreadButton.TabIndex = 3;
             restartBackgroundThreadButton.Text = "重置线程";
             restartBackgroundThreadButton.UseVisualStyleBackColor = true;
@@ -535,17 +504,16 @@ namespace DellFanManagement.App
             // 
             statusStrip.ImageScalingSize = new System.Drawing.Size(32, 32);
             statusStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] { consistencyModeStatusLabel });
-            statusStrip.Location = new System.Drawing.Point(0, 589);
+            statusStrip.Location = new System.Drawing.Point(0, 293);
             statusStrip.Name = "statusStrip";
-            statusStrip.Padding = new System.Windows.Forms.Padding(2, 0, 28, 0);
-            statusStrip.Size = new System.Drawing.Size(1345, 41);
+            statusStrip.Size = new System.Drawing.Size(672, 22);
             statusStrip.SizingGrip = false;
             statusStrip.TabIndex = 13;
             // 
             // consistencyModeStatusLabel
             // 
             consistencyModeStatusLabel.Name = "consistencyModeStatusLabel";
-            consistencyModeStatusLabel.Size = new System.Drawing.Size(237, 31);
+            consistencyModeStatusLabel.Size = new System.Drawing.Size(124, 17);
             consistencyModeStatusLabel.Text = "Fan speed is locked";
             // 
             // trayIcon
@@ -557,10 +525,9 @@ namespace DellFanManagement.App
             trayIconCheckBox.AutoSize = true;
             trayIconCheckBox.Checked = true;
             trayIconCheckBox.CheckState = System.Windows.Forms.CheckState.Checked;
-            trayIconCheckBox.Location = new System.Drawing.Point(712, 492);
-            trayIconCheckBox.Margin = new System.Windows.Forms.Padding(6);
+            trayIconCheckBox.Location = new System.Drawing.Point(356, 246);
             trayIconCheckBox.Name = "trayIconCheckBox";
-            trayIconCheckBox.Size = new System.Drawing.Size(142, 35);
+            trayIconCheckBox.Size = new System.Drawing.Size(75, 21);
             trayIconCheckBox.TabIndex = 7;
             trayIconCheckBox.Text = "托盘图标";
             trayIconCheckBox.UseVisualStyleBackColor = true;
@@ -570,19 +537,18 @@ namespace DellFanManagement.App
             animatedCheckBox.AutoSize = true;
             animatedCheckBox.Checked = true;
             animatedCheckBox.CheckState = System.Windows.Forms.CheckState.Checked;
-            animatedCheckBox.Location = new System.Drawing.Point(712, 532);
-            animatedCheckBox.Margin = new System.Windows.Forms.Padding(6);
+            animatedCheckBox.Location = new System.Drawing.Point(356, 266);
             animatedCheckBox.Name = "animatedCheckBox";
-            animatedCheckBox.Size = new System.Drawing.Size(94, 35);
+            animatedCheckBox.Size = new System.Drawing.Size(51, 21);
             animatedCheckBox.TabIndex = 8;
             animatedCheckBox.Text = "动画";
             animatedCheckBox.UseVisualStyleBackColor = true;
             // 
             // DellFanManagementGuiForm
             // 
-            AutoScaleDimensions = new System.Drawing.SizeF(192F, 192F);
+            AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
             AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
-            ClientSize = new System.Drawing.Size(1345, 630);
+            ClientSize = new System.Drawing.Size(672, 315);
             Controls.Add(animatedCheckBox);
             Controls.Add(trayIconCheckBox);
             Controls.Add(statusStrip);
@@ -596,7 +562,6 @@ namespace DellFanManagement.App
             Controls.Add(fansGroupBox);
             FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             Icon = (System.Drawing.Icon)resources.GetObject("$this.Icon");
-            Margin = new System.Windows.Forms.Padding(6);
             MaximizeBox = false;
             Name = "DellFanManagementGuiForm";
             Text = "Dell Fan Management";
