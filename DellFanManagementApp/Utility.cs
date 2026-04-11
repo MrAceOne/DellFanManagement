@@ -12,28 +12,6 @@ namespace DellFanManagement.App
     static class Utility
     {
         /// <summary>
-        /// Get a list of audio devices in the system.
-        /// </summary>
-        /// <returns>Audio device list</returns>
-        public static List<AudioDevice> GetAudioDevices()
-        {
-            List<AudioDevice> audioDevices = new();
-
-            ISoundDeviceList soundDeviceList = new(SoundDeviceListType.PlaybackDevice);
-
-            for (int index = 0; index < soundDeviceList.DeviceCount; index++)
-            {
-                string deviceId = soundDeviceList.getDeviceID(index);
-                if (deviceId != string.Empty)
-                {
-                    audioDevices.Add(new AudioDevice(deviceId, soundDeviceList.getDeviceDescription(index)));
-                }
-            }
-
-            return audioDevices;
-        }
-
-        /// <summary>
         /// Attempt to set the NVIDIA GPU P-state.
         /// </summary>
         /// <param name="inspectorPath">Path to NVIDIA Inspector, or an application that can manipulate the NVIDIA GPU

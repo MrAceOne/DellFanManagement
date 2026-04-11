@@ -120,6 +120,11 @@ namespace DellFanManagement.App
             consistencyModeRpmThresholdTextBox.TextChanged += new EventHandler(ConsistencyModeTextBoxesChangedEventHandler);
             consistencyModeApplyChangesButton.Click += new EventHandler(ConsistencyApplyChangesButtonClickedEventHandler);
 
+            frequencyTextBox.TextChanged += new EventHandler(ConsistencyModeTextBoxesChangedEventHandler);
+            powerApplyButton.Click += new EventHandler(PowerApplyButtonClickedEventHandler);
+
+            eppTrackBar.Scroll += new EventHandler(EppTrackBarScrollEventHandler);
+
             // ...Tray icon checkboxes...
             trayIconCheckBox.CheckedChanged += new EventHandler(TrayIconCheckBoxChangedEventHandler);
             animatedCheckBox.CheckedChanged += new EventHandler(AnimatedCheckBoxChangedEventHandler);
@@ -153,6 +158,8 @@ namespace DellFanManagement.App
             // Initial update of the tray icon (required for it to appear for display).
             UpdateTrayIcon(false);
 
+            //初始化电源管理相关的UI元素。
+            UpdatePowerForm();
             // Update form with default state values.
             UpdateForm();
 
@@ -281,6 +288,21 @@ namespace DellFanManagement.App
             }
         }
 
+        private void UpdatePowerForm()
+        {
+            if (CpuPowerApi.GetGuidByState(CpuPowerApi.GUID_PROCESSOR_PERFEPP, out uint epp) == 0)
+            {
+                eppTrackBar.Value = (int)epp;
+                eppLabel.Text = string.Format("EPP: {0}", epp);
+            }
+
+            if (CpuPowerApi.GetGuidByState(CpuPowerApi.GUID_PROCESSOR_FREQUENCYMAX, out uint frequencyMax) == 0)
+            {
+                frequencyTextBox.Text = frequencyMax.ToString();
+            }
+            Console.WriteLine("Finished updating power form.");
+        }
+
         /// <summary>
         /// Clear the manual operation mode configuration (when we switch to a different mode, it should be reset).
         /// </summary>
@@ -299,8 +321,6 @@ namespace DellFanManagement.App
             // This method does not write to the state, but we should still make sure that the state is not changing
             // during the update.
             _state.WaitOne();
-
-            AudioDevice bringBackAudioDevice = null;
 
             // Fan RPM.
             fan1RpmLabel.Text = string.Format("Fan 1 RPM: {0}", _state.Fan1Rpm != null ? _state.Fan1Rpm : "(Error)");
@@ -459,6 +479,8 @@ namespace DellFanManagement.App
                 }
             }
 
+            //Console.WriteLine("Finished updating form.");
+
             _state.Release();
         }
 
@@ -589,7 +611,6 @@ namespace DellFanManagement.App
 
             _state.WaitOne();
             _state.BackgroundThreadRunning = false; // Request termination of background thread.
-            _core.StopAudioThread(); // Request termination of the audio thread.
             _state.FormClosed = true;
             _state.Release();
         }
@@ -731,6 +752,11 @@ namespace DellFanManagement.App
             if (Regex.IsMatch(consistencyModeRpmThresholdTextBox.Text, "[^0-9]"))
             {
                 consistencyModeRpmThresholdTextBox.Text = Regex.Replace(consistencyModeRpmThresholdTextBox.Text, "[^0-9]", "");
+            }
+
+            if (Regex.IsMatch(frequencyTextBox.Text, "[^0-9]"))
+            {
+                frequencyTextBox.Text = Regex.Replace(frequencyTextBox.Text, "[^0-9]", "");
             }
 
             CheckConsistencyModeOptionsConsistency();
@@ -976,69 +1002,16 @@ namespace DellFanManagement.App
             MessageBox.Show("Note: While every has been made to make this program safe to use, it does interact with the embedded controller and system BIOS using undocumented methods and may have adverse effects on your system.  Use at your own risk.  If you experience odd behavior, a full system shutdown should restore everything back to the original state.  This program is not created by or affiliated with Dell Inc. or Dell Technologies Inc.", "Dell Fan Management – Disclaimer");
         }
 
-        private void alertsCheckBox_CheckedChanged(object sender, EventArgs e)
+        private void EppTrackBarScrollEventHandler(object sender, EventArgs e)
         {
-
+            uint result= CpuPowerApi.SetGuidByState(CpuPowerApi.GUID_PROCESSOR_PERFEPP, (uint)eppTrackBar.Value);
+            eppLabel.Text = string.Format("EPP: {0}", eppTrackBar.Value);
         }
 
-        private void manualFan2GroupBox_Enter(object sender, EventArgs e)
+        private void PowerApplyButtonClickedEventHandler(object sender, EventArgs e)
         {
-
-        }
-
-        private void consistencyModeLowerTemperatureThresholdTextBox_TextChanged(object sender, EventArgs e)
-        {
-
-        }
-
-        private void consistencyModeLowerTemperatureThresholdLabel_Click(object sender, EventArgs e)
-        {
-
-        }
-
-        private void operationModeRadioButtonAutomatic_CheckedChanged(object sender, EventArgs e)
-        {
-
-        }
-
-        private void consistencyModeRpmThresholdTextBox_TextChanged(object sender, EventArgs e)
-        {
-
-        }
-
-        private void temperatureLabel1_Click(object sender, EventArgs e)
-        {
-
-        }
-
-        private void restartBackgroundThreadButton_Click(object sender, EventArgs e)
-        {
-
-        }
-
-        private void temperatureLabel17_Click(object sender, EventArgs e)
-        {
-
-        }
-
-        private void temperatureLabel2_Click(object sender, EventArgs e)
-        {
-
-        }
-
-        private void groupBox1_Enter(object sender, EventArgs e)
-        {
-
-        }
-
-        private void powerButton_Click(object sender, EventArgs e)
-        {
-
-        }
-
-        private void trackBar1_Scroll(object sender, EventArgs e)
-        {
-
+            CpuPowerApi.SetGuidByState(CpuPowerApi.GUID_PROCESSOR_PERFEPP, (uint)eppTrackBar.Value);
+            CpuPowerApi.SetGuidByState(CpuPowerApi.GUID_PROCESSOR_FREQUENCYMAX, uint.Parse(frequencyTextBox.Text));
         }
     }
 }

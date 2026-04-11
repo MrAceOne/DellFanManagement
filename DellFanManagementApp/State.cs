@@ -79,16 +79,6 @@ namespace DellFanManagement.App
         private string _consistencyModeStatus;
 
         /// <summary>
-        /// The currently selected audio device.
-        /// </summary>
-        private AudioDevice _selectedAudioDevice;
-
-        /// <summary>
-        /// If the selected audio device disappears and returns, we want to automatically select it again.
-        /// </summary>
-        private AudioDevice _bringBackAudioDevice;
-
-        /// <summary>
         /// Number of times in a row that the thermal setting has failed to update.
         /// </summary>
         private int _consecutiveThermalSettingFailures;
@@ -108,7 +98,6 @@ namespace DellFanManagement.App
             _audioThreadRunning = false;
             _formClosed = false;
             _ecFanControlEnabled = true;
-            _selectedAudioDevice = null;
             _error = null;
 
             _semaphore = new(1, 1);
@@ -166,7 +155,6 @@ namespace DellFanManagement.App
             UpdateTemperatures();
             UpdatePowerProfile();
             UpdateThermalSetting();
-            UpdateAudioDevices();
         }
 
         /// <summary>
@@ -264,19 +252,11 @@ namespace DellFanManagement.App
         /// </summary>
         private void UpdatePowerProfile()
         {
-            Guid? activeProfile = PowerProfiles.GetActivePowerProfile();
+            Guid? activeProfile = CpuPowerApi.GetActivePowerProfile();
             if (activeProfile != null)
             {
                 ActivePowerProfile = activeProfile;
             }
-        }
-
-        /// <summary>
-        /// Update the audio device list.
-        /// </summary>
-        private void UpdateAudioDevices()
-        {
-            AudioDevices = Utility.GetAudioDevices();
         }
 
         /// <summary>
@@ -394,24 +374,6 @@ namespace DellFanManagement.App
         }
 
         /// <summary>
-        /// The currently selected audio device.
-        /// </summary>
-        public AudioDevice SelectedAudioDevice
-        {
-            get { return _selectedAudioDevice; }
-            set { AccessCheck(); _selectedAudioDevice = value; }
-        }
-
-        /// <summary>
-        /// If the selected audio device disappears and returns, we want to automatically select it again.
-        /// </summary>
-        public AudioDevice BringBackAudioDevice
-        {
-            get { return _bringBackAudioDevice; }
-            set { AccessCheck(); _bringBackAudioDevice = value; }
-        }
-
-        /// <summary>
         /// RPM value for fan 1.
         /// </summary>
         public uint? Fan1Rpm { get; private set; }
@@ -450,10 +412,5 @@ namespace DellFanManagement.App
         /// Current "thermal setting".
         /// </summary>
         public ThermalSetting ThermalSetting { get; private set; }
-
-        /// <summary>
-        /// List of audio devices in the system (keyed by ID).
-        /// </summary>
-        public List<AudioDevice> AudioDevices { get; private set; }
     }
 }

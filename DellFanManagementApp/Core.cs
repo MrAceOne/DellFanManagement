@@ -40,11 +40,6 @@ namespace DellFanManagement.App
         private readonly ConsistencyModeHandler _consistencyModeHandler;
 
         /// <summary>
-        /// Used to play back sounds in the application.
-        /// </summary>
-        private SoundPlayer _soundPlayer;
-
-        /// <summary>
         /// Block state change requests while a state update is in progress.
         /// </summary>
         private readonly Semaphore _requestSemaphore;
@@ -97,7 +92,6 @@ namespace DellFanManagement.App
             _form = form;
             _fanController = FanControllerFactory.GetFanFanController();
             _consistencyModeHandler = ConsistencyModeHandlerFactory.GetConsistencyModeHandler(this, _state, _fanController);
-            _soundPlayer = null;
             _requestSemaphore = new(1, 1);
 
             RequestedThermalSetting = null;
@@ -197,36 +191,6 @@ namespace DellFanManagement.App
             }
 
             _requestSemaphore.Release();
-        }
-
-        /// <summary>
-        /// Set the state audio device for the audio keep-alive thread.
-        /// </summary>
-        /// <param name="device">Selected audio device</param>
-        public void RequestAudioDevice(AudioDevice device)
-        {
-            bool activeAudioDeviceChanged = false;
-
-            _state.WaitOne();
-
-            if (device != null)
-            {
-                _state.BringBackAudioDevice = null;
-
-                if (device != _state.SelectedAudioDevice && _state.AudioThreadRunning)
-                {
-                    activeAudioDeviceChanged = true;
-                }
-            }
-
-            _state.SelectedAudioDevice = device;
-
-            _state.Release();
-
-            if (activeAudioDeviceChanged)
-            {
-                StopAudioThread();
-            }
         }
 
         /// <summary>
@@ -344,16 +308,6 @@ namespace DellFanManagement.App
                         RequestedThermalSetting = null;
                     }
 
-                    // Check to see if the active audio device has disappeared.
-                    if (_state.AudioThreadRunning && !_state.AudioDevices.Contains(_state.SelectedAudioDevice))
-                    {
-                        // Remember the audio device in case it reappears.
-                        _state.BringBackAudioDevice = _state.SelectedAudioDevice;
-
-                        // Terminate the audio thread.
-                        _soundPlayer?.RequestTermination();
-                    }
-
                     _requestSemaphore.Release();
                     _state.Release();
                     releaseSemaphore = false;
@@ -392,14 +346,6 @@ namespace DellFanManagement.App
             _state.Release();
 
             UpdateForm();
-        }
-
-        /// <summary>
-        /// Request that the audio thread be terminated.
-        /// </summary>
-        public void StopAudioThread()
-        {
-            _soundPlayer?.RequestTermination();
         }
 
         /// <summary>

@@ -19,7 +19,7 @@ namespace DellFanManagement.App
         /// <returns>True if all tests were successful, false otherwise</returns>
         public static bool RunPackageTests()
         {
-            return OpenHardwareMonitorTest() && NvapiTest() && DellSmbiosBzhTest() && DellSmbiosSmiTest() && IrrKlangTest();
+            return OpenHardwareMonitorTest() && NvapiTest() && DellSmbiosBzhTest() && DellSmbiosSmiTest();
         }
 
         /// <summary>
@@ -157,33 +157,6 @@ namespace DellFanManagement.App
 
                 ThermalSetting currentSetting = DellSmbiosSmi.GetThermalSetting();
                 Console.WriteLine("Thermal setting: {0}", currentSetting);
-            }
-            catch (Exception exception)
-            {
-                Console.Error.WriteLine("{0}: {1}\n{2}", exception.GetType().ToString(), exception.Message, exception.StackTrace);
-                return false;
-            }
-
-            Console.WriteLine("  ...Passed.");
-            return true;
-        }
-
-        /// <summary>
-        /// Run a quick test of the irrKlang package.
-        /// </summary>
-        /// <returns>True if the test was successful, false otherwise</returns>
-        private static bool IrrKlangTest()
-        {
-            try
-            {
-                Console.WriteLine("Running irrKlang test.");
-
-                new SoundPlayer().PlaySound(@"C:\Windows\Media\Windows Logon.wav");
-
-                foreach (AudioDevice audioDevice in Utility.GetAudioDevices())
-                {
-                    Console.WriteLine("  {0}: {1}", audioDevice.DeviceId, audioDevice.DeviceName);
-                }
             }
             catch (Exception exception)
             {
