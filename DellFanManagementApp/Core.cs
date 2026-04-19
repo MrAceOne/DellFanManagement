@@ -1,5 +1,6 @@
 ﻿using DellFanManagement.App.ConsistencyModeHandlers;
 using DellFanManagement.App.FanControllers;
+using DellFanManagement.App.TemperatureReaders;
 using DellFanManagement.DellSmbiosSmiLib;
 using System;
 using System.Threading;
@@ -80,6 +81,36 @@ namespace DellFanManagement.App
         /// Thermal setting that has been requested by the user but not yet applied.
         /// </summary>
         public ThermalSetting? RequestedThermalSetting { get; private set; }
+
+        /// <summary>
+        /// 上次CPU温度（用于智能UI更新）
+        /// </summary>
+        private int _lastCpuTemperature = -1;
+
+        /// <summary>
+        /// 上次GPU温度（用于智能UI更新）
+        /// </summary>
+        private int _lastGpuTemperature = -1;
+
+        /// <summary>
+        /// 上次风扇1转速（用于智能UI更新）
+        /// </summary>
+        private uint? _lastFan1Rpm = null;
+
+        /// <summary>
+        /// 上次风扇2转速（用于智能UI更新）
+        /// </summary>
+        private uint? _lastFan2Rpm = null;
+
+        /// <summary>
+        /// 强制更新计数器（每5秒强制更新一次）
+        /// </summary>
+        private int _forceUpdateCounter = 0;
+
+        /// <summary>
+        /// 强制更新间隔（秒）
+        /// </summary>
+        private const int ForceUpdateInterval = 5;
 
         /// <summary>
         /// Constructor.
@@ -312,7 +343,16 @@ namespace DellFanManagement.App
                     _state.Release();
                     releaseSemaphore = false;
 
-                    UpdateForm();
+                    // 智能UI更新：只在数据变化或达到强制更新间隔时更新
+                    _forceUpdateCounter++;
+                    bool forceUpdate = _forceUpdateCounter >= ForceUpdateInterval;
+                    bool dataChanged = HasDataChanged();
+
+                    if (dataChanged || forceUpdate)
+                    {
+                        UpdateForm();
+                        _forceUpdateCounter = 0;
+                    }
 
                     Thread.Sleep(Core.RefreshInterval);
                 }
@@ -367,6 +407,103 @@ namespace DellFanManagement.App
                     // (There could be an error if trying to update the form after it has been closed... let it slide.)
                 }
             }
+        }
+
+        /// <summary>
+        /// 检查数据是否发生变化，用于智能UI更新
+        /// </summary>
+        /// <returns>如果数据发生变化返回true，否则返回false</returns>
+        private bool HasDataChanged()
+        {
+            bool changed = false;
+
+            // 获取当前温度数据
+            int currentCpuTemp = GetCpuTemperature();
+            int currentGpuTemp = GetGpuTemperature();
+
+            // 检查CPU温度变化（超过1度才更新）
+            if (currentCpuTemp >= 0 && Math.Abs(currentCpuTemp - _lastCpuTemperature) >= 1)
+            {
+                changed = true;
+                _lastCpuTemperature = currentCpuTemp;
+            }
+
+            // 检查GPU温度变化（超过1度才更新）
+            if (currentGpuTemp >= 0 && Math.Abs(currentGpuTemp - _lastGpuTemperature) >= 1)
+            {
+                changed = true;
+                _lastGpuTemperature = currentGpuTemp;
+            }
+
+            // 检查风扇1转速变化（超过50 RPM才更新）
+            if (_state.Fan1Rpm.HasValue)
+            {
+                if (!_lastFan1Rpm.HasValue || Math.Abs((int)(_state.Fan1Rpm.Value - _lastFan1Rpm.Value)) >= 50)
+                {
+                    changed = true;
+                    _lastFan1Rpm = _state.Fan1Rpm;
+                }
+            }
+
+            // 检查风扇2转速变化（超过50 RPM才更新）
+            if (_state.Fan2Rpm.HasValue)
+            {
+                if (!_lastFan2Rpm.HasValue || Math.Abs((int)(_state.Fan2Rpm.Value - _lastFan2Rpm.Value)) >= 50)
+                {
+                    changed = true;
+                    _lastFan2Rpm = _state.Fan2Rpm;
+                }
+            }
+
+            return changed;
+        }
+
+        /// <summary>
+        /// 获取CPU温度
+        /// </summary>
+        /// <returns>CPU温度，如果无法获取则返回-1</returns>
+        private int GetCpuTemperature()
+        {
+            try
+            {
+                if (_state.Temperatures.ContainsKey(TemperatureComponent.CPU))
+                {
+                    var cpuTemps = _state.Temperatures[TemperatureComponent.CPU];
+                    if (cpuTemps.ContainsKey("CPU"))
+                    {
+                        return cpuTemps["CPU"];
+                    }
+                }
+            }
+            catch (Exception)
+            {
+                // 忽略异常
+            }
+            return -1;
+        }
+
+        /// <summary>
+        /// 获取GPU温度
+        /// </summary>
+        /// <returns>GPU温度，如果无法获取则返回-1</returns>
+        private int GetGpuTemperature()
+        {
+            try
+            {
+                if (_state.Temperatures.ContainsKey(TemperatureComponent.GPU))
+                {
+                    var gpuTemps = _state.Temperatures[TemperatureComponent.GPU];
+                    foreach (var temp in gpuTemps.Values)
+                    {
+                        return temp; // 返回第一个GPU温度
+                    }
+                }
+            }
+            catch (Exception)
+            {
+                // 忽略异常
+            }
+            return -1;
         }
 
         /// <summary>

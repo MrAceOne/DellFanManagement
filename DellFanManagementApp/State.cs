@@ -24,6 +24,11 @@ namespace DellFanManagement.App
         private readonly IFanSpeedReader _fanSpeedReader;
 
         /// <summary>
+        /// Object for reading system monitor data (CPU frequency, GPU frequency, memory, etc.)
+        /// </summary>
+        private readonly SystemMonitor _systemMonitor;
+
+        /// <summary>
         /// Semaphore for protecting access to state changes.
         /// </summary>
         private readonly Semaphore _semaphore;
@@ -131,6 +136,9 @@ namespace DellFanManagement.App
             // Initialize fan speed reader.
             _fanSpeedReader = FanSpeedReaderFactory.GetFanSpeedReader();
 
+            // Initialize system monitor.
+            _systemMonitor = new SystemMonitor();
+
             Temperatures = new();
             MinimumTemperatures = new();
             MaximumTemperatures = new();
@@ -155,6 +163,28 @@ namespace DellFanManagement.App
             UpdateTemperatures();
             UpdatePowerProfile();
             UpdateThermalSetting();
+            UpdateSystemMonitorData();
+        }
+
+        /// <summary>
+        /// Update system monitor data (CPU frequency, GPU frequency, memory usage).
+        /// </summary>
+        private void UpdateSystemMonitorData()
+        {
+            try
+            {
+                SystemMonitorData monitorData = _systemMonitor.GetMonitorData();
+                
+                CpuFrequency = monitorData.CpuFrequency;
+                GpuFrequency = monitorData.GpuFrequency;
+                MemoryUsagePercent = monitorData.MemoryUsagePercent;
+                UsedMemoryMB = monitorData.UsedMemoryMB;
+                TotalMemoryMB = monitorData.TotalMemoryMB;
+            }
+            catch (Exception ex)
+            {
+                Log.Write($"Error updating system monitor data: {ex.Message}");
+            }
         }
 
         /// <summary>
@@ -412,5 +442,30 @@ namespace DellFanManagement.App
         /// Current "thermal setting".
         /// </summary>
         public ThermalSetting ThermalSetting { get; private set; }
+
+        /// <summary>
+        /// CPU核心频率（MHz）
+        /// </summary>
+        public int? CpuFrequency { get; private set; }
+
+        /// <summary>
+        /// GPU核心频率（MHz）
+        /// </summary>
+        public int? GpuFrequency { get; private set; }
+
+        /// <summary>
+        /// 内存使用率（百分比）
+        /// </summary>
+        public float? MemoryUsagePercent { get; private set; }
+
+        /// <summary>
+        /// 已使用内存（MB）
+        /// </summary>
+        public long? UsedMemoryMB { get; private set; }
+
+        /// <summary>
+        /// 总内存（MB）
+        /// </summary>
+        public long? TotalMemoryMB { get; private set; }
     }
 }

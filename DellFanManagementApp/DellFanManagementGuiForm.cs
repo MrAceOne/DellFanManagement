@@ -2,6 +2,7 @@
 using DellFanManagement.DellSmbiosSmiLib;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
 using System.Text.RegularExpressions;
 using System.Threading;
@@ -87,6 +88,8 @@ namespace DellFanManagement.App
             FormClosed += new FormClosedEventHandler(FormClosedEventHandler);
             Resize += new EventHandler(OnResizeEventHandler);
             trayIcon.Click += new EventHandler(TrayIconOnClickEventHandler);
+            trayMenuItemShow.Click += new EventHandler(TrayMenuItemShowClickEventHandler);
+            trayMenuItemExit.Click += new EventHandler(TrayMenuItemExitClickEventHandler);
 
             // ...Thermal setting radio buttons...
             thermalSettingRadioButtonOptimized.CheckedChanged += new EventHandler(ThermalSettingChangedEventHandler);
@@ -106,28 +109,14 @@ namespace DellFanManagement.App
             manualFan2RadioButtonMedium.CheckedChanged += new EventHandler(FanLevelChangedEventHandler);
             manualFan2RadioButtonHigh.CheckedChanged += new EventHandler(FanLevelChangedEventHandler);
 
-            // ...Restart background thread button...
-            restartBackgroundThreadButton.Click += new EventHandler(ThermalSettingChangedEventHandler);
-
             // ...Operation mode radio buttons...
             operationModeRadioButtonAutomatic.CheckedChanged += new EventHandler(ConfigurationRadioButtonAutomaticEventHandler);
             operationModeRadioButtonManual.CheckedChanged += new EventHandler(ConfigurationRadioButtonManualEventHandler);
-            operationModeRadioButtonConsistency.CheckedChanged += new EventHandler(ConfigurationRadioButtonConsistencyEventHandler);
-
-            // ...Consistency mode section...
-            consistencyModeLowerTemperatureThresholdTextBox.TextChanged += new EventHandler(ConsistencyModeTextBoxesChangedEventHandler);
-            consistencyModeUpperTemperatureThresholdTextBox.TextChanged += new EventHandler(ConsistencyModeTextBoxesChangedEventHandler);
-            consistencyModeRpmThresholdTextBox.TextChanged += new EventHandler(ConsistencyModeTextBoxesChangedEventHandler);
-            consistencyModeApplyChangesButton.Click += new EventHandler(ConsistencyApplyChangesButtonClickedEventHandler);
-
+            
             frequencyTextBox.TextChanged += new EventHandler(ConsistencyModeTextBoxesChangedEventHandler);
             powerApplyButton.Click += new EventHandler(PowerApplyButtonClickedEventHandler);
 
             eppTrackBar.Scroll += new EventHandler(EppTrackBarScrollEventHandler);
-
-            // ...Tray icon checkboxes...
-            trayIconCheckBox.CheckedChanged += new EventHandler(TrayIconCheckBoxChangedEventHandler);
-            animatedCheckBox.CheckedChanged += new EventHandler(AnimatedCheckBoxChangedEventHandler);
 
             // Empty out pre-populated temperature label text fields.
             // (There are so many to allow support for lots of CPU cores, which many systems will not have.)
@@ -138,22 +127,11 @@ namespace DellFanManagement.App
             if (!_core.IsAutomaticFanControlDisableSupported)
             {
                 operationModeRadioButtonManual.Enabled = false;
-                //operationModeRadioButtonConsistency.Enabled = false;
-                consistencyModeLowerTemperatureThresholdLabel.Enabled = false;
-                consistencyModeUpperTemperatureThresholdLabel.Enabled = false;
-                consistencyModeLowerTemperatureThresholdTextBox.Enabled = false;
-                consistencyModeUpperTemperatureThresholdTextBox.Enabled = false;
             }
             if (!_core.IsSpecificFanControlSupported)
             {
                 operationModeRadioButtonManual.Enabled = false;
             }
-
-            // Apply configuration loaded from registry.
-            ApplyConfiguration();
-
-            // Save initial keep alive configuration.
-            WriteConsistencyModeConfiguration();
 
             // Initial update of the tray icon (required for it to appear for display).
             UpdateTrayIcon(false);
@@ -165,6 +143,9 @@ namespace DellFanManagement.App
 
             // Apply manual fan control configuration from registry.
             ApplyManualModeConfiguration();
+            
+            // Apply operation mode configuration from registry.
+            ApplyConfiguration();
 
             // Start threads to do background work.
             _core.StartBackgroundThread();
@@ -178,35 +159,11 @@ namespace DellFanManagement.App
         /// </summary>
         private void ApplyConfiguration()
         {
-            // The tray icon is enabled by default; disable only if that has been explicitly set.
-            if (_configurationStore.GetIntOption(ConfigurationOption.TrayIconEnabled) == 0)
-            {
-                trayIconCheckBox.Checked = false;
-            }
-
-            // Similar for tray icon animation.
-            if (_configurationStore.GetIntOption(ConfigurationOption.TrayIconAnimationEnabled) == 0)
-            {
-                animatedCheckBox.Checked = false;
-            }
-
             // Consistency mode settings.
             int? lowerTemperatureThreshold = _configurationStore.GetIntOption(ConfigurationOption.ConsistencyModeLowerTemperatureThreshold);
             int? upperTemperatureThreshold = _configurationStore.GetIntOption(ConfigurationOption.ConsistencyModeUpperTemperatureThreshold);
-
-            if (lowerTemperatureThreshold != null && lowerTemperatureThreshold >= 0 && lowerTemperatureThreshold < 100 &&
-                upperTemperatureThreshold != null && upperTemperatureThreshold >= 0 && upperTemperatureThreshold < 100 &&
-                lowerTemperatureThreshold <= upperTemperatureThreshold)
-            {
-                consistencyModeLowerTemperatureThresholdTextBox.Text = lowerTemperatureThreshold.ToString();
-                consistencyModeUpperTemperatureThresholdTextBox.Text = upperTemperatureThreshold.ToString();
-            }
-
             int? rpmThreshold = _configurationStore.GetIntOption(ConfigurationOption.ConsistencyModeRpmThreshold);
-            if (rpmThreshold != null && rpmThreshold > 0 && rpmThreshold < 10000)
-            {
-                consistencyModeRpmThresholdTextBox.Text = rpmThreshold.ToString();
-            }
+            
 
             // Read previous operation mode from configuration.
             bool modeSet = false;
@@ -226,11 +183,7 @@ namespace DellFanManagement.App
                         }
                         break;
                     case OperationMode.Consistency:
-                        if (operationModeRadioButtonConsistency.Enabled)
-                        {
-                            operationModeRadioButtonConsistency.Checked = true;
-                            modeSet = true;
-                        }
+                        
                         break;
                 }
             }
@@ -369,6 +322,28 @@ namespace DellFanManagement.App
                 }
             }
 
+            // 系统监测数据 - CPU和GPU频率已经是GHz单位，内存显示为 已用/总内存 (GB)
+            cpuFrequencyLabel.Text = _state.CpuFrequency.HasValue 
+                ? string.Format("CPU 频率: {0:F1} GHz", _state.CpuFrequency.Value / 1000.0) 
+                : "CPU 频率: --";
+
+            gpuFrequencyLabel.Text = _state.GpuFrequency.HasValue 
+                ? string.Format("GPU 频率: {0:F1} GHz", _state.GpuFrequency.Value / 1000.0) 
+                : "GPU 频率: --";
+
+            // 内存显示：已用内存/总内存 (GB) 使用率百分比
+            if (_state.UsedMemoryMB.HasValue && _state.TotalMemoryMB.HasValue)
+            {
+                float usedGB = _state.UsedMemoryMB.Value / 1024.0f;
+                float totalGB = _state.TotalMemoryMB.Value / 1024.0f;
+                float usagePercent = (usedGB / totalGB) * 100;
+                memoryLabel.Text = string.Format("内存: {0:F1}/{1:F1} GB ({2:F1}%)", usedGB, totalGB, usagePercent);
+            }
+            else
+            {
+                memoryLabel.Text = "内存: --";
+            }
+
             // EC fan control enabled?
             if (_state.OperationMode != OperationMode.Manual)
             {
@@ -383,7 +358,7 @@ namespace DellFanManagement.App
             }
 
             // Consistency mode status.
-            consistencyModeStatusLabel.Text = _state.ConsistencyModeStatus;
+            //consistencyModeStatusLabel.Text = _state.ConsistencyModeStatus;
 
             // Thermal setting.
             if (_core.RequestedThermalSetting == null)
@@ -412,8 +387,7 @@ namespace DellFanManagement.App
                 }
             }
 
-            // Restart background thread button.
-            restartBackgroundThreadButton.Enabled = !_state.BackgroundThreadRunning;
+            // Restart background thread button removed.
 
             // Tray icon hover text.
             if (_state.Fan2Present)
@@ -463,7 +437,7 @@ namespace DellFanManagement.App
                             Log.Write(string.Format("Power mode overrode: {0}", powerMode));
                         }
 
-                        // Check to see if we should change the NVIDIA GPU P-state.
+                        // Check to see if we should change the NVIDIAGPU P-state.
                         int? nvPstate = _configurationStore.GetNvPstateOverride((Guid)_state.ActivePowerProfile);
                         if (nvPstate != null)
                         {
@@ -572,7 +546,7 @@ namespace DellFanManagement.App
         /// <param name="enabled">Indicates whether to enable or disable the controls</param>
         private void SetConsistencyModeControlsAvailability(bool enabled)
         {
-            consistencyModeGroupBox.Enabled = enabled;
+            //consistencyModeGroupBox.Enabled = enabled;
         }
 
         /// <summary>
@@ -738,28 +712,11 @@ namespace DellFanManagement.App
         /// </summary>
         private void ConsistencyModeTextBoxesChangedEventHandler(Object sender, EventArgs e)
         {
-            // Enforce digits only in these text boxes.
-            if (Regex.IsMatch(consistencyModeLowerTemperatureThresholdTextBox.Text, "[^0-9]"))
-            {
-                consistencyModeLowerTemperatureThresholdTextBox.Text = Regex.Replace(consistencyModeLowerTemperatureThresholdTextBox.Text, "[^0-9]", "");
-            }
-
-            if (Regex.IsMatch(consistencyModeUpperTemperatureThresholdTextBox.Text, "[^0-9]"))
-            {
-                consistencyModeUpperTemperatureThresholdTextBox.Text = Regex.Replace(consistencyModeUpperTemperatureThresholdTextBox.Text, "[^0-9]", "");
-            }
-
-            if (Regex.IsMatch(consistencyModeRpmThresholdTextBox.Text, "[^0-9]"))
-            {
-                consistencyModeRpmThresholdTextBox.Text = Regex.Replace(consistencyModeRpmThresholdTextBox.Text, "[^0-9]", "");
-            }
-
             if (Regex.IsMatch(frequencyTextBox.Text, "[^0-9]"))
             {
                 frequencyTextBox.Text = Regex.Replace(frequencyTextBox.Text, "[^0-9]", "");
             }
 
-            CheckConsistencyModeOptionsConsistency();
         }
 
         /// <summary>
@@ -767,38 +724,16 @@ namespace DellFanManagement.App
         /// </summary>
         private void ConsistencyApplyChangesButtonClickedEventHandler(Object sender, EventArgs e)
         {
-            WriteConsistencyModeConfiguration();
+            //WriteConsistencyModeConfiguration();
         }
 
         /// <summary>
-        /// Called when the "tray icon" checkbox is clicked.
-        /// </summary>
-        private void TrayIconCheckBoxChangedEventHandler(Object sender, EventArgs e)
-        {
-            UpdateTrayIcon(false);
-            animatedCheckBox.Enabled = trayIconCheckBox.Checked;
-
-            _configurationStore.SetOption(ConfigurationOption.TrayIconEnabled, trayIconCheckBox.Checked ? 1 : 0);
-        }
-
-        /// <summary>
-        /// Called when the "animated" checkbox is clicked.
-        /// </summary>
-        private void AnimatedCheckBoxChangedEventHandler(Object sender, EventArgs e)
-        {
-            UpdateTrayIcon(false);
-
-            _configurationStore.SetOption(ConfigurationOption.TrayIconAnimationEnabled, animatedCheckBox.Checked ? 1 : 0);
-        }
-
-        /// <summary>
-        /// Called when the tray icon is clicked. Restores the window and makes it visible in the task bar.
+        /// Called when the tray icon is clicked. Only shows the context menu, does not restore the window.
         /// </summary>
         private void TrayIconOnClickEventHandler(object sender, EventArgs e)
         {
-            Visible = true;
-            ShowInTaskbar = true;
-            WindowState = FormWindowState.Normal;
+            // 只显示上下文菜单，不恢复窗口
+            // 这样用户必须通过"Dell控制面板"菜单项来恢复窗口
         }
 
         /// <summary>
@@ -811,63 +746,6 @@ namespace DellFanManagement.App
             {
                 ShowInTaskbar = false;
                 Visible = false;
-            }
-        }
-
-        /// <summary>
-        /// Check to see if the GUI consistency mode options text boxes match the currently stored configuration, and
-        /// enable or disable the "apply changes" button accordingly.
-        /// </summary>
-        private void CheckConsistencyModeOptionsConsistency()
-        {
-            bool result = false;
-
-            if (consistencyModeLowerTemperatureThresholdTextBox.Text != _core.LowerTemperatureThreshold.ToString() ||
-                consistencyModeUpperTemperatureThresholdTextBox.Text != _core.UpperTemperatureThreshold.ToString() ||
-                consistencyModeRpmThresholdTextBox.Text != _core.RpmThreshold.ToString())
-            {
-                // Configuration doesn't match.  Check for flip-flop.
-                bool success = int.TryParse(consistencyModeLowerTemperatureThresholdTextBox.Text, out int lowerTemperatureThreshold);
-                if (success)
-                {
-                    success = int.TryParse(consistencyModeUpperTemperatureThresholdTextBox.Text, out int upperTemperatureThreshold);
-                    if (success)
-                    {
-                        if (upperTemperatureThreshold >= lowerTemperatureThreshold)
-                        {
-                            // Looks good, we can enable the button.
-                            result = true;
-                        }
-                    }
-                }
-            }
-
-            consistencyModeApplyChangesButton.Enabled = result;
-        }
-
-        /// <summary>
-        /// Take the consistency mode configuration and save it to the core.
-        /// </summary>
-        private void WriteConsistencyModeConfiguration()
-        {
-            bool success = int.TryParse(consistencyModeLowerTemperatureThresholdTextBox.Text, out int lowerTemperatureThreshold);
-            if (success)
-            {
-                success = int.TryParse(consistencyModeUpperTemperatureThresholdTextBox.Text, out int upperTemperatureThreshold);
-                if (success)
-                {
-                    success = int.TryParse(consistencyModeRpmThresholdTextBox.Text, out int rpmThreshold);
-                    if (success)
-                    {
-                        _core.WriteConsistencyModeConfiguration(lowerTemperatureThreshold, upperTemperatureThreshold, rpmThreshold);
-
-                        _configurationStore.SetOption(ConfigurationOption.ConsistencyModeLowerTemperatureThreshold, lowerTemperatureThreshold);
-                        _configurationStore.SetOption(ConfigurationOption.ConsistencyModeUpperTemperatureThreshold, upperTemperatureThreshold);
-                        _configurationStore.SetOption(ConfigurationOption.ConsistencyModeRpmThreshold, rpmThreshold);
-
-                        CheckConsistencyModeOptionsConsistency();
-                    }
-                }
             }
         }
 
@@ -893,36 +771,26 @@ namespace DellFanManagement.App
         /// <param name="advance">Whether or not to advance a frame</param>
         private void UpdateTrayIcon(bool advance)
         {
-            // Actually, hide tray icon if it is not enabled.
-            trayIcon.Visible = trayIconCheckBox.Checked;
+            // Tray icon is always visible
+            trayIcon.Visible = true;
 
-            if (trayIconCheckBox.Checked)
+            int offset = _core.TrayIconColor switch
             {
-                int offset = _core.TrayIconColor switch
-                {
-                    TrayIconColor.Gray => 0,
-                    TrayIconColor.Blue => 16,
-                    TrayIconColor.Red => 32,
-                    _ => 0
-                };
+                TrayIconColor.Gray => 0,
+                TrayIconColor.Blue => 16,
+                TrayIconColor.Red => 32,
+                _ => 0
+            };
 
-                if (animatedCheckBox.Checked)
-                {
-                    if (advance)
-                    {
-                        _trayIconIndex = (_trayIconIndex + 1) % (_trayIcons.Length / 3);
-                    }
-                }
-                else
-                {
-                    _trayIconIndex = 0;
-                }
+            if (advance)
+            {
+                _trayIconIndex = (_trayIconIndex + 1) % (_trayIcons.Length / 3);
+            }
 
-                Icon newIcon = _trayIcons[_trayIconIndex + offset];
-                if (trayIcon.Icon != newIcon)
-                {
-                    trayIcon.Icon = newIcon;
-                }
+            Icon newIcon = _trayIcons[_trayIconIndex + offset];
+            if (trayIcon.Icon != newIcon)
+            {
+                trayIcon.Icon = newIcon;
             }
         }
 
@@ -955,34 +823,31 @@ namespace DellFanManagement.App
                 {
                     int waitTime = 1000; // One second.
 
-                    if (trayIconCheckBox.Checked && animatedCheckBox.Checked)
+                    // Always animate
+                    uint? averageRpm;
+                    if (_state.Fan2Present)
                     {
-                        // Grab state information that we need.
-                        uint? averageRpm;
-                        if (_state.Fan2Present)
+                        averageRpm = (_state.Fan1Rpm + _state.Fan2Rpm) / 2;
+                    }
+                    else
+                    {
+                        averageRpm = _state.Fan1Rpm;
+                    }
+
+                    if (averageRpm > 250 && averageRpm < 10000)
+                    {
+                        try
                         {
-                            averageRpm = (_state.Fan1Rpm + _state.Fan2Rpm) / 2;
+                            BeginInvoke(updateInvoker);
                         }
-                        else
+                        catch (Exception)
                         {
-                            averageRpm = _state.Fan1Rpm;
+                            // If the window handle is not here (not open yet, or closing), there could be an error.
+                            // Silently ignore.
                         }
 
-                        if (averageRpm > 250 && averageRpm < 10000)
-                        {
-                            try
-                            {
-                                BeginInvoke(updateInvoker);
-                            }
-                            catch (Exception)
-                            {
-                                // If the window handle is not here (not open yet, or closing), there could be an error.
-                                // Silently ignore.
-                            }
-
-                            // Higher RPM = lower wait time = faster animation.
-                            waitTime = 250000 / (int)averageRpm;
-                        }
+                        // Higher RPM = lower wait time = faster animation.
+                        waitTime = 250000 / (int)averageRpm;
                     }
 
                     Thread.Sleep(Math.Min(waitTime, 1000));
@@ -1012,6 +877,102 @@ namespace DellFanManagement.App
         {
             CpuPowerApi.SetGuidByState(CpuPowerApi.GUID_PROCESSOR_PERFEPP, (uint)eppTrackBar.Value);
             CpuPowerApi.SetGuidByState(CpuPowerApi.GUID_PROCESSOR_FREQUENCYMAX, uint.Parse(frequencyTextBox.Text));
+        }
+
+        /// <summary>
+        /// 托盘菜单 - 显示主界面
+        /// </summary>
+        private void TrayMenuItemShowClickEventHandler(object sender, EventArgs e)
+        {
+            Visible = true;
+            ShowInTaskbar = true;
+            WindowState = FormWindowState.Normal;
+        }
+
+        /// <summary>
+        /// 托盘菜单 - 退出程序
+        /// </summary>
+        private void TrayMenuItemExitClickEventHandler(object sender, EventArgs e)
+        {
+            // 调用退出处理方法
+            ExitApplication();
+        }
+        
+        /// <summary>
+        /// 重写WndProc以拦截关闭消息，将其转为最小化
+        /// </summary>
+        /// <param name="m">Windows消息</param>
+        protected override void WndProc(ref Message m)
+        {
+            const int WM_CLOSE = 0x0010;
+            
+            if (m.Msg == WM_CLOSE)
+            {
+                // 最小化到托盘而不是关闭
+                WindowState = FormWindowState.Minimized;
+                ShowInTaskbar = false;
+                Visible = false;
+                return;
+            }
+            
+            base.WndProc(ref m);
+        }
+        
+        /// <summary>
+        /// 当窗体关闭时的事件处理程序
+        /// </summary>
+        private void ClosedEventHandler(Object sender, FormClosedEventArgs e)
+        {
+            ExitApplication();
+        }
+        
+        /// <summary>
+        /// 退出应用程序的处理方法
+        /// </summary>
+        private void ExitApplication()
+        {
+            _formClosed = true;
+
+            _state.WaitOne();
+            _state.BackgroundThreadRunning = false; // Request termination of background thread.
+            _state.FormClosed = true;
+            _state.Release();
+            
+            // 确保所有子进程都被终止
+            try
+            {
+                // 获取当前进程的所有子进程
+                Process currentProcess = Process.GetCurrentProcess();
+                Process[] processes = Process.GetProcesses();
+                
+                foreach (Process process in processes)
+                {
+                    // 检查是否是当前进程的子进程
+                    if (process.MainModule != null && process.MainModule.FileName == currentProcess.MainModule.FileName)
+                    {
+                        // 如果是同一个进程的实例，终止它
+                        if (process.Id != currentProcess.Id)
+                        {
+                            try
+                            {
+                                process.Kill();
+                                process.WaitForExit(5000); // 等待最多5秒
+                            }
+                            catch (Exception)
+                            {
+                                // 忽略终止失败的进程
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.Write($"Error terminating child processes: {ex.Message}");
+            }
+            
+            // 退出应用程序
+            Application.Exit();
         }
     }
 }

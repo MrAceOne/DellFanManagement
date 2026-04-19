@@ -1,5 +1,4 @@
-﻿
-using System.Threading;
+﻿using System.Threading;
 
 namespace DellFanManagement.App
 {
@@ -44,8 +43,11 @@ namespace DellFanManagement.App
             temperatureGroupBox = new System.Windows.Forms.GroupBox();
             temperatureLabel2 = new System.Windows.Forms.Label();
             temperatureLabel1 = new System.Windows.Forms.Label();
+            systemMonitorGroupBox = new System.Windows.Forms.GroupBox();
+            cpuFrequencyLabel = new System.Windows.Forms.Label();
+            gpuFrequencyLabel = new System.Windows.Forms.Label();
+            memoryLabel = new System.Windows.Forms.Label();
             operationModeGroupBox = new System.Windows.Forms.GroupBox();
-            operationModeRadioButtonConsistency = new System.Windows.Forms.RadioButton();
             operationModeRadioButtonManual = new System.Windows.Forms.RadioButton();
             operationModeRadioButtonAutomatic = new System.Windows.Forms.RadioButton();
             manualGroupBox = new System.Windows.Forms.GroupBox();
@@ -57,24 +59,14 @@ namespace DellFanManagement.App
             manualFan1RadioButtonHigh = new System.Windows.Forms.RadioButton();
             manualFan1RadioButtonMedium = new System.Windows.Forms.RadioButton();
             manualFan1RadioButtonOff = new System.Windows.Forms.RadioButton();
-            consistencyModeGroupBox = new System.Windows.Forms.GroupBox();
-            alertsCheckBox = new System.Windows.Forms.CheckBox();
-            consistencyModeApplyChangesButton = new System.Windows.Forms.Button();
-            consistencyModeRpmThresholdTextBox = new System.Windows.Forms.TextBox();
-            consistencyModeRpmThresholdLabel = new System.Windows.Forms.Label();
-            consistencyModeUpperTemperatureThresholdTextBox = new System.Windows.Forms.TextBox();
-            consistencyModeUpperTemperatureThresholdLabel = new System.Windows.Forms.Label();
-            consistencyModeLowerTemperatureThresholdTextBox = new System.Windows.Forms.TextBox();
-            consistencyModeLowerTemperatureThresholdLabel = new System.Windows.Forms.Label();
             ecFanControlRadioButtonOn = new System.Windows.Forms.RadioButton();
             ecFanControlRadioButtonOff = new System.Windows.Forms.RadioButton();
             ecFanControlGroupBox = new System.Windows.Forms.GroupBox();
-            restartBackgroundThreadButton = new System.Windows.Forms.Button();
             statusStrip = new System.Windows.Forms.StatusStrip();
-            consistencyModeStatusLabel = new System.Windows.Forms.ToolStripStatusLabel();
             trayIcon = new System.Windows.Forms.NotifyIcon(components);
-            trayIconCheckBox = new System.Windows.Forms.CheckBox();
-            animatedCheckBox = new System.Windows.Forms.CheckBox();
+            trayContextMenu = new System.Windows.Forms.ContextMenuStrip(components);
+            trayMenuItemShow = new System.Windows.Forms.ToolStripMenuItem();
+            trayMenuItemExit = new System.Windows.Forms.ToolStripMenuItem();
             groupBox1 = new System.Windows.Forms.GroupBox();
             powerApplyButton = new System.Windows.Forms.Button();
             frequencyTextBox = new System.Windows.Forms.TextBox();
@@ -84,13 +76,13 @@ namespace DellFanManagement.App
             fansGroupBox.SuspendLayout();
             thermalSettingGroupBox.SuspendLayout();
             temperatureGroupBox.SuspendLayout();
+            systemMonitorGroupBox.SuspendLayout();
             operationModeGroupBox.SuspendLayout();
             manualGroupBox.SuspendLayout();
             manualFan2GroupBox.SuspendLayout();
             manualFan1GroupBox.SuspendLayout();
-            consistencyModeGroupBox.SuspendLayout();
             ecFanControlGroupBox.SuspendLayout();
-            statusStrip.SuspendLayout();
+            trayContextMenu.SuspendLayout();
             groupBox1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)eppTrackBar).BeginInit();
             SuspendLayout();
@@ -101,7 +93,7 @@ namespace DellFanManagement.App
             fansGroupBox.Controls.Add(fan1RpmLabel);
             fansGroupBox.Location = new System.Drawing.Point(12, 12);
             fansGroupBox.Name = "fansGroupBox";
-            fansGroupBox.Size = new System.Drawing.Size(223, 64);
+            fansGroupBox.Size = new System.Drawing.Size(175, 64);
             fansGroupBox.TabIndex = 1;
             fansGroupBox.TabStop = false;
             fansGroupBox.Text = "风扇:";
@@ -111,18 +103,18 @@ namespace DellFanManagement.App
             fan2RpmLabel.AutoSize = true;
             fan2RpmLabel.Location = new System.Drawing.Point(6, 38);
             fan2RpmLabel.Name = "fan2RpmLabel";
-            fan2RpmLabel.Size = new System.Drawing.Size(169, 17);
+            fan2RpmLabel.Size = new System.Drawing.Size(130, 17);
             fan2RpmLabel.TabIndex = 2;
-            fan2RpmLabel.Text = "Fan 2 RPM: (Not measured)";
+            fan2RpmLabel.Text = "Fan 2 RPM: (no data)";
             // 
             // fan1RpmLabel
             // 
             fan1RpmLabel.AutoSize = true;
             fan1RpmLabel.Location = new System.Drawing.Point(6, 19);
             fan1RpmLabel.Name = "fan1RpmLabel";
-            fan1RpmLabel.Size = new System.Drawing.Size(169, 17);
+            fan1RpmLabel.Size = new System.Drawing.Size(130, 17);
             fan1RpmLabel.TabIndex = 1;
-            fan1RpmLabel.Text = "Fan 1 RPM: (Not measured)";
+            fan1RpmLabel.Text = "Fan 1 RPM: (no data)";
             // 
             // thermalSettingGroupBox
             // 
@@ -130,9 +122,9 @@ namespace DellFanManagement.App
             thermalSettingGroupBox.Controls.Add(thermalSettingRadioButtonQuiet);
             thermalSettingGroupBox.Controls.Add(thermalSettingRadioButtonCool);
             thermalSettingGroupBox.Controls.Add(thermalSettingRadioButtonOptimized);
-            thermalSettingGroupBox.Location = new System.Drawing.Point(350, 117);
+            thermalSettingGroupBox.Location = new System.Drawing.Point(193, 147);
             thermalSettingGroupBox.Name = "thermalSettingGroupBox";
-            thermalSettingGroupBox.Size = new System.Drawing.Size(111, 124);
+            thermalSettingGroupBox.Size = new System.Drawing.Size(103, 124);
             thermalSettingGroupBox.TabIndex = 6;
             thermalSettingGroupBox.TabStop = false;
             thermalSettingGroupBox.Text = "散热管理:";
@@ -191,7 +183,7 @@ namespace DellFanManagement.App
             temperatureGroupBox.Controls.Add(temperatureLabel1);
             temperatureGroupBox.Location = new System.Drawing.Point(12, 80);
             temperatureGroupBox.Name = "temperatureGroupBox";
-            temperatureGroupBox.Size = new System.Drawing.Size(223, 78);
+            temperatureGroupBox.Size = new System.Drawing.Size(175, 78);
             temperatureGroupBox.TabIndex = 4;
             temperatureGroupBox.TabStop = false;
             temperatureGroupBox.Text = "温度:";
@@ -214,29 +206,55 @@ namespace DellFanManagement.App
             temperatureLabel1.TabIndex = 0;
             temperatureLabel1.Text = "CPU: 50 (50-100)";
             // 
+            // systemMonitorGroupBox
+            // 
+            systemMonitorGroupBox.Controls.Add(cpuFrequencyLabel);
+            systemMonitorGroupBox.Controls.Add(gpuFrequencyLabel);
+            systemMonitorGroupBox.Controls.Add(memoryLabel);
+            systemMonitorGroupBox.Location = new System.Drawing.Point(12, 164);
+            systemMonitorGroupBox.Name = "systemMonitorGroupBox";
+            systemMonitorGroupBox.Size = new System.Drawing.Size(175, 105);
+            systemMonitorGroupBox.TabIndex = 15;
+            systemMonitorGroupBox.TabStop = false;
+            systemMonitorGroupBox.Text = "系统监测:";
+            // 
+            // cpuFrequencyLabel
+            // 
+            cpuFrequencyLabel.AutoSize = true;
+            cpuFrequencyLabel.Location = new System.Drawing.Point(6, 23);
+            cpuFrequencyLabel.Name = "cpuFrequencyLabel";
+            cpuFrequencyLabel.Size = new System.Drawing.Size(77, 17);
+            cpuFrequencyLabel.TabIndex = 0;
+            cpuFrequencyLabel.Text = "CPU 频率: --";
+            // 
+            // gpuFrequencyLabel
+            // 
+            gpuFrequencyLabel.AutoSize = true;
+            gpuFrequencyLabel.Location = new System.Drawing.Point(6, 42);
+            gpuFrequencyLabel.Name = "gpuFrequencyLabel";
+            gpuFrequencyLabel.Size = new System.Drawing.Size(78, 17);
+            gpuFrequencyLabel.TabIndex = 1;
+            gpuFrequencyLabel.Text = "GPU 频率: --";
+            // 
+            // memoryLabel
+            // 
+            memoryLabel.AutoSize = true;
+            memoryLabel.Location = new System.Drawing.Point(6, 61);
+            memoryLabel.Name = "memoryLabel";
+            memoryLabel.Size = new System.Drawing.Size(49, 17);
+            memoryLabel.TabIndex = 2;
+            memoryLabel.Text = "内存: --";
+            // 
             // operationModeGroupBox
             // 
-            operationModeGroupBox.Controls.Add(operationModeRadioButtonConsistency);
             operationModeGroupBox.Controls.Add(operationModeRadioButtonManual);
             operationModeGroupBox.Controls.Add(operationModeRadioButtonAutomatic);
-            operationModeGroupBox.Location = new System.Drawing.Point(350, 12);
+            operationModeGroupBox.Location = new System.Drawing.Point(193, 66);
             operationModeGroupBox.Name = "operationModeGroupBox";
-            operationModeGroupBox.Size = new System.Drawing.Size(111, 99);
+            operationModeGroupBox.Size = new System.Drawing.Size(103, 75);
             operationModeGroupBox.TabIndex = 5;
             operationModeGroupBox.TabStop = false;
             operationModeGroupBox.Text = "操作模式:";
-            // 
-            // operationModeRadioButtonConsistency
-            // 
-            operationModeRadioButtonConsistency.AutoSize = true;
-            operationModeRadioButtonConsistency.Font = new System.Drawing.Font("Microsoft YaHei UI", 8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-            operationModeRadioButtonConsistency.Location = new System.Drawing.Point(6, 72);
-            operationModeRadioButtonConsistency.Name = "operationModeRadioButtonConsistency";
-            operationModeRadioButtonConsistency.Size = new System.Drawing.Size(58, 20);
-            operationModeRadioButtonConsistency.TabIndex = 2;
-            operationModeRadioButtonConsistency.TabStop = true;
-            operationModeRadioButtonConsistency.Text = "一致性";
-            operationModeRadioButtonConsistency.UseVisualStyleBackColor = true;
             // 
             // operationModeRadioButtonManual
             // 
@@ -266,9 +284,9 @@ namespace DellFanManagement.App
             // 
             manualGroupBox.Controls.Add(manualFan2GroupBox);
             manualGroupBox.Controls.Add(manualFan1GroupBox);
-            manualGroupBox.Location = new System.Drawing.Point(467, 12);
+            manualGroupBox.Location = new System.Drawing.Point(302, 12);
             manualGroupBox.Name = "manualGroupBox";
-            manualGroupBox.Size = new System.Drawing.Size(194, 126);
+            manualGroupBox.Size = new System.Drawing.Size(194, 129);
             manualGroupBox.TabIndex = 9;
             manualGroupBox.TabStop = false;
             manualGroupBox.Text = "手动控制:";
@@ -369,97 +387,6 @@ namespace DellFanManagement.App
             manualFan1RadioButtonOff.Text = "关";
             manualFan1RadioButtonOff.UseVisualStyleBackColor = true;
             // 
-            // consistencyModeGroupBox
-            // 
-            consistencyModeGroupBox.Controls.Add(alertsCheckBox);
-            consistencyModeGroupBox.Controls.Add(consistencyModeApplyChangesButton);
-            consistencyModeGroupBox.Controls.Add(consistencyModeRpmThresholdTextBox);
-            consistencyModeGroupBox.Controls.Add(consistencyModeRpmThresholdLabel);
-            consistencyModeGroupBox.Controls.Add(consistencyModeUpperTemperatureThresholdTextBox);
-            consistencyModeGroupBox.Controls.Add(consistencyModeUpperTemperatureThresholdLabel);
-            consistencyModeGroupBox.Controls.Add(consistencyModeLowerTemperatureThresholdTextBox);
-            consistencyModeGroupBox.Controls.Add(consistencyModeLowerTemperatureThresholdLabel);
-            consistencyModeGroupBox.Location = new System.Drawing.Point(467, 144);
-            consistencyModeGroupBox.Name = "consistencyModeGroupBox";
-            consistencyModeGroupBox.Size = new System.Drawing.Size(194, 138);
-            consistencyModeGroupBox.TabIndex = 10;
-            consistencyModeGroupBox.TabStop = false;
-            consistencyModeGroupBox.Text = "一致性选项:";
-            // 
-            // alertsCheckBox
-            // 
-            alertsCheckBox.AutoSize = true;
-            alertsCheckBox.Enabled = false;
-            alertsCheckBox.Location = new System.Drawing.Point(137, 80);
-            alertsCheckBox.Name = "alertsCheckBox";
-            alertsCheckBox.Size = new System.Drawing.Size(51, 21);
-            alertsCheckBox.TabIndex = 13;
-            alertsCheckBox.Text = "警告";
-            alertsCheckBox.UseVisualStyleBackColor = true;
-            // 
-            // consistencyModeApplyChangesButton
-            // 
-            consistencyModeApplyChangesButton.Location = new System.Drawing.Point(5, 107);
-            consistencyModeApplyChangesButton.Name = "consistencyModeApplyChangesButton";
-            consistencyModeApplyChangesButton.Size = new System.Drawing.Size(184, 25);
-            consistencyModeApplyChangesButton.TabIndex = 14;
-            consistencyModeApplyChangesButton.Text = "应用";
-            consistencyModeApplyChangesButton.UseVisualStyleBackColor = true;
-            // 
-            // consistencyModeRpmThresholdTextBox
-            // 
-            consistencyModeRpmThresholdTextBox.Location = new System.Drawing.Point(71, 78);
-            consistencyModeRpmThresholdTextBox.MaxLength = 4;
-            consistencyModeRpmThresholdTextBox.Name = "consistencyModeRpmThresholdTextBox";
-            consistencyModeRpmThresholdTextBox.Size = new System.Drawing.Size(55, 23);
-            consistencyModeRpmThresholdTextBox.TabIndex = 5;
-            consistencyModeRpmThresholdTextBox.Text = "2400";
-            // 
-            // consistencyModeRpmThresholdLabel
-            // 
-            consistencyModeRpmThresholdLabel.AutoSize = true;
-            consistencyModeRpmThresholdLabel.Location = new System.Drawing.Point(7, 81);
-            consistencyModeRpmThresholdLabel.Name = "consistencyModeRpmThresholdLabel";
-            consistencyModeRpmThresholdLabel.Size = new System.Drawing.Size(59, 17);
-            consistencyModeRpmThresholdLabel.TabIndex = 4;
-            consistencyModeRpmThresholdLabel.Text = "转速阈值:";
-            // 
-            // consistencyModeUpperTemperatureThresholdTextBox
-            // 
-            consistencyModeUpperTemperatureThresholdTextBox.Location = new System.Drawing.Point(106, 49);
-            consistencyModeUpperTemperatureThresholdTextBox.MaxLength = 2;
-            consistencyModeUpperTemperatureThresholdTextBox.Name = "consistencyModeUpperTemperatureThresholdTextBox";
-            consistencyModeUpperTemperatureThresholdTextBox.Size = new System.Drawing.Size(82, 23);
-            consistencyModeUpperTemperatureThresholdTextBox.TabIndex = 3;
-            consistencyModeUpperTemperatureThresholdTextBox.Text = "85";
-            // 
-            // consistencyModeUpperTemperatureThresholdLabel
-            // 
-            consistencyModeUpperTemperatureThresholdLabel.AutoSize = true;
-            consistencyModeUpperTemperatureThresholdLabel.Location = new System.Drawing.Point(6, 52);
-            consistencyModeUpperTemperatureThresholdLabel.Name = "consistencyModeUpperTemperatureThresholdLabel";
-            consistencyModeUpperTemperatureThresholdLabel.Size = new System.Drawing.Size(59, 17);
-            consistencyModeUpperTemperatureThresholdLabel.TabIndex = 2;
-            consistencyModeUpperTemperatureThresholdLabel.Text = "温度上限:";
-            // 
-            // consistencyModeLowerTemperatureThresholdTextBox
-            // 
-            consistencyModeLowerTemperatureThresholdTextBox.Location = new System.Drawing.Point(106, 20);
-            consistencyModeLowerTemperatureThresholdTextBox.MaxLength = 2;
-            consistencyModeLowerTemperatureThresholdTextBox.Name = "consistencyModeLowerTemperatureThresholdTextBox";
-            consistencyModeLowerTemperatureThresholdTextBox.Size = new System.Drawing.Size(82, 23);
-            consistencyModeLowerTemperatureThresholdTextBox.TabIndex = 1;
-            consistencyModeLowerTemperatureThresholdTextBox.Text = "65";
-            // 
-            // consistencyModeLowerTemperatureThresholdLabel
-            // 
-            consistencyModeLowerTemperatureThresholdLabel.AutoSize = true;
-            consistencyModeLowerTemperatureThresholdLabel.Location = new System.Drawing.Point(6, 23);
-            consistencyModeLowerTemperatureThresholdLabel.Name = "consistencyModeLowerTemperatureThresholdLabel";
-            consistencyModeLowerTemperatureThresholdLabel.Size = new System.Drawing.Size(59, 17);
-            consistencyModeLowerTemperatureThresholdLabel.TabIndex = 0;
-            consistencyModeLowerTemperatureThresholdLabel.Text = "温度下限:";
-            // 
             // ecFanControlRadioButtonOn
             // 
             ecFanControlRadioButtonOn.AutoSize = true;
@@ -488,66 +415,45 @@ namespace DellFanManagement.App
             // 
             ecFanControlGroupBox.Controls.Add(ecFanControlRadioButtonOn);
             ecFanControlGroupBox.Controls.Add(ecFanControlRadioButtonOff);
-            ecFanControlGroupBox.Location = new System.Drawing.Point(241, 12);
+            ecFanControlGroupBox.Location = new System.Drawing.Point(193, 12);
             ecFanControlGroupBox.Name = "ecFanControlGroupBox";
             ecFanControlGroupBox.Size = new System.Drawing.Size(103, 48);
             ecFanControlGroupBox.TabIndex = 2;
             ecFanControlGroupBox.TabStop = false;
             ecFanControlGroupBox.Text = "EC 风扇控制:";
             // 
-            // restartBackgroundThreadButton
-            // 
-            restartBackgroundThreadButton.Font = new System.Drawing.Font("Segoe UI", 7F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-            restartBackgroundThreadButton.Location = new System.Drawing.Point(241, 66);
-            restartBackgroundThreadButton.Name = "restartBackgroundThreadButton";
-            restartBackgroundThreadButton.Size = new System.Drawing.Size(105, 21);
-            restartBackgroundThreadButton.TabIndex = 3;
-            restartBackgroundThreadButton.Text = "重置线程";
-            restartBackgroundThreadButton.UseVisualStyleBackColor = true;
-            // 
             // statusStrip
             // 
             statusStrip.ImageScalingSize = new System.Drawing.Size(32, 32);
-            statusStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] { consistencyModeStatusLabel });
-            statusStrip.Location = new System.Drawing.Point(0, 286);
+            statusStrip.Location = new System.Drawing.Point(0, 278);
             statusStrip.Name = "statusStrip";
-            statusStrip.Size = new System.Drawing.Size(672, 22);
+            statusStrip.Size = new System.Drawing.Size(507, 22);
             statusStrip.SizingGrip = false;
             statusStrip.TabIndex = 13;
             // 
-            // consistencyModeStatusLabel
-            // 
-            consistencyModeStatusLabel.Name = "consistencyModeStatusLabel";
-            consistencyModeStatusLabel.Size = new System.Drawing.Size(124, 17);
-            consistencyModeStatusLabel.Text = "Fan speed is locked";
-            // 
             // trayIcon
             // 
+            trayIcon.ContextMenuStrip = trayContextMenu;
             trayIcon.Text = "Dell Fan Management";
+            trayIcon.Visible = true;
             // 
-            // trayIconCheckBox
+            // trayContextMenu
             // 
-            trayIconCheckBox.AutoSize = true;
-            trayIconCheckBox.Checked = true;
-            trayIconCheckBox.CheckState = System.Windows.Forms.CheckState.Checked;
-            trayIconCheckBox.Location = new System.Drawing.Point(356, 246);
-            trayIconCheckBox.Name = "trayIconCheckBox";
-            trayIconCheckBox.Size = new System.Drawing.Size(75, 21);
-            trayIconCheckBox.TabIndex = 7;
-            trayIconCheckBox.Text = "托盘图标";
-            trayIconCheckBox.UseVisualStyleBackColor = true;
+            trayContextMenu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] { trayMenuItemShow, trayMenuItemExit });
+            trayContextMenu.Name = "trayContextMenu";
+            trayContextMenu.Size = new System.Drawing.Size(147, 48);
             // 
-            // animatedCheckBox
+            // trayMenuItemShow
             // 
-            animatedCheckBox.AutoSize = true;
-            animatedCheckBox.Checked = true;
-            animatedCheckBox.CheckState = System.Windows.Forms.CheckState.Checked;
-            animatedCheckBox.Location = new System.Drawing.Point(356, 266);
-            animatedCheckBox.Name = "animatedCheckBox";
-            animatedCheckBox.Size = new System.Drawing.Size(51, 21);
-            animatedCheckBox.TabIndex = 8;
-            animatedCheckBox.Text = "动画";
-            animatedCheckBox.UseVisualStyleBackColor = true;
+            trayMenuItemShow.Name = "trayMenuItemShow";
+            trayMenuItemShow.Size = new System.Drawing.Size(146, 22);
+            trayMenuItemShow.Text = "Dell控制面板";
+            // 
+            // trayMenuItemExit
+            // 
+            trayMenuItemExit.Name = "trayMenuItemExit";
+            trayMenuItemExit.Size = new System.Drawing.Size(146, 22);
+            trayMenuItemExit.Text = "退出";
             // 
             // groupBox1
             // 
@@ -556,9 +462,9 @@ namespace DellFanManagement.App
             groupBox1.Controls.Add(label1);
             groupBox1.Controls.Add(eppLabel);
             groupBox1.Controls.Add(eppTrackBar);
-            groupBox1.Location = new System.Drawing.Point(12, 164);
+            groupBox1.Location = new System.Drawing.Point(302, 147);
             groupBox1.Name = "groupBox1";
-            groupBox1.Size = new System.Drawing.Size(192, 118);
+            groupBox1.Size = new System.Drawing.Size(192, 124);
             groupBox1.TabIndex = 14;
             groupBox1.TabStop = false;
             groupBox1.Text = "温度优化";
@@ -602,7 +508,7 @@ namespace DellFanManagement.App
             eppTrackBar.Anchor = System.Windows.Forms.AnchorStyles.None;
             eppTrackBar.AutoSize = false;
             eppTrackBar.BackColor = System.Drawing.SystemColors.ButtonFace;
-            eppTrackBar.Location = new System.Drawing.Point(84, 19);
+            eppTrackBar.Location = new System.Drawing.Point(84, 22);
             eppTrackBar.Margin = new System.Windows.Forms.Padding(0);
             eppTrackBar.Maximum = 100;
             eppTrackBar.Name = "eppTrackBar";
@@ -617,14 +523,11 @@ namespace DellFanManagement.App
             AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
             BackColor = System.Drawing.SystemColors.ButtonFace;
             BackgroundImageLayout = System.Windows.Forms.ImageLayout.None;
-            ClientSize = new System.Drawing.Size(672, 308);
+            ClientSize = new System.Drawing.Size(507, 300);
+            Controls.Add(systemMonitorGroupBox);
             Controls.Add(groupBox1);
-            Controls.Add(animatedCheckBox);
-            Controls.Add(trayIconCheckBox);
             Controls.Add(statusStrip);
-            Controls.Add(restartBackgroundThreadButton);
             Controls.Add(ecFanControlGroupBox);
-            Controls.Add(consistencyModeGroupBox);
             Controls.Add(manualGroupBox);
             Controls.Add(operationModeGroupBox);
             Controls.Add(temperatureGroupBox);
@@ -642,6 +545,8 @@ namespace DellFanManagement.App
             thermalSettingGroupBox.PerformLayout();
             temperatureGroupBox.ResumeLayout(false);
             temperatureGroupBox.PerformLayout();
+            systemMonitorGroupBox.ResumeLayout(false);
+            systemMonitorGroupBox.PerformLayout();
             operationModeGroupBox.ResumeLayout(false);
             operationModeGroupBox.PerformLayout();
             manualGroupBox.ResumeLayout(false);
@@ -649,12 +554,9 @@ namespace DellFanManagement.App
             manualFan2GroupBox.PerformLayout();
             manualFan1GroupBox.ResumeLayout(false);
             manualFan1GroupBox.PerformLayout();
-            consistencyModeGroupBox.ResumeLayout(false);
-            consistencyModeGroupBox.PerformLayout();
             ecFanControlGroupBox.ResumeLayout(false);
             ecFanControlGroupBox.PerformLayout();
-            statusStrip.ResumeLayout(false);
-            statusStrip.PerformLayout();
+            trayContextMenu.ResumeLayout(false);
             groupBox1.ResumeLayout(false);
             groupBox1.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)eppTrackBar).EndInit();
@@ -676,8 +578,11 @@ namespace DellFanManagement.App
         private System.Windows.Forms.GroupBox temperatureGroupBox;
         private System.Windows.Forms.Label temperatureLabel2;
         private System.Windows.Forms.Label temperatureLabel1;
+        private System.Windows.Forms.GroupBox systemMonitorGroupBox;
+        private System.Windows.Forms.Label cpuFrequencyLabel;
+        private System.Windows.Forms.Label gpuFrequencyLabel;
+        private System.Windows.Forms.Label memoryLabel;
         private System.Windows.Forms.GroupBox operationModeGroupBox;
-        private System.Windows.Forms.RadioButton operationModeRadioButtonConsistency;
         private System.Windows.Forms.RadioButton operationModeRadioButtonManual;
         private System.Windows.Forms.RadioButton operationModeRadioButtonAutomatic;
         private System.Windows.Forms.GroupBox manualGroupBox;
@@ -689,24 +594,14 @@ namespace DellFanManagement.App
         private System.Windows.Forms.RadioButton manualFan1RadioButtonHigh;
         private System.Windows.Forms.RadioButton manualFan1RadioButtonMedium;
         private System.Windows.Forms.RadioButton manualFan1RadioButtonOff;
-        private System.Windows.Forms.GroupBox consistencyModeGroupBox;
-        private System.Windows.Forms.Button consistencyModeApplyChangesButton;
-        private System.Windows.Forms.TextBox consistencyModeRpmThresholdTextBox;
-        private System.Windows.Forms.Label consistencyModeRpmThresholdLabel;
-        private System.Windows.Forms.TextBox consistencyModeUpperTemperatureThresholdTextBox;
-        private System.Windows.Forms.Label consistencyModeUpperTemperatureThresholdLabel;
-        private System.Windows.Forms.TextBox consistencyModeLowerTemperatureThresholdTextBox;
-        private System.Windows.Forms.Label consistencyModeLowerTemperatureThresholdLabel;
         private System.Windows.Forms.RadioButton ecFanControlRadioButtonOn;
         private System.Windows.Forms.RadioButton ecFanControlRadioButtonOff;
         private System.Windows.Forms.GroupBox ecFanControlGroupBox;
-        private System.Windows.Forms.Button restartBackgroundThreadButton;
         private System.Windows.Forms.StatusStrip statusStrip;
-        private System.Windows.Forms.ToolStripStatusLabel consistencyModeStatusLabel;
         private System.Windows.Forms.NotifyIcon trayIcon;
-        private System.Windows.Forms.CheckBox trayIconCheckBox;
-        private System.Windows.Forms.CheckBox alertsCheckBox;
-        private System.Windows.Forms.CheckBox animatedCheckBox;
+        private System.Windows.Forms.ContextMenuStrip trayContextMenu;
+        private System.Windows.Forms.ToolStripMenuItem trayMenuItemShow;
+        private System.Windows.Forms.ToolStripMenuItem trayMenuItemExit;
         private System.Windows.Forms.GroupBox groupBox1;
         private System.Windows.Forms.TrackBar eppTrackBar;
         private System.Windows.Forms.Label eppLabel;
@@ -715,4 +610,3 @@ namespace DellFanManagement.App
         private System.Windows.Forms.Button powerApplyButton;
     }
 }
-
