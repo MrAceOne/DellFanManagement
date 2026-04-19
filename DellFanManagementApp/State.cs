@@ -136,8 +136,8 @@ namespace DellFanManagement.App
             // Initialize fan speed reader.
             _fanSpeedReader = FanSpeedReaderFactory.GetFanSpeedReader();
 
-            // Initialize system monitor.
-            _systemMonitor = new SystemMonitor();
+            // Initialize system monitor using singleton pattern to avoid memory leaks
+            _systemMonitor = SystemMonitor.Instance;
 
             Temperatures = new();
             MinimumTemperatures = new();
@@ -441,6 +441,15 @@ namespace DellFanManagement.App
         /// Current "thermal setting".
         /// </summary>
         public ThermalSetting ThermalSetting { get; private set; }
+        
+        /// <summary>
+        /// Internal method to set thermal setting from Core class
+        /// </summary>
+        internal void SetThermalSetting(ThermalSetting setting)
+        {
+            AccessCheck();
+            ThermalSetting = setting;
+        }
 
         /// <summary>
         /// CPU核心频率（MHz）

@@ -5,16 +5,11 @@ namespace DellFanManagement.App.TemperatureReaders
     class GenericGpuTemperatureReader : LibreHardwareMonitorTemperatureReader
     {
         /// <summary>
-        /// Constructor.  Initialize the computer object for reading the CPU temperature.
+        /// Constructor.  使用 SystemMonitor 的共享 Computer 实例读取 GPU 温度
         /// </summary>
-        public GenericGpuTemperatureReader()
+        public GenericGpuTemperatureReader() : base()
         {
-            _computer = new Computer
-            {
-                IsGpuEnabled = true
-            };
-
-            _computer.Open();
+            // 无需创建 Computer 实例，使用基类的共享实例
         }
     }
 }

@@ -6,13 +6,22 @@ namespace DellFanManagement.App.TemperatureReaders
 {
     /// <summary>
     /// Handles reading temperatures from Libre Hardware Monitor.
+    /// 使用 SystemMonitor 的共享 Computer 实例，避免重复创建导致内存占用过高
     /// </summary>
     abstract class LibreHardwareMonitorTemperatureReader : TemperatureReader, IDisposable
     {
         /// <summary>
-        /// Libre Hardware Monitor computer object.
+        /// Libre Hardware Monitor computer object（共享实例）
         /// </summary>
         protected Computer _computer;
+
+        /// <summary>
+        /// 构造函数，获取 SystemMonitor 的共享 Computer 实例
+        /// </summary>
+        protected LibreHardwareMonitorTemperatureReader()
+        {
+            _computer = SystemMonitor.Instance.Computer;
+        }
 
         /// <summary>
         /// Read all of the available temperatures into a dictionary.
@@ -49,14 +58,7 @@ namespace DellFanManagement.App.TemperatureReaders
         /// </summary>
         public void Dispose()
         {
-            try
-            {
-                _computer.Close();
-            }
-            catch (Exception)
-            {
-                // Ignore errors that come out of closing.
-            }
+            // 不关闭共享的 Computer 实例，由 SystemMonitor 负责清理
         }
     }
 }

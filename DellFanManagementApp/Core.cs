@@ -308,8 +308,20 @@ namespace DellFanManagement.App
                         }
                     }
 
-                    // 散热模式只在页面加载时读取一次，不再循环更新
-                    // 如果需要更改散热模式，可以通过配置文件或手动设置
+                    // 应用用户请求的热设置
+                    if (RequestedThermalSetting != null && RequestedThermalSetting != _state.ThermalSetting)
+                    {
+                        if (DellSmbiosSmi.SetThermalSetting(RequestedThermalSetting.Value))
+                        {
+                            Log.Write($"Thermal setting applied: {RequestedThermalSetting.Value}");
+                            _state.SetThermalSetting(RequestedThermalSetting.Value);
+                            RequestedThermalSetting = null;
+                        }
+                        else
+                        {
+                            Log.Write($"Failed to apply thermal setting: {RequestedThermalSetting.Value}");
+                        }
+                    }
 
                     _requestSemaphore.Release();
                     _state.Release();

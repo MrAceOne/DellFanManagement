@@ -48,24 +48,56 @@ namespace DellFanManagement.App
 
     /// <summary>
     /// 系统监测类，使用LibreHardwareMonitor获取CPU频率、GPU频率、内存使用等信息
+    /// 单例模式，避免重复创建Computer实例导致内存占用过高
     /// </summary>
     public class SystemMonitor : IDisposable
     {
+        private static SystemMonitor _instance;
+        private static readonly object _instanceLock = new object();
+        
         private readonly LibreHardwareMonitor.Hardware.Computer _computer;
         private readonly PerformanceCounter _memoryAvailableCounter;
+        private readonly PerformanceCounter _commitLimitCounter;
         private readonly Dictionary<string, int> _cachedTemperatures;
         private SystemMonitorData _lastData;
         private readonly object _lockObject = new object();
+        private bool _disposed;
 
         /// <summary>
-        /// 构造函数，初始化LibreHardwareMonitor
+        /// 获取共享的SystemMonitor实例（单例模式）
         /// </summary>
-        public SystemMonitor()
+        public static SystemMonitor Instance
+        {
+            get
+            {
+                if (_instance == null)
+                {
+                    lock (_instanceLock)
+                    {
+                        if (_instance == null)
+                        {
+                            _instance = new SystemMonitor();
+                        }
+                    }
+                }
+                return _instance;
+            }
+        }
+
+        /// <summary>
+        /// 获取共享的Computer实例，供温度读取器使用
+        /// </summary>
+        public LibreHardwareMonitor.Hardware.Computer Computer => _computer;
+
+        /// <summary>
+        /// 私有构造函数，初始化LibreHardwareMonitor
+        /// </summary>
+        private SystemMonitor()
         {
             _cachedTemperatures = new Dictionary<string, int>();
             _lastData = new SystemMonitorData();
 
-            // 初始化LibreHardwareMonitor
+            // 初始化LibreHardwareMonitor（只创建一个实例）
             _computer = new LibreHardwareMonitor.Hardware.Computer
             {
                 IsCpuEnabled = true,
@@ -78,11 +110,13 @@ namespace DellFanManagement.App
             try
             {
                 _memoryAvailableCounter = new PerformanceCounter("Memory", "Available MBytes");
+                _commitLimitCounter = new PerformanceCounter("Memory", "Commit Limit");
             }
             catch (Exception)
             {
                 // 如果性能计数器初始化失败，将使用LibreHardwareMonitor
                 _memoryAvailableCounter = null;
+                _commitLimitCounter = null;
             }
         }
 
@@ -274,11 +308,9 @@ namespace DellFanManagement.App
         {
             try
             {
-                using (var pc = new PerformanceCounter("Memory", "Committed Bytes"))
+                if (_commitLimitCounter != null)
                 {
-                    // 使用GC获取内存信息
-                    var memCounter = new PerformanceCounter("Memory", "Commit Limit");
-                    long commitLimit = (long)memCounter.NextValue();
+                    long commitLimit = (long)_commitLimitCounter.NextValue();
                     return commitLimit / (1024 * 1024); // 转换为MB
                 }
             }
@@ -288,6 +320,9 @@ namespace DellFanManagement.App
                 var computerInfo = new Microsoft.VisualBasic.Devices.ComputerInfo();
                 return (long)(computerInfo.TotalPhysicalMemory / (1024 * 1024));
             }
+            
+            // 如果性能计数器不可用，返回0
+            return 0;
         }
 
         /// <summary>
@@ -295,9 +330,13 @@ namespace DellFanManagement.App
         /// </summary>
         public void Dispose()
         {
+            if (_disposed) return;
+            _disposed = true;
+            
             try
             {
                 _memoryAvailableCounter?.Dispose();
+                _commitLimitCounter?.Dispose();
                 _computer?.Close();
             }
             catch (Exception)
