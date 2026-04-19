@@ -3,6 +3,7 @@ using DellFanManagement.DellSmbiosSmiLib.DellSmi;
 using System;
 using System.Diagnostics;
 using System.Globalization;
+using System.Threading;
 using System.Windows.Forms;
 
 namespace DellFanManagement.App
@@ -15,101 +16,150 @@ namespace DellFanManagement.App
         public const string Version = "DEV";
 
         /// <summary>
+        /// Unique name for the mutex to ensure single instance.
+        /// </summary>
+        private static readonly string MutexName = "Local\\DellFanManagementAppMutex";
+
+        /// <summary>
         /// The main entry point for the application.
         /// </summary>
         [STAThread]
         static int Main(string[] args)
         {
-            if (args.Length == 0)
+            bool createdNew;
+            using (Mutex mutex = new Mutex(true, MutexName, out createdNew))
             {
-                // GUI mode.
-                try
+                if (!createdNew)
                 {
-                    if (UacHelper.IsProcessElevated())
+                    // Another instance is running, bring it to foreground
+                    string processName = Process.GetCurrentProcess().ProcessName;
+                    Process[] processes = Process.GetProcessesByName(processName);
+                    
+                    foreach (Process process in processes)
                     {
-                        // Looks like we're ready to start up the GUI app.
-                        // Set process priority to high.
-                        Process.GetCurrentProcess().PriorityClass = ProcessPriorityClass.High;
-
-                        // Boilerplate code to start the app.
-                        Application.SetHighDpiMode(HighDpiMode.DpiUnaware);
-                        Application.EnableVisualStyles();
-                        Application.SetCompatibleTextRenderingDefault(false);
-                        Application.Run(new DellFanManagementGuiForm());
+                        if (process.Id != Process.GetCurrentProcess().Id)
+                        {
+                            try
+                            {
+                                // Bring the existing window to foreground
+                                if (process.MainWindowHandle != IntPtr.Zero)
+                                {
+                                    // Show the window if minimized
+                                    ShowWindow(process.MainWindowHandle, 9); // SW_RESTORE = 9
+                                    // Bring to foreground
+                                    SetForegroundWindow(process.MainWindowHandle);
+                                }
+                                return 0; // Exit current instance
+                            }
+                            catch
+                            {
+                                // If we can't interact with the window, just continue to start new instance
+                            }
+                        }
                     }
-                    else
-                    {
-                        MessageBox.Show("This program must be run with administrative privileges.", "Dell Fan Management privilege check", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    }
+                    
+                    // Fallback: if we can't find the window, just exit
+                    return 0;
                 }
-                catch (Exception exception)
+                
+                // This is the first instance, continue with normal startup
+                if (args.Length == 0)
                 {
-                    MessageBox.Show(string.Format("{0}: {1}\n{2}", exception.GetType().ToString(), exception.Message, exception.StackTrace),
-                        "Error starting application", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    return 1;
-                }
-
-                return 0;
-            }
-            else
-            {
-                // CMD mode.
-                try
-                {
-                    Console.WriteLine("Dell Fan Management, version {0}", Version);
-                    Console.WriteLine("By Aaron Kelley");
-                    Console.WriteLine("Licensed under GPLv3");
-                    Console.WriteLine("Source code available at https://github.com/AaronKelley/DellFanManagement");
-                    Console.WriteLine();
-
-                    if (UacHelper.IsProcessElevated())
+                    // GUI mode.
+                    try
                     {
-                        if (args[0].ToLower() == "packagetest")
+                        if (UacHelper.IsProcessElevated())
                         {
-                            return PackageTest.RunPackageTests() ? 0 : 1;
-                        }
-                        else if (args[0].ToLower() == "setthermalsetting")
-                        {
-                            return SetThermalSetting.ExecuteSetThermalSetting(args);
-                        }
-                        else if (args[0].ToLower() == "smi-token-dump")
-                        {
-                            return SmiTokenDump();
-                        }
-                        else if (args[0].ToLower() == "smi-get-token")
-                        {
-                            return SmiGetToken(args);
-                        }
-                        else if (args[0].ToLower() == "smi-set-token")
-                        {
-                            return SmiSetToken(args);
+                            // Looks like we're ready to start up the GUI app.
+                            // Set process priority to high.
+                            Process.GetCurrentProcess().PriorityClass = ProcessPriorityClass.High;
+
+                            // Boilerplate code to start the app.
+                            Application.SetHighDpiMode(HighDpiMode.DpiUnaware);
+                            Application.EnableVisualStyles();
+                            Application.SetCompatibleTextRenderingDefault(false);
+                            Application.Run(new DellFanManagementGuiForm());
                         }
                         else
                         {
-                            Console.WriteLine("Dell SMM I/O driver by 424778940z");
-                            Console.WriteLine("https://github.com/424778940z/bzh-windrv-dell-smm-io");
-                            Console.WriteLine();
-                            Console.WriteLine("Derived from \"Dell fan utility\" by 424778940z");
-                            Console.WriteLine("https://github.com/424778940z/dell-fan-utility");
-                            Console.WriteLine();
-
-                            return DellFanCmd.ProcessCommand(args);
+                            MessageBox.Show("This program must be run with administrative privileges.", "Dell Fan Management privilege check", MessageBoxButtons.OK, MessageBoxIcon.Error);
                         }
                     }
-                    else
+                    catch (Exception exception)
                     {
+                        MessageBox.Show(string.Format("{0}: {1}\n{2}", exception.GetType().ToString(), exception.Message, exception.StackTrace),
+                            "Error starting application", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        return 1;
+                    }
+
+                    return 0;
+                }
+                else
+                {
+                    // CMD mode.
+                    try
+                    {
+                        Console.WriteLine("Dell Fan Management, version {0}", Version);
+                        Console.WriteLine("By Aaron Kelley");
+                        Console.WriteLine("Licensed under GPLv3");
+                        Console.WriteLine("Source code available at https://github.com/AaronKelley/DellFanManagement");
                         Console.WriteLine();
-                        Console.WriteLine("This program must be run with administrative privileges.");
+
+                        if (UacHelper.IsProcessElevated())
+                        {
+                            if (args[0].ToLower() == "packagetest")
+                            {
+                                return PackageTest.RunPackageTests() ? 0 : 1;
+                            }
+                            else if (args[0].ToLower() == "setthermalsetting")
+                            {
+                                return SetThermalSetting.ExecuteSetThermalSetting(args);
+                            }
+                            else if (args[0].ToLower() == "smi-token-dump")
+                            {
+                                return SmiTokenDump();
+                            }
+                            else if (args[0].ToLower() == "smi-get-token")
+                            {
+                                return SmiGetToken(args);
+                            }
+                            else if (args[0].ToLower() == "smi-set-token")
+                            {
+                                return SmiSetToken(args);
+                            }
+                            else
+                            {
+                                Console.WriteLine("Dell SMM I/O driver by 424778940z");
+                                Console.WriteLine("https://github.com/424778940z/bzh-windrv-dell-smm-io");
+                                Console.WriteLine();
+                                Console.WriteLine("Derived from \"Dell fan utility\" by 424778940z");
+                                Console.WriteLine("https://github.com/424778940z/dell-fan-utility");
+                                Console.WriteLine();
+
+                                return DellFanCmd.ProcessCommand(args);
+                            }
+                        }
+                        else
+                        {
+                            Console.WriteLine();
+                            Console.WriteLine("This program must be run with administrative privileges.");
+                            return 1;
+                        }
+                    }
+                    catch (Exception exception)
+                    {
+                        Console.Error.WriteLine("{0}: {1}\n{2}", exception.GetType().ToString(), exception.Message, exception.StackTrace);
                         return 1;
                     }
                 }
-                catch (Exception exception)
-                {
-                    Console.Error.WriteLine("{0}: {1}\n{2}", exception.GetType().ToString(), exception.Message, exception.StackTrace);
-                    return 1;
-                }
             }
         }
+
+        [System.Runtime.InteropServices.DllImport("user32.dll")]
+        private static extern bool SetForegroundWindow(IntPtr hWnd);
+
+        [System.Runtime.InteropServices.DllImport("user32.dll")]
+        private static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
 
         private static int SmiTokenDump()
         {
