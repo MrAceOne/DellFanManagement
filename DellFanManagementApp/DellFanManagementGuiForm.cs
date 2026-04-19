@@ -56,6 +56,11 @@ namespace DellFanManagement.App
         private Guid? _registeredPowerProfile;
 
         /// <summary>
+        /// Current "thermal setting".
+        /// </summary>
+        public ThermalSetting ThermalSetting { get; private set; }
+
+        /// <summary>
         /// Constructor.  Get everything set up before the window is displayed.
         /// </summary>
         public DellFanManagementGuiForm()
@@ -140,7 +145,7 @@ namespace DellFanManagement.App
             UpdatePowerForm();
             // Update form with default state values.
             UpdateForm();
-
+            _state.UpdateThermalSetting();
             // Apply manual fan control configuration from registry.
             ApplyManualModeConfiguration();
             
@@ -486,22 +491,6 @@ namespace DellFanManagement.App
             SetFanControlsAvailability(false);
             SetConsistencyModeControlsAvailability(false);
             SetEcFanControlsAvailability(true);
-
-            UpdateTrayIcon(false);
-        }
-
-        /// <summary>
-        /// Called when "Consistency" configuration radio button is clicked.
-        /// </summary>
-        private void ConfigurationRadioButtonConsistencyEventHandler(Object sender, EventArgs e)
-        {
-            _core.SetConsistencyMode();
-            _configurationStore.SetOption(ConfigurationOption.OperationMode, OperationMode.Consistency);
-            ClearManualControlConfiguration();
-
-            SetFanControlsAvailability(false);
-            SetConsistencyModeControlsAvailability(true);
-            SetEcFanControlsAvailability(false);
 
             UpdateTrayIcon(false);
         }

@@ -1,5 +1,4 @@
-﻿using DellFanManagement.App.ConsistencyModeHandlers;
-using DellFanManagement.App.FanControllers;
+﻿using DellFanManagement.App.FanControllers;
 using DellFanManagement.App.TemperatureReaders;
 using DellFanManagement.DellSmbiosSmiLib;
 using System;
@@ -34,11 +33,6 @@ namespace DellFanManagement.App
         /// Fan controller for making fan speed adjustments.
         /// </summary>
         private readonly FanController _fanController;
-
-        /// <summary>
-        /// Logic for handling "consistency mode".
-        /// </summary>
-        private readonly ConsistencyModeHandler _consistencyModeHandler;
 
         /// <summary>
         /// Block state change requests while a state update is in progress.
@@ -122,7 +116,6 @@ namespace DellFanManagement.App
             _state = state;
             _form = form;
             _fanController = FanControllerFactory.GetFanFanController();
-            _consistencyModeHandler = ConsistencyModeHandlerFactory.GetConsistencyModeHandler(this, _state, _fanController);
             _requestSemaphore = new(1, 1);
 
             RequestedThermalSetting = null;
@@ -163,16 +156,6 @@ namespace DellFanManagement.App
             _fan2LevelRequested = null;
             _state.Release();
             TrayIconColor = TrayIconColor.Gray;
-        }
-
-        /// <summary>
-        /// Switch configuration to consistency mode.
-        /// </summary>
-        public void SetConsistencyMode()
-        {
-            _state.WaitOne();
-            _state.OperationMode = OperationMode.Consistency;
-            _state.Release();
         }
 
         /// <summary>
@@ -324,20 +307,9 @@ namespace DellFanManagement.App
                             _state.ConsistencyModeStatus = " ";
                         }
                     }
-                    else if (_state.OperationMode == OperationMode.Consistency)
-                    {
-                        // Consistency mode logic.
-                        _consistencyModeHandler.RunConsistencyModeLogic();
-                    }
 
-                    // See if we need to update the BIOS thermal setting.
-                    if (_state.ThermalSetting != ThermalSetting.Error && RequestedThermalSetting != null && RequestedThermalSetting != _state.ThermalSetting)
-                    {
-                        Log.Write(string.Format("Switching thermal setting to {0}", RequestedThermalSetting));
-                        DellSmbiosSmi.SetThermalSetting((ThermalSetting)RequestedThermalSetting);
-                        _state.UpdateThermalSetting();
-                        RequestedThermalSetting = null;
-                    }
+                    // 散热模式只在页面加载时读取一次，不再循环更新
+                    // 如果需要更改散热模式，可以通过配置文件或手动设置
 
                     _requestSemaphore.Release();
                     _state.Release();

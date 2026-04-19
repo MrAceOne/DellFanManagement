@@ -162,7 +162,6 @@ namespace DellFanManagement.App
             UpdateFanRpms();
             UpdateTemperatures();
             UpdatePowerProfile();
-            UpdateThermalSetting();
             UpdateSystemMonitorData();
         }
 
