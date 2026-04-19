@@ -23,7 +23,10 @@ namespace DellFanManagement.App.FanControllers
         /// <returns>True on success, false on failure.</returns>
         public override bool DisableAutomaticFanControl()
         {
-            return DellSmbiosSmi.DisableAutomaticFanControl();
+            Log.Write("[SMI] Disabling automatic fan control");
+            bool result = DellSmbiosSmi.DisableAutomaticFanControl();
+            Log.Write(string.Format("[SMI] Disable automatic fan control result: {0}", result));
+            return result;
         }
 
         /// <summary>
@@ -32,7 +35,10 @@ namespace DellFanManagement.App.FanControllers
         /// <returns>True on success, false on failure.</returns>
         public override bool EnableAutomaticFanControl()
         {
-            return DellSmbiosSmi.EnableAutomaticFanControl();
+            Log.Write("[SMI] Enabling automatic fan control");
+            bool result = DellSmbiosSmi.EnableAutomaticFanControl();
+            Log.Write(string.Format("[SMI] Enable automatic fan control result: {0}", result));
+            return result;
         }
 
         /// <summary>
@@ -65,7 +71,10 @@ namespace DellFanManagement.App.FanControllers
                     return false;
             }
 
-            return DellSmbiosSmi.SetFanLevel(smiLevel);
+            Log.Write(string.Format("[SMI] Setting fan level: {0}", smiLevel));
+            bool result = DellSmbiosSmi.SetFanLevel(smiLevel);
+            Log.Write(string.Format("[SMI] Set fan level result: {0}", result));
+            return result;
         }
 
         /// <summary>

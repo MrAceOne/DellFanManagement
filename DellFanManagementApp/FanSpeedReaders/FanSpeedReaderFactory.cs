@@ -16,8 +16,8 @@ namespace DellFanManagement.App.FanSpeedReaders
             // Fan speed reader options (prioritized):
             List<IFanSpeedReader> readers = new()
             {
-                new SmiFanSpeedReader(),
                 new BzhFanSpeedReader(),
+                new SmiFanSpeedReader(),
                 new WmiFanSpeedReader()
             };
 

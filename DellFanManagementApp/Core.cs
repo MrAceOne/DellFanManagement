@@ -422,21 +422,21 @@ namespace DellFanManagement.App
             // 检查风扇1转速变化（超过50 RPM才更新）
             if (_state.Fan1Rpm.HasValue)
             {
-                if (!_lastFan1Rpm.HasValue || Math.Abs((int)(_state.Fan1Rpm.Value - _lastFan1Rpm.Value)) >= 50)
-                {
+                // if (!_lastFan1Rpm.HasValue || Math.Abs((int)(_state.Fan1Rpm.Value - _lastFan1Rpm.Value)) >= 10)
+                // {
                     changed = true;
                     _lastFan1Rpm = _state.Fan1Rpm;
-                }
+                //}
             }
 
             // 检查风扇2转速变化（超过50 RPM才更新）
             if (_state.Fan2Rpm.HasValue)
             {
-                if (!_lastFan2Rpm.HasValue || Math.Abs((int)(_state.Fan2Rpm.Value - _lastFan2Rpm.Value)) >= 50)
-                {
+                // if (!_lastFan2Rpm.HasValue || Math.Abs((int)(_state.Fan2Rpm.Value - _lastFan2Rpm.Value)) >= 10)
+                // {
                     changed = true;
                     _lastFan2Rpm = _state.Fan2Rpm;
-                }
+                //}
             }
 
             return changed;

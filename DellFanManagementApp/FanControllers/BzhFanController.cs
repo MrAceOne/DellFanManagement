@@ -39,10 +39,14 @@ namespace DellFanManagement.App.FanControllers
         {
             if (DellSmbiosBzh.IsInitialized)
             {
-                return DellSmbiosBzh.DisableAutomaticFanControl();
+                Log.Write("[BZH] Disabling automatic fan control");
+                bool result = DellSmbiosBzh.DisableAutomaticFanControl();
+                Log.Write(string.Format("[BZH] Disable automatic fan control result: {0}", result));
+                return result;
             }
             else
             {
+                Log.Write("[BZH] Cannot disable automatic fan control - BZH driver not initialized");
                 return false;
             }
         }
@@ -55,10 +59,14 @@ namespace DellFanManagement.App.FanControllers
         {
             if (DellSmbiosBzh.IsInitialized)
             {
-                return DellSmbiosBzh.EnableAutomaticFanControl();
+                Log.Write("[BZH] Enabling automatic fan control");
+                bool result = DellSmbiosBzh.EnableAutomaticFanControl();
+                Log.Write(string.Format("[BZH] Enable automatic fan control result: {0}", result));
+                return result;
             }
             else
             {
+                Log.Write("[BZH] Cannot enable automatic fan control - BZH driver not initialized");
                 return false;
             }
         }
@@ -73,9 +81,6 @@ namespace DellFanManagement.App.FanControllers
         {
             if (DellSmbiosBzh.IsInitialized)
             {
-                bool result1 = true;
-                bool result2 = true;
-
                 BzhFanLevel bzhLevel;
                 switch (level)
                 {
@@ -89,23 +94,34 @@ namespace DellFanManagement.App.FanControllers
                         bzhLevel = BzhFanLevel.Level2;
                         break;
                     default:
+                        Log.Write(string.Format("[BZH] Invalid fan level: {0}", level));
                         return false;
                 }
+
+                Log.Write(string.Format("[BZH] Setting fan level: {0} for fan index: {1}", bzhLevel, fanIndex));
+                
+                bool result1 = true;
+                bool result2 = true;
 
                 if (fanIndex == FanIndex.Fan1 || fanIndex == FanIndex.AllFans)
                 {
                     result1 = DellSmbiosBzh.SetFanLevel(BzhFanIndex.Fan1, bzhLevel);
+                    Log.Write(string.Format("[BZH] Set fan 1 level result: {0}", result1));
                 }
 
                 if (fanIndex == FanIndex.Fan2 || fanIndex == FanIndex.AllFans)
                 {
                     result2 = DellSmbiosBzh.SetFanLevel(BzhFanIndex.Fan2, bzhLevel);
+                    Log.Write(string.Format("[BZH] Set fan 2 level result: {0}", result2));
                 }
 
-                return result1 && result2;
+                bool result = result1 && result2;
+                Log.Write(string.Format("[BZH] Set fan level overall result: {0}", result));
+                return result;
             }
             else
             {
+                Log.Write("[BZH] Cannot set fan level - BZH driver not initialized");
                 return false;
             }
         }

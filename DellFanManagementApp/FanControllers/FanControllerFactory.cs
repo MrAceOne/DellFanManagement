@@ -1,4 +1,6 @@
-﻿namespace DellFanManagement.App.FanControllers
+﻿using DellFanManagement.DellSmbiosSmiLib;
+
+namespace DellFanManagement.App.FanControllers
 {
     /// <summary>
     /// Determine system capabilities and select an appropriate fan speed controller to use.
@@ -6,35 +8,32 @@
     class FanControllerFactory
     {
         /// <summary>
-        /// Selects a fan speed reader and returns it.
+        /// Selects a fan speed controller and returns it.
         /// </summary>
-        /// <returns>Fan speed reader appropriate for the system.</returns>
+        /// <returns>Fan speed controller appropriate for the system.</returns>
         public static FanController GetFanFanController()
         {
-            FanController controller = new BzhFanController();
-            if (controller.IsAutomaticFanControlDisableSupported)
+            // 优先使用 BZH 控制器（支持单独风扇控制）
+            BzhFanController bzhController = new BzhFanController();
+            if (bzhController.IsAutomaticFanControlDisableSupported)
             {
-                return controller;
+                Log.Write("Using BZH fan control (supports individual fan control).");
+                return bzhController;
             }
             else
             {
-                return new NullFanController();
+                // 如果 BZH 不可用，回退到 SMI（不支持单独风扇控制）
+                if (DellSmbiosSmi.IsFanControlOverrideAvailable())
+                {
+                    Log.Write("Using SMI fan control (does not support individual fan control).");
+                    return new SmiFanController();
+                }
+                else
+                {
+                    Log.Write("No fan control available.");
+                    return new NullFanController();
+                }
             }
-
-            /*
-            if (DellSmbiosSmi.IsFanControlOverrideAvailable())
-            {
-                // If the WMI/SMI interface is available, use it.
-                Log.Write("Using SMI fan control.");
-                return new SmiFanController();
-            }
-            else
-            {
-                // Fall back to BZH SMM fan control.
-                Log.Write("Using BZH fan control.");
-                return new BzhFanController();
-            }
-            */
         }
     }
 }
