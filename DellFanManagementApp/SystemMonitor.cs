@@ -102,7 +102,7 @@ namespace DellFanManagement.App
             {
                 IsCpuEnabled = true,
                 IsGpuEnabled = true,
-                IsMemoryEnabled = true
+                // IsMemoryEnabled = true
             };
             _computer.Open();
 
@@ -246,45 +246,23 @@ namespace DellFanManagement.App
         /// </summary>
         private void ProcessMemory(IHardware hardware, SystemMonitorData data)
         {
-            foreach (ISensor sensor in hardware.Sensors)
-            {
-                if (!sensor.Value.HasValue)
-                    continue;
-
-                if (sensor.SensorType == SensorType.Data)
-                {
-                    if (sensor.Name.Contains("Used"))
-                    {
-                        data.MemoryUsagePercent = sensor.Value.Value;
-                    }
-                }
-                else if (sensor.SensorType == SensorType.SmallData)
-                {
-                    if (sensor.Name.Contains("Used"))
-                    {
-                        data.UsedMemoryMB = (long)(sensor.Value.Value * 1024); // GB to MB
-                    }
-                    else if (sensor.Name.Contains("Available"))
-                    {
-                        // 可用内存
-                    }
-                }
-            }
+            // 移除 LibreHardwareMonitor 的内存数据处理，仅使用性能计数器
+            // 此方法现在为空，因为内存数据完全由 GetMemoryInfo() 提供
         }
 
         /// <summary>
-        /// 获取内存信息（备用方案）
+        /// 获取内存信息（主方案）
         /// </summary>
         private void GetMemoryInfo(SystemMonitorData data)
         {
             try
             {
-                // 使用性能计数器获取内存信息
+                // 使用性能计数器获取可用内存
                 if (_memoryAvailableCounter != null)
                 {
                     long availableMB = (long)_memoryAvailableCounter.NextValue();
                     
-                    // 获取总物理内存
+                    // 获取总物理内存（使用 ComputerInfo 获取准确的总物理内存）
                     long totalMemoryMB = GetTotalPhysicalMemoryMB();
                     
                     if (totalMemoryMB > 0)
@@ -294,10 +272,26 @@ namespace DellFanManagement.App
                         data.MemoryUsagePercent = (float)((double)data.UsedMemoryMB / totalMemoryMB * 100);
                     }
                 }
+                else
+                {
+                    // 如果性能计数器不可用，使用系统信息作为最后备选
+                    var computerInfo = new Microsoft.VisualBasic.Devices.ComputerInfo();
+                    ulong totalMemoryBytes = computerInfo.TotalPhysicalMemory;
+                    long totalMemoryMB = (long)(totalMemoryBytes / (1024 * 1024));
+                    
+                    // 由于性能计数器不可用，我们无法准确获取可用内存，因此使用总内存作为近似值
+                    data.TotalMemoryMB = totalMemoryMB;
+                    data.UsedMemoryMB = totalMemoryMB; // 近似值
+                    data.MemoryUsagePercent = 100.0f; // 近似值
+                }
             }
             catch (Exception ex)
             {
                 Log.Write($"Error getting memory info: {ex.Message}");
+                // 如果获取失败，使用默认值
+                data.TotalMemoryMB = 0;
+                data.UsedMemoryMB = 0;
+                data.MemoryUsagePercent = 0.0f;
             }
         }
 
@@ -308,21 +302,16 @@ namespace DellFanManagement.App
         {
             try
             {
-                if (_commitLimitCounter != null)
-                {
-                    long commitLimit = (long)_commitLimitCounter.NextValue();
-                    return commitLimit / (1024 * 1024); // 转换为MB
-                }
-            }
-            catch
-            {
-                // 使用系统信息作为最后备选
+                // 使用 ComputerInfo 获取准确的总物理内存
                 var computerInfo = new Microsoft.VisualBasic.Devices.ComputerInfo();
-                return (long)(computerInfo.TotalPhysicalMemory / (1024 * 1024));
+                ulong totalMemoryBytes = computerInfo.TotalPhysicalMemory;
+                return (long)(totalMemoryBytes / (1024 * 1024));
             }
-            
-            // 如果性能计数器不可用，返回0
-            return 0;
+            catch (Exception ex)
+            {
+                Log.Write($"Error getting total physical memory: {ex.Message}");
+                return 0;
+            }
         }
 
         /// <summary>
