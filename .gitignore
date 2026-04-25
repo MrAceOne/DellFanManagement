@@ -9,3 +9,9 @@
 /DellFanManagementApp/obj
 /DellSmmIoLibTest/bin
 /DellSmmIoLibTest/obj
+
+/ECFanLevelProbe/bin
+/ECFanLevelProbe/obj
+
+/SMIFanLevelProbe/bin
+/SMIFanLevelProbe/obj
