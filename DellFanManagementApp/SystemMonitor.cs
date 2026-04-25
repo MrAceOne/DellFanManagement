@@ -225,7 +225,7 @@ namespace DellFanManagement.App
                 // GPU温度
                 if (sensor.SensorType == SensorType.Temperature)
                 {
-                    if (sensor.Name.Contains("Core") || sensor.Name.Contains("GPU"))
+                    if (sensor.Name.Contains("GPU Core"))
                     {
                         data.GpuTemperature = (int)Math.Round(sensor.Value.Value);
                     }
@@ -233,7 +233,7 @@ namespace DellFanManagement.App
                 // GPU频率
                 else if (sensor.SensorType == SensorType.Clock)
                 {
-                    if (sensor.Name.Contains("Core") || sensor.Name.Contains("GPU"))
+                    if (sensor.Name.Contains("GPU Core"))
                     {
                         data.GpuFrequency = (int)Math.Round(sensor.Value.Value);
                     }

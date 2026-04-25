@@ -1,0 +1,11 @@
+{
+  "version": 2,
+  "dgSpecHash": "PFdeprhyiPg=",
+  "success": true,
+  "projectFilePath": "D:\\work\\net\\DellFanManagement\\SMIFanLevelProbe\\SMIFanLevelProbe.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\lidon\\.nuget\\packages\\system.codedom\\6.0.0\\system.codedom.6.0.0.nupkg.sha512",
+    "C:\\Users\\lidon\\.nuget\\packages\\system.management\\6.0.0\\system.management.6.0.0.nupkg.sha512"
+  ],
+  "logs": []
+}

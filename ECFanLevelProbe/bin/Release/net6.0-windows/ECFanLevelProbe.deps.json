@@ -1,0 +1,39 @@
+{
+  "runtimeTarget": {
+    "name": ".NETCoreApp,Version=v6.0",
+    "signature": ""
+  },
+  "compilationOptions": {},
+  "targets": {
+    ".NETCoreApp,Version=v6.0": {
+      "ECFanLevelProbe/1.0.0": {
+        "dependencies": {
+          "DellSmbiosBzhLib": "1.0.0"
+        },
+        "runtime": {
+          "ECFanLevelProbe.dll": {}
+        }
+      },
+      "DellSmbiosBzhLib/1.0.0": {
+        "runtime": {
+          "DellSmbiosBzhLib.dll": {
+            "assemblyVersion": "0.0.0.0",
+            "fileVersion": "0.0.0.0"
+          }
+        }
+      }
+    }
+  },
+  "libraries": {
+    "ECFanLevelProbe/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "DellSmbiosBzhLib/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    }
+  }
+}
