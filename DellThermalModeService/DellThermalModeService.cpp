@@ -245,23 +245,13 @@ bool WmiSetThermalMode(ThermalMode mode) {
                 LogMessage(L"INFO", L"Object path: %s", objectPath.c_str());
                 VariantClear(&varPath);
 
-                // Get method input parameter definition
-                IWbemClassObject* pInParamsDef = NULL;
-                hr = pBfn->GetMethod(_bstr_t(L"DoBFn"), 0, &pInParamsDef, NULL);
-                if (FAILED(hr) || !pInParamsDef) {
-                    LogMessage(L"ERROR", L"GetMethod(DoBFn) failed, hr=0x%08X", hr);
-                    VariantClear(&varName);
-                    pBfn->Release();
-                    pBfn = NULL;
-                    break;
-                }
-
-                // Spawn input parameter instance
+                // Create input parameters object directly (skip GetMethod which may fail)
+                // BFn.DoBFn takes a single "Data" property of type BDat
                 IWbemClassObject* pInParams = NULL;
-                hr = pInParamsDef->SpawnInstance(0, &pInParams);
-                pInParamsDef->Release();
+                hr = CoCreateInstance(CLSID_WbemClassObject, NULL, CLSCTX_INPROC_SERVER,
+                                      IID_IWbemClassObject, (void**)&pInParams);
                 if (FAILED(hr) || !pInParams) {
-                    LogMessage(L"ERROR", L"SpawnInstance(InParams) failed, hr=0x%08X", hr);
+                    LogMessage(L"ERROR", L"CoCreateInstance(WbemClassObject) failed, hr=0x%08X", hr);
                     VariantClear(&varName);
                     pBfn->Release();
                     pBfn = NULL;
