@@ -229,81 +229,175 @@ bool WmiSetThermalMode(ThermalMode mode) {
             if (_wcsicmp(name.c_str(), L"ACPI\\PNP0C14\\0_0") == 0) {
                 LogMessage(L"INFO", L"Found BFn instance: %s", name.c_str());
 
+                // Get the object path for ExecMethod
+                VARIANT varPath;
+                VariantInit(&varPath);
+                hr = pBfn->Get(L"__PATH", 0, &varPath, 0, 0);
+                if (FAILED(hr) || varPath.vt != VT_BSTR || !varPath.bstrVal) {
+                    LogMessage(L"ERROR", L"Get(__PATH) failed, hr=0x%08X", hr);
+                    VariantClear(&varPath);
+                    VariantClear(&varName);
+                    pBfn->Release();
+                    pBfn = NULL;
+                    break;
+                }
+                std::wstring objectPath(varPath.bstrVal);
+                LogMessage(L"INFO", L"Object path: %s", objectPath.c_str());
+                VariantClear(&varPath);
+
+                // Get method input parameter definition
                 IWbemClassObject* pInParamsDef = NULL;
                 hr = pBfn->GetMethod(_bstr_t(L"DoBFn"), 0, &pInParamsDef, NULL);
-                if (SUCCEEDED(hr) && pInParamsDef) {
-                    IWbemClassObject* pInParams = NULL;
-                    hr = pInParamsDef->SpawnInstance(0, &pInParams);
-                    pInParamsDef->Release();
-
-                    if (SUCCEEDED(hr) && pInParams) {
-                        VARIANT varData;
-                        VariantInit(&varData);
-                        varData.vt = VT_UNKNOWN;
-                        varData.punkVal = pBdatInst;
-                        pBdatInst->AddRef();
-
-                        hr = pInParams->Put(L"Data", 0, &varData, 0);
-                        VariantClear(&varData);
-
-                        if (SUCCEEDED(hr)) {
-                            IWbemClassObject* pOutParams = NULL;
-                            hr = pSvc->ExecMethod(
-                                _bstr_t(L"BFn.InstanceName=\"ACPI\\PNP0C14\\0_0\""),
-                                _bstr_t(L"DoBFn"),
-                                0, NULL, pInParams, &pOutParams, NULL);
-
-                            if (SUCCEEDED(hr) && pOutParams) {
-                                VARIANT varRetData;
-                                VariantInit(&varRetData);
-                                hr = pOutParams->Get(L"Data", 0, &varRetData, 0, 0);
-
-                                if (SUCCEEDED(hr) && varRetData.vt == VT_UNKNOWN && varRetData.punkVal) {
-                                    IWbemClassObject* pRetBdat = NULL;
-                                    hr = varRetData.punkVal->QueryInterface(IID_IWbemClassObject, (void**)&pRetBdat);
-                                    if (SUCCEEDED(hr) && pRetBdat) {
-                                        VARIANT varRetBytes;
-                                        VariantInit(&varRetBytes);
-                                        hr = pRetBdat->Get(L"Bytes", 0, &varRetBytes, 0, 0);
-
-                                        if (SUCCEEDED(hr) && (varRetBytes.vt & VT_ARRAY) && varRetBytes.parray) {
-                                            DellSmiObject retSmi = {};
-                                            void* pRetData = NULL;
-                                            SafeArrayAccessData(varRetBytes.parray, &pRetData);
-                                            memcpy(&retSmi, pRetData, min(sizeof(DellSmiObject),
-                                                varRetBytes.parray->rgsabound[0].cElements));
-                                            SafeArrayUnaccessData(varRetBytes.parray);
-
-                                            LogMessage(L"INFO", L"SMI returned: Output1=%lu, Output2=%lu, Output3=%lu, Output4=%lu",
-                                                       retSmi.Output1, retSmi.Output2, retSmi.Output3, retSmi.Output4);
-
-                                            if (retSmi.Output1 == 0) {
-                                                success = true;
-                                                LogMessage(L"INFO", L"Thermal mode set successfully");
-                                            } else {
-                                                LogMessage(L"ERROR", L"SMI returned error code: %lu", retSmi.Output1);
-                                            }
-                                        }
-                                        VariantClear(&varRetBytes);
-                                        pRetBdat->Release();
-                                    }
-                                }
-                                VariantClear(&varRetData);
-                                pOutParams->Release();
-                            } else {
-                                LogMessage(L"ERROR", L"ExecMethod(DoBFn) failed, hr=0x%08X", hr);
-                            }
-                        }
-                        pInParams->Release();
-                    }
+                if (FAILED(hr) || !pInParamsDef) {
+                    LogMessage(L"ERROR", L"GetMethod(DoBFn) failed, hr=0x%08X", hr);
+                    VariantClear(&varName);
+                    pBfn->Release();
+                    pBfn = NULL;
+                    break;
                 }
+
+                // Spawn input parameter instance
+                IWbemClassObject* pInParams = NULL;
+                hr = pInParamsDef->SpawnInstance(0, &pInParams);
+                pInParamsDef->Release();
+                if (FAILED(hr) || !pInParams) {
+                    LogMessage(L"ERROR", L"SpawnInstance(InParams) failed, hr=0x%08X", hr);
+                    VariantClear(&varName);
+                    pBfn->Release();
+                    pBfn = NULL;
+                    break;
+                }
+
+                // Set Data property to BDat instance
+                VARIANT varData;
+                VariantInit(&varData);
+                varData.vt = VT_UNKNOWN;
+                varData.punkVal = pBdatInst;
+                pBdatInst->AddRef();
+
+                hr = pInParams->Put(L"Data", 0, &varData, 0);
+                VariantClear(&varData);
+
+                if (FAILED(hr)) {
+                    LogMessage(L"ERROR", L"Put(Data) failed, hr=0x%08X", hr);
+                    pInParams->Release();
+                    VariantClear(&varName);
+                    pBfn->Release();
+                    pBfn = NULL;
+                    break;
+                }
+
+                LogMessage(L"INFO", L"Calling ExecMethod on %s", objectPath.c_str());
+
+                // Execute method using the actual object path
+                IWbemClassObject* pOutParams = NULL;
+                hr = pSvc->ExecMethod(
+                    _bstr_t(objectPath.c_str()),
+                    _bstr_t(L"DoBFn"),
+                    0, NULL, pInParams, &pOutParams, NULL);
+
+                pInParams->Release();
+
+                if (FAILED(hr)) {
+                    LogMessage(L"ERROR", L"ExecMethod(DoBFn) failed, hr=0x%08X", hr);
+                    VariantClear(&varName);
+                    pBfn->Release();
+                    pBfn = NULL;
+                    break;
+                }
+
+                if (!pOutParams) {
+                    LogMessage(L"ERROR", L"ExecMethod returned NULL outParams");
+                    VariantClear(&varName);
+                    pBfn->Release();
+                    pBfn = NULL;
+                    break;
+                }
+
+                // Get return Data property
+                VARIANT varRetData;
+                VariantInit(&varRetData);
+                hr = pOutParams->Get(L"Data", 0, &varRetData, 0, 0);
+                pOutParams->Release();
+
+                if (FAILED(hr)) {
+                    LogMessage(L"ERROR", L"Get(Data) from outParams failed, hr=0x%08X", hr);
+                    VariantClear(&varName);
+                    pBfn->Release();
+                    pBfn = NULL;
+                    break;
+                }
+
+                if (varRetData.vt != VT_UNKNOWN || !varRetData.punkVal) {
+                    LogMessage(L"ERROR", L"Return Data is not VT_UNKNOWN, vt=%d", varRetData.vt);
+                    VariantClear(&varRetData);
+                    VariantClear(&varName);
+                    pBfn->Release();
+                    pBfn = NULL;
+                    break;
+                }
+
+                IWbemClassObject* pRetBdat = NULL;
+                hr = varRetData.punkVal->QueryInterface(IID_IWbemClassObject, (void**)&pRetBdat);
+                VariantClear(&varRetData);
+
+                if (FAILED(hr) || !pRetBdat) {
+                    LogMessage(L"ERROR", L"QueryInterface(IID_IWbemClassObject) failed, hr=0x%08X", hr);
+                    VariantClear(&varName);
+                    pBfn->Release();
+                    pBfn = NULL;
+                    break;
+                }
+
+                VARIANT varRetBytes;
+                VariantInit(&varRetBytes);
+                hr = pRetBdat->Get(L"Bytes", 0, &varRetBytes, 0, 0);
+                pRetBdat->Release();
+
+                if (FAILED(hr)) {
+                    LogMessage(L"ERROR", L"Get(Bytes) from return BDat failed, hr=0x%08X", hr);
+                    VariantClear(&varName);
+                    pBfn->Release();
+                    pBfn = NULL;
+                    break;
+                }
+
+                if ((varRetBytes.vt & VT_ARRAY) == 0 || !varRetBytes.parray) {
+                    LogMessage(L"ERROR", L"Return Bytes is not array, vt=%d", varRetBytes.vt);
+                    VariantClear(&varRetBytes);
+                    VariantClear(&varName);
+                    pBfn->Release();
+                    pBfn = NULL;
+                    break;
+                }
+
+                DellSmiObject retSmi = {};
+                void* pRetData = NULL;
+                SafeArrayAccessData(varRetBytes.parray, &pRetData);
+                ULONG arraySize = varRetBytes.parray->rgsabound[0].cElements;
+                memcpy(&retSmi, pRetData, min(sizeof(DellSmiObject), arraySize));
+                SafeArrayUnaccessData(varRetBytes.parray);
+                VariantClear(&varRetBytes);
+
+                LogMessage(L"INFO", L"SMI returned: Output1=%lu, Output2=%lu, Output3=%lu, Output4=%lu",
+                           retSmi.Output1, retSmi.Output2, retSmi.Output3, retSmi.Output4);
+
+                if (retSmi.Output1 == 0) {
+                    success = true;
+                    LogMessage(L"INFO", L"Thermal mode set successfully");
+                } else {
+                    LogMessage(L"ERROR", L"SMI returned error code: %lu", retSmi.Output1);
+                }
+
+                VariantClear(&varName);
+                pBfn->Release();
+                pBfn = NULL;
+                break;
             }
         }
         VariantClear(&varName);
         pBfn->Release();
         pBfn = NULL;
-
-        if (success) break;
     }
 
     pEnum->Release();
