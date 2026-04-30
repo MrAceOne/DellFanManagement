@@ -1,0 +1,57 @@
+name: Build DellThermalMode
+
+on:
+  push:
+    paths:
+      - 'DellThermalModeService/**'
+      - '.github/workflows/**'
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: 'Build configuration'
+        required: true
+        default: 'Release'
+        type: choice
+        options:
+          - Release
+          - Debug
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup MSVC
+      uses: ilammy/msvc-dev-cmd@v1
+
+    - name: Build DellThermalMode
+      run: |
+        cd DellThermalModeService
+        cl.exe /EHsc /O2 /W4 /DUNICODE /D_UNICODE /Fe:DellThermalMode.exe DellThermalModeService.cpp /link wbemuuid.lib
+      shell: cmd
+
+    - name: Upload artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: DellThermalMode-${{ github.event.inputs.mode || 'Release' }}
+        path: |
+          DellThermalModeService/DellThermalMode.exe
+          DellThermalModeService/register_startup.ps1
+          DellThermalModeService/unregister_startup.ps1
+          DellThermalModeService/README.md
+
+    - name: Create Release
+      if: github.event_name == 'workflow_dispatch'
+      uses: softprops/action-gh-release@v1
+      with:
+        tag_name: v${{ github.run_number }}
+        name: DellThermalMode Build ${{ github.run_number }}
+        files: |
+          DellThermalModeService/DellThermalMode.exe
+          DellThermalModeService/register_startup.ps1
+          DellThermalModeService/unregister_startup.ps1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
