@@ -109,7 +109,8 @@ void LogMessage(const wchar_t* level, const wchar_t* fmt, ...) {
 bool WmiSetThermalMode(ThermalMode mode) {
     LogMessage(L"INFO", L"WmiSetThermalMode: mode=%lu", (ULONG)mode);
 
-    HRESULT hr = CoInitializeEx(0, COINIT_MULTITHREADED);
+    // Use STA (Single-Threaded Apartment) to match C# ManagementObject behavior
+    HRESULT hr = CoInitializeEx(0, COINIT_APARTMENTTHREADED);
     if (FAILED(hr)) {
         LogMessage(L"ERROR", L"CoInitializeEx failed, hr=0x%08X", hr);
         return false;
@@ -166,12 +167,20 @@ bool WmiSetThermalMode(ThermalMode mode) {
         return false;
     }
 
-    // 2. Prepare SmiObject
+    // 2. Prepare SmiObject (must match C# BufferLength = 32768)
+    static const int BufferLength = 32768;
+    static const int MinimumBufferLength = 36;
+
     DellSmiObject smi = {};
     smi.Class    = 17;      // Class.Info
     smi.Selector = 19;      // Selector.ThermalMode
     smi.Input1   = 1;       // Write operation
     smi.Input2   = (ULONG)mode;
+
+    // Allocate full buffer (32768 bytes) to match C# implementation
+    BYTE* buffer = new BYTE[BufferLength];
+    ZeroMemory(buffer, BufferLength);
+    memcpy(buffer, &smi, sizeof(DellSmiObject));
 
     VARIANT varBytes;
     VariantInit(&varBytes);
@@ -179,10 +188,11 @@ bool WmiSetThermalMode(ThermalMode mode) {
 
     SAFEARRAYBOUND bound;
     bound.lLbound = 0;
-    bound.cElements = sizeof(DellSmiObject);
+    bound.cElements = BufferLength;
     varBytes.parray = SafeArrayCreate(VT_UI1, 1, &bound);
     if (!varBytes.parray) {
         LogMessage(L"ERROR", L"SafeArrayCreate failed");
+        delete[] buffer;
         pBdatInst->Release();
         pSvc->Release();
         CoUninitialize();
@@ -191,8 +201,9 @@ bool WmiSetThermalMode(ThermalMode mode) {
 
     void* pData = NULL;
     SafeArrayAccessData(varBytes.parray, &pData);
-    memcpy(pData, &smi, sizeof(DellSmiObject));
+    memcpy(pData, buffer, BufferLength);
     SafeArrayUnaccessData(varBytes.parray);
+    delete[] buffer;
 
     hr = pBdatInst->Put(L"Bytes", 0, &varBytes, 0);
     VariantClear(&varBytes);
@@ -245,22 +256,12 @@ bool WmiSetThermalMode(ThermalMode mode) {
                 LogMessage(L"INFO", L"Object path: %s", objectPath.c_str());
                 VariantClear(&varRelPath);
 
-                // Get method parameters from BFn CLASS (not instance)
-                IWbemClassObject* pBfnClass = NULL;
-                hr = pSvc->GetObject(_bstr_t(L"BFn"), 0, NULL, &pBfnClass, NULL);
-                if (FAILED(hr) || !pBfnClass) {
-                    LogMessage(L"ERROR", L"GetObject(BFn class) failed, hr=0x%08X", hr);
-                    VariantClear(&varName);
-                    pBfn->Release();
-                    pBfn = NULL;
-                    break;
-                }
-
-                IWbemClassObject* pInParamsDef = NULL;
-                hr = pBfnClass->GetMethod(_bstr_t(L"DoBFn"), 0, &pInParamsDef, NULL);
-                pBfnClass->Release();
-                if (FAILED(hr) || !pInParamsDef) {
-                    LogMessage(L"ERROR", L"GetMethod(DoBFn) from class failed, hr=0x%08X", hr);
+                // Create input parameters from __PARAMETERS system class
+                // (matches C# ManagementObject.GetMethodParameters behavior)
+                IWbemClassObject* pParamClass = NULL;
+                hr = pSvc->GetObject(_bstr_t(L"__PARAMETERS"), 0, NULL, &pParamClass, NULL);
+                if (FAILED(hr) || !pParamClass) {
+                    LogMessage(L"ERROR", L"GetObject(__PARAMETERS) failed, hr=0x%08X", hr);
                     VariantClear(&varName);
                     pBfn->Release();
                     pBfn = NULL;
@@ -268,10 +269,10 @@ bool WmiSetThermalMode(ThermalMode mode) {
                 }
 
                 IWbemClassObject* pInParams = NULL;
-                hr = pInParamsDef->SpawnInstance(0, &pInParams);
-                pInParamsDef->Release();
+                hr = pParamClass->SpawnInstance(0, &pInParams);
+                pParamClass->Release();
                 if (FAILED(hr) || !pInParams) {
-                    LogMessage(L"ERROR", L"SpawnInstance(InParams) failed, hr=0x%08X", hr);
+                    LogMessage(L"ERROR", L"SpawnInstance(__PARAMETERS) failed, hr=0x%08X", hr);
                     VariantClear(&varName);
                     pBfn->Release();
                     pBfn = NULL;
@@ -279,13 +280,15 @@ bool WmiSetThermalMode(ThermalMode mode) {
                 }
 
                 // Set Data property to BDat instance
+                // Use VT_UNKNOWN with CIM_OBJECT type to match C# ManagementBaseObject behavior
                 VARIANT varData;
                 VariantInit(&varData);
                 varData.vt = VT_UNKNOWN;
                 varData.punkVal = pBdatInst;
                 pBdatInst->AddRef();
 
-                hr = pInParams->Put(L"Data", 0, &varData, 0);
+                // CIM_OBJECT = 13 (object reference type)
+                hr = pInParams->Put(L"Data", 0, &varData, CIM_OBJECT);
                 VariantClear(&varData);
 
                 if (FAILED(hr)) {
