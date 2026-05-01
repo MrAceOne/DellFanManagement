@@ -229,29 +229,49 @@ bool WmiSetThermalMode(ThermalMode mode) {
             if (_wcsicmp(name.c_str(), L"ACPI\\PNP0C14\\0_0") == 0) {
                 LogMessage(L"INFO", L"Found BFn instance: %s", name.c_str());
 
-                // Get the object path for ExecMethod
-                VARIANT varPath;
-                VariantInit(&varPath);
-                hr = pBfn->Get(L"__PATH", 0, &varPath, 0, 0);
-                if (FAILED(hr) || varPath.vt != VT_BSTR || !varPath.bstrVal) {
-                    LogMessage(L"ERROR", L"Get(__PATH) failed, hr=0x%08X", hr);
-                    VariantClear(&varPath);
+                // Get the relative object path for ExecMethod
+                VARIANT varRelPath;
+                VariantInit(&varRelPath);
+                hr = pBfn->Get(L"__RELPATH", 0, &varRelPath, 0, 0);
+                if (FAILED(hr) || varRelPath.vt != VT_BSTR || !varRelPath.bstrVal) {
+                    LogMessage(L"ERROR", L"Get(__RELPATH) failed, hr=0x%08X", hr);
+                    VariantClear(&varRelPath);
                     VariantClear(&varName);
                     pBfn->Release();
                     pBfn = NULL;
                     break;
                 }
-                std::wstring objectPath(varPath.bstrVal);
+                std::wstring objectPath(varRelPath.bstrVal);
                 LogMessage(L"INFO", L"Object path: %s", objectPath.c_str());
-                VariantClear(&varPath);
+                VariantClear(&varRelPath);
 
-                // Create input parameters object directly (skip GetMethod which may fail)
-                // BFn.DoBFn takes a single "Data" property of type BDat
+                // Get method parameters from BFn CLASS (not instance)
+                IWbemClassObject* pBfnClass = NULL;
+                hr = pSvc->GetObject(_bstr_t(L"BFn"), 0, NULL, &pBfnClass, NULL);
+                if (FAILED(hr) || !pBfnClass) {
+                    LogMessage(L"ERROR", L"GetObject(BFn class) failed, hr=0x%08X", hr);
+                    VariantClear(&varName);
+                    pBfn->Release();
+                    pBfn = NULL;
+                    break;
+                }
+
+                IWbemClassObject* pInParamsDef = NULL;
+                hr = pBfnClass->GetMethod(_bstr_t(L"DoBFn"), 0, &pInParamsDef, NULL);
+                pBfnClass->Release();
+                if (FAILED(hr) || !pInParamsDef) {
+                    LogMessage(L"ERROR", L"GetMethod(DoBFn) from class failed, hr=0x%08X", hr);
+                    VariantClear(&varName);
+                    pBfn->Release();
+                    pBfn = NULL;
+                    break;
+                }
+
                 IWbemClassObject* pInParams = NULL;
-                hr = CoCreateInstance(CLSID_WbemClassObject, NULL, CLSCTX_INPROC_SERVER,
-                                      IID_IWbemClassObject, (void**)&pInParams);
+                hr = pInParamsDef->SpawnInstance(0, &pInParams);
+                pInParamsDef->Release();
                 if (FAILED(hr) || !pInParams) {
-                    LogMessage(L"ERROR", L"CoCreateInstance(WbemClassObject) failed, hr=0x%08X", hr);
+                    LogMessage(L"ERROR", L"SpawnInstance(InParams) failed, hr=0x%08X", hr);
                     VariantClear(&varName);
                     pBfn->Release();
                     pBfn = NULL;
