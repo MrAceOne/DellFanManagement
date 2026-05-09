@@ -47,18 +47,6 @@ namespace DellFanManagement.App
             cpuFrequencyLabel = new System.Windows.Forms.Label();
             gpuFrequencyLabel = new System.Windows.Forms.Label();
             memoryLabel = new System.Windows.Forms.Label();
-            operationModeGroupBox = new System.Windows.Forms.GroupBox();
-            operationModeRadioButtonManual = new System.Windows.Forms.RadioButton();
-            operationModeRadioButtonAutomatic = new System.Windows.Forms.RadioButton();
-            manualGroupBox = new System.Windows.Forms.GroupBox();
-            manualFan2GroupBox = new System.Windows.Forms.GroupBox();
-            manualFan2RadioButtonHigh = new System.Windows.Forms.RadioButton();
-            manualFan2RadioButtonMedium = new System.Windows.Forms.RadioButton();
-            manualFan2RadioButtonOff = new System.Windows.Forms.RadioButton();
-            manualFan1GroupBox = new System.Windows.Forms.GroupBox();
-            manualFan1RadioButtonHigh = new System.Windows.Forms.RadioButton();
-            manualFan1RadioButtonMedium = new System.Windows.Forms.RadioButton();
-            manualFan1RadioButtonOff = new System.Windows.Forms.RadioButton();
             ecFanControlRadioButtonOn = new System.Windows.Forms.RadioButton();
             ecFanControlRadioButtonOff = new System.Windows.Forms.RadioButton();
             ecFanControlGroupBox = new System.Windows.Forms.GroupBox();
@@ -77,10 +65,6 @@ namespace DellFanManagement.App
             thermalSettingGroupBox.SuspendLayout();
             temperatureGroupBox.SuspendLayout();
             systemMonitorGroupBox.SuspendLayout();
-            operationModeGroupBox.SuspendLayout();
-            manualGroupBox.SuspendLayout();
-            manualFan2GroupBox.SuspendLayout();
-            manualFan1GroupBox.SuspendLayout();
             ecFanControlGroupBox.SuspendLayout();
             trayContextMenu.SuspendLayout();
             groupBox1.SuspendLayout();
@@ -122,7 +106,7 @@ namespace DellFanManagement.App
             thermalSettingGroupBox.Controls.Add(thermalSettingRadioButtonQuiet);
             thermalSettingGroupBox.Controls.Add(thermalSettingRadioButtonCool);
             thermalSettingGroupBox.Controls.Add(thermalSettingRadioButtonOptimized);
-            thermalSettingGroupBox.Location = new System.Drawing.Point(193, 147);
+            thermalSettingGroupBox.Location = new System.Drawing.Point(193, 66);
             thermalSettingGroupBox.Name = "thermalSettingGroupBox";
             thermalSettingGroupBox.Size = new System.Drawing.Size(103, 124);
             thermalSettingGroupBox.TabIndex = 6;
@@ -245,158 +229,16 @@ namespace DellFanManagement.App
             memoryLabel.TabIndex = 2;
             memoryLabel.Text = "内存: --";
             // 
-            // operationModeGroupBox
-            // 
-            operationModeGroupBox.Controls.Add(operationModeRadioButtonManual);
-            operationModeGroupBox.Controls.Add(operationModeRadioButtonAutomatic);
-            operationModeGroupBox.Location = new System.Drawing.Point(193, 66);
-            operationModeGroupBox.Name = "operationModeGroupBox";
-            operationModeGroupBox.Size = new System.Drawing.Size(103, 75);
-            operationModeGroupBox.TabIndex = 5;
-            operationModeGroupBox.TabStop = false;
-            operationModeGroupBox.Text = "操作模式:";
-            // 
-            // operationModeRadioButtonManual
-            // 
-            operationModeRadioButtonManual.AutoSize = true;
-            operationModeRadioButtonManual.Font = new System.Drawing.Font("Microsoft YaHei UI", 8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-            operationModeRadioButtonManual.Location = new System.Drawing.Point(6, 47);
-            operationModeRadioButtonManual.Name = "operationModeRadioButtonManual";
-            operationModeRadioButtonManual.Size = new System.Drawing.Size(47, 20);
-            operationModeRadioButtonManual.TabIndex = 1;
-            operationModeRadioButtonManual.TabStop = true;
-            operationModeRadioButtonManual.Text = "手动";
-            operationModeRadioButtonManual.UseVisualStyleBackColor = true;
-            // 
-            // operationModeRadioButtonAutomatic
-            // 
-            operationModeRadioButtonAutomatic.AutoSize = true;
-            operationModeRadioButtonAutomatic.Font = new System.Drawing.Font("Microsoft YaHei UI", 8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-            operationModeRadioButtonAutomatic.Location = new System.Drawing.Point(6, 22);
-            operationModeRadioButtonAutomatic.Name = "operationModeRadioButtonAutomatic";
-            operationModeRadioButtonAutomatic.Size = new System.Drawing.Size(47, 20);
-            operationModeRadioButtonAutomatic.TabIndex = 0;
-            operationModeRadioButtonAutomatic.TabStop = true;
-            operationModeRadioButtonAutomatic.Text = "自动";
-            operationModeRadioButtonAutomatic.UseVisualStyleBackColor = true;
-            // 
-            // manualGroupBox
-            // 
-            manualGroupBox.Controls.Add(manualFan2GroupBox);
-            manualGroupBox.Controls.Add(manualFan1GroupBox);
-            manualGroupBox.Location = new System.Drawing.Point(302, 12);
-            manualGroupBox.Name = "manualGroupBox";
-            manualGroupBox.Size = new System.Drawing.Size(194, 129);
-            manualGroupBox.TabIndex = 9;
-            manualGroupBox.TabStop = false;
-            manualGroupBox.Text = "手动控制:";
-            // 
-            // manualFan2GroupBox
-            // 
-            manualFan2GroupBox.Controls.Add(manualFan2RadioButtonHigh);
-            manualFan2GroupBox.Controls.Add(manualFan2RadioButtonMedium);
-            manualFan2GroupBox.Controls.Add(manualFan2RadioButtonOff);
-            manualFan2GroupBox.Location = new System.Drawing.Point(100, 21);
-            manualFan2GroupBox.Name = "manualFan2GroupBox";
-            manualFan2GroupBox.Size = new System.Drawing.Size(88, 99);
-            manualFan2GroupBox.TabIndex = 1;
-            manualFan2GroupBox.TabStop = false;
-            manualFan2GroupBox.Text = "风扇 2:";
-            // 
-            // manualFan2RadioButtonHigh
-            // 
-            manualFan2RadioButtonHigh.AutoSize = true;
-            manualFan2RadioButtonHigh.Font = new System.Drawing.Font("Microsoft YaHei UI", 8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-            manualFan2RadioButtonHigh.Location = new System.Drawing.Point(6, 72);
-            manualFan2RadioButtonHigh.Name = "manualFan2RadioButtonHigh";
-            manualFan2RadioButtonHigh.Size = new System.Drawing.Size(36, 20);
-            manualFan2RadioButtonHigh.TabIndex = 5;
-            manualFan2RadioButtonHigh.TabStop = true;
-            manualFan2RadioButtonHigh.Text = "高";
-            manualFan2RadioButtonHigh.UseVisualStyleBackColor = true;
-            // 
-            // manualFan2RadioButtonMedium
-            // 
-            manualFan2RadioButtonMedium.AutoSize = true;
-            manualFan2RadioButtonMedium.Font = new System.Drawing.Font("Microsoft YaHei UI", 8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-            manualFan2RadioButtonMedium.Location = new System.Drawing.Point(6, 47);
-            manualFan2RadioButtonMedium.Name = "manualFan2RadioButtonMedium";
-            manualFan2RadioButtonMedium.Size = new System.Drawing.Size(36, 20);
-            manualFan2RadioButtonMedium.TabIndex = 5;
-            manualFan2RadioButtonMedium.TabStop = true;
-            manualFan2RadioButtonMedium.Text = "中";
-            manualFan2RadioButtonMedium.UseVisualStyleBackColor = true;
-            // 
-            // manualFan2RadioButtonOff
-            // 
-            manualFan2RadioButtonOff.AutoSize = true;
-            manualFan2RadioButtonOff.Font = new System.Drawing.Font("Microsoft YaHei UI", 8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-            manualFan2RadioButtonOff.Location = new System.Drawing.Point(6, 22);
-            manualFan2RadioButtonOff.Name = "manualFan2RadioButtonOff";
-            manualFan2RadioButtonOff.Size = new System.Drawing.Size(36, 20);
-            manualFan2RadioButtonOff.TabIndex = 5;
-            manualFan2RadioButtonOff.TabStop = true;
-            manualFan2RadioButtonOff.Text = "关";
-            manualFan2RadioButtonOff.UseVisualStyleBackColor = true;
-            // 
-            // manualFan1GroupBox
-            // 
-            manualFan1GroupBox.Controls.Add(manualFan1RadioButtonHigh);
-            manualFan1GroupBox.Controls.Add(manualFan1RadioButtonMedium);
-            manualFan1GroupBox.Controls.Add(manualFan1RadioButtonOff);
-            manualFan1GroupBox.Location = new System.Drawing.Point(6, 21);
-            manualFan1GroupBox.Name = "manualFan1GroupBox";
-            manualFan1GroupBox.Size = new System.Drawing.Size(88, 99);
-            manualFan1GroupBox.TabIndex = 0;
-            manualFan1GroupBox.TabStop = false;
-            manualFan1GroupBox.Text = "风扇 1:";
-            // 
-            // manualFan1RadioButtonHigh
-            // 
-            manualFan1RadioButtonHigh.AutoSize = true;
-            manualFan1RadioButtonHigh.Font = new System.Drawing.Font("Microsoft YaHei UI", 8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-            manualFan1RadioButtonHigh.Location = new System.Drawing.Point(6, 72);
-            manualFan1RadioButtonHigh.Name = "manualFan1RadioButtonHigh";
-            manualFan1RadioButtonHigh.Size = new System.Drawing.Size(36, 20);
-            manualFan1RadioButtonHigh.TabIndex = 2;
-            manualFan1RadioButtonHigh.TabStop = true;
-            manualFan1RadioButtonHigh.Text = "高";
-            manualFan1RadioButtonHigh.UseVisualStyleBackColor = true;
-            // 
-            // manualFan1RadioButtonMedium
-            // 
-            manualFan1RadioButtonMedium.AutoSize = true;
-            manualFan1RadioButtonMedium.Font = new System.Drawing.Font("Microsoft YaHei UI", 8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-            manualFan1RadioButtonMedium.Location = new System.Drawing.Point(6, 47);
-            manualFan1RadioButtonMedium.Name = "manualFan1RadioButtonMedium";
-            manualFan1RadioButtonMedium.Size = new System.Drawing.Size(36, 20);
-            manualFan1RadioButtonMedium.TabIndex = 1;
-            manualFan1RadioButtonMedium.TabStop = true;
-            manualFan1RadioButtonMedium.Text = "中";
-            manualFan1RadioButtonMedium.UseVisualStyleBackColor = true;
-            // 
-            // manualFan1RadioButtonOff
-            // 
-            manualFan1RadioButtonOff.AutoSize = true;
-            manualFan1RadioButtonOff.Font = new System.Drawing.Font("Microsoft YaHei UI", 8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-            manualFan1RadioButtonOff.Location = new System.Drawing.Point(6, 22);
-            manualFan1RadioButtonOff.Name = "manualFan1RadioButtonOff";
-            manualFan1RadioButtonOff.Size = new System.Drawing.Size(36, 20);
-            manualFan1RadioButtonOff.TabIndex = 0;
-            manualFan1RadioButtonOff.TabStop = true;
-            manualFan1RadioButtonOff.Text = "关";
-            manualFan1RadioButtonOff.UseVisualStyleBackColor = true;
-            // 
             // ecFanControlRadioButtonOn
             // 
             ecFanControlRadioButtonOn.AutoSize = true;
             ecFanControlRadioButtonOn.Font = new System.Drawing.Font("Microsoft YaHei UI", 8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
             ecFanControlRadioButtonOn.Location = new System.Drawing.Point(6, 22);
             ecFanControlRadioButtonOn.Name = "ecFanControlRadioButtonOn";
-            ecFanControlRadioButtonOn.Size = new System.Drawing.Size(36, 20);
+            ecFanControlRadioButtonOn.Size = new System.Drawing.Size(47, 20);
             ecFanControlRadioButtonOn.TabIndex = 2;
             ecFanControlRadioButtonOn.TabStop = true;
-            ecFanControlRadioButtonOn.Text = "开";
+            ecFanControlRadioButtonOn.Text = "自动";
             ecFanControlRadioButtonOn.UseVisualStyleBackColor = true;
             // 
             // ecFanControlRadioButtonOff
@@ -405,10 +247,10 @@ namespace DellFanManagement.App
             ecFanControlRadioButtonOff.Font = new System.Drawing.Font("Microsoft YaHei UI", 8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
             ecFanControlRadioButtonOff.Location = new System.Drawing.Point(53, 22);
             ecFanControlRadioButtonOff.Name = "ecFanControlRadioButtonOff";
-            ecFanControlRadioButtonOff.Size = new System.Drawing.Size(36, 20);
+            ecFanControlRadioButtonOff.Size = new System.Drawing.Size(47, 20);
             ecFanControlRadioButtonOff.TabIndex = 3;
             ecFanControlRadioButtonOff.TabStop = true;
-            ecFanControlRadioButtonOff.Text = "关";
+            ecFanControlRadioButtonOff.Text = "手动";
             ecFanControlRadioButtonOff.UseVisualStyleBackColor = true;
             // 
             // ecFanControlGroupBox
@@ -462,9 +304,9 @@ namespace DellFanManagement.App
             groupBox1.Controls.Add(label1);
             groupBox1.Controls.Add(eppLabel);
             groupBox1.Controls.Add(eppTrackBar);
-            groupBox1.Location = new System.Drawing.Point(302, 147);
+            groupBox1.Location = new System.Drawing.Point(302, 12);
             groupBox1.Name = "groupBox1";
-            groupBox1.Size = new System.Drawing.Size(192, 124);
+            groupBox1.Size = new System.Drawing.Size(192, 259);
             groupBox1.TabIndex = 14;
             groupBox1.TabStop = false;
             groupBox1.Text = "温度优化";
@@ -528,8 +370,6 @@ namespace DellFanManagement.App
             Controls.Add(groupBox1);
             Controls.Add(statusStrip);
             Controls.Add(ecFanControlGroupBox);
-            Controls.Add(manualGroupBox);
-            Controls.Add(operationModeGroupBox);
             Controls.Add(temperatureGroupBox);
             Controls.Add(thermalSettingGroupBox);
             Controls.Add(fansGroupBox);
@@ -547,13 +387,6 @@ namespace DellFanManagement.App
             temperatureGroupBox.PerformLayout();
             systemMonitorGroupBox.ResumeLayout(false);
             systemMonitorGroupBox.PerformLayout();
-            operationModeGroupBox.ResumeLayout(false);
-            operationModeGroupBox.PerformLayout();
-            manualGroupBox.ResumeLayout(false);
-            manualFan2GroupBox.ResumeLayout(false);
-            manualFan2GroupBox.PerformLayout();
-            manualFan1GroupBox.ResumeLayout(false);
-            manualFan1GroupBox.PerformLayout();
             ecFanControlGroupBox.ResumeLayout(false);
             ecFanControlGroupBox.PerformLayout();
             trayContextMenu.ResumeLayout(false);
@@ -582,18 +415,6 @@ namespace DellFanManagement.App
         private System.Windows.Forms.Label cpuFrequencyLabel;
         private System.Windows.Forms.Label gpuFrequencyLabel;
         private System.Windows.Forms.Label memoryLabel;
-        private System.Windows.Forms.GroupBox operationModeGroupBox;
-        private System.Windows.Forms.RadioButton operationModeRadioButtonManual;
-        private System.Windows.Forms.RadioButton operationModeRadioButtonAutomatic;
-        private System.Windows.Forms.GroupBox manualGroupBox;
-        private System.Windows.Forms.GroupBox manualFan2GroupBox;
-        private System.Windows.Forms.RadioButton manualFan2RadioButtonHigh;
-        private System.Windows.Forms.RadioButton manualFan2RadioButtonMedium;
-        private System.Windows.Forms.RadioButton manualFan2RadioButtonOff;
-        private System.Windows.Forms.GroupBox manualFan1GroupBox;
-        private System.Windows.Forms.RadioButton manualFan1RadioButtonHigh;
-        private System.Windows.Forms.RadioButton manualFan1RadioButtonMedium;
-        private System.Windows.Forms.RadioButton manualFan1RadioButtonOff;
         private System.Windows.Forms.RadioButton ecFanControlRadioButtonOn;
         private System.Windows.Forms.RadioButton ecFanControlRadioButtonOff;
         private System.Windows.Forms.GroupBox ecFanControlGroupBox;

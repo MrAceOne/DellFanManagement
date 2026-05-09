@@ -66,6 +66,26 @@
         public static readonly ConfigurationOption DisableCpuTemperatures = new(ConfigurationOptionType.Integer, "DisableCpuTemperatures");
 
         /// <summary>
+        /// Store whether EC fan control is enabled (1) or disabled/manual mode (0).
+        /// </summary>
+        public static readonly ConfigurationOption EcFanControlEnabled = new(ConfigurationOptionType.Integer, "EcFanControlEnabled");
+
+        /// <summary>
+        /// CPU temperature threshold for manual mode fan control (default 45 degrees).
+        /// </summary>
+        public static readonly ConfigurationOption ManualModeCpuTemperatureThreshold = new(ConfigurationOptionType.Integer, "ManualModeCpuTemperatureThreshold");
+
+        /// <summary>
+        /// GPU temperature threshold for manual mode fan control (default 45 degrees).
+        /// </summary>
+        public static readonly ConfigurationOption ManualModeGpuTemperatureThreshold = new(ConfigurationOptionType.Integer, "ManualModeGpuTemperatureThreshold");
+
+        /// <summary>
+        /// Temperature check interval in seconds for manual mode (default 30 seconds).
+        /// </summary>
+        public static readonly ConfigurationOption ManualModeCheckIntervalSeconds = new(ConfigurationOptionType.Integer, "ManualModeCheckIntervalSeconds");
+
+        /// <summary>
         /// Indicates whether this configuration option is for a "number" or a "string".
         /// </summary>
         public ConfigurationOptionType Type { get; private set; }

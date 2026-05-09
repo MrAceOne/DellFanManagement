@@ -46,11 +46,6 @@ namespace DellFanManagement.App
         private bool _formClosed;
 
         /// <summary>
-        /// Indicates whether the initial setup code has finished or not.
-        /// </summary>
-        private readonly bool _initializationComplete;
-
-        /// <summary>
         /// Last observed Windows power profile.
         /// </summary>
         private Guid? _registeredPowerProfile;
@@ -65,8 +60,6 @@ namespace DellFanManagement.App
         /// </summary>
         public DellFanManagementGuiForm()
         {
-            _initializationComplete = false;
-
             InitializeComponent();
 
             // Initialize objects.
@@ -86,9 +79,6 @@ namespace DellFanManagement.App
                 _configurationStore.SetOption(ConfigurationOption.DisclaimerShown, 1);
             }
 
-            // Version number in the about box.
-            //aboutProductLabel.Text = string.Format("Dell Fan Management, version {0}", DellFanManagementApp.Version);
-
             // Set event handlers.
             FormClosed += new FormClosedEventHandler(FormClosedEventHandler);
             Resize += new EventHandler(OnResizeEventHandler);
@@ -106,143 +96,45 @@ namespace DellFanManagement.App
             ecFanControlRadioButtonOn.CheckedChanged += new EventHandler(EcFanControlSettingChangedEventHandler);
             ecFanControlRadioButtonOff.CheckedChanged += new EventHandler(EcFanControlSettingChangedEventHandler);
 
-            // ...Manual fan control radio buttons...
-            manualFan1RadioButtonOff.CheckedChanged += new EventHandler(FanLevelChangedEventHandler);
-            manualFan1RadioButtonMedium.CheckedChanged += new EventHandler(FanLevelChangedEventHandler);
-            manualFan1RadioButtonHigh.CheckedChanged += new EventHandler(FanLevelChangedEventHandler);
-            manualFan2RadioButtonOff.CheckedChanged += new EventHandler(FanLevelChangedEventHandler);
-            manualFan2RadioButtonMedium.CheckedChanged += new EventHandler(FanLevelChangedEventHandler);
-            manualFan2RadioButtonHigh.CheckedChanged += new EventHandler(FanLevelChangedEventHandler);
-
-            // ...Operation mode radio buttons...
-            operationModeRadioButtonAutomatic.CheckedChanged += new EventHandler(ConfigurationRadioButtonAutomaticEventHandler);
-            operationModeRadioButtonManual.CheckedChanged += new EventHandler(ConfigurationRadioButtonManualEventHandler);
-            
-            frequencyTextBox.TextChanged += new EventHandler(ConsistencyModeTextBoxesChangedEventHandler);
-            powerApplyButton.Click += new EventHandler(PowerApplyButtonClickedEventHandler);
-
             eppTrackBar.Scroll += new EventHandler(EppTrackBarScrollEventHandler);
 
             // Empty out pre-populated temperature label text fields.
-            // (There are so many to allow support for lots of CPU cores, which many systems will not have.)
             temperatureLabel1.Text = string.Empty;
             temperatureLabel2.Text = string.Empty;
 
-            // Disable some options depending on fan control capability.
-            if (!_core.IsAutomaticFanControlDisableSupported)
-            {
-                operationModeRadioButtonManual.Enabled = false;
-            }
-            if (!_core.IsSpecificFanControlSupported)
-            {
-                operationModeRadioButtonManual.Enabled = false;
-            }
+            // EC fan control is always available.
+            ecFanControlGroupBox.Enabled = true;
 
             // Initial update of the tray icon (required for it to appear for display).
             UpdateTrayIcon(false);
 
-            //初始化电源管理相关的UI元素。
+            // Initialize power management related UI elements.
             UpdatePowerForm();
             // Update form with default state values.
             UpdateForm();
             _state.UpdateThermalSetting();
-            // Apply manual fan control configuration from registry.
-            ApplyManualModeConfiguration();
-            
-            // Apply operation mode configuration from registry.
-            ApplyConfiguration();
+
+            // Apply EC fan control configuration from registry.
+            ApplyEcFanControlConfiguration();
 
             // Start threads to do background work.
             _core.StartBackgroundThread();
             StartTrayIconThread();
-
-            _initializationComplete = true;
         }
 
         /// <summary>
-        /// Apply configuration settings loaded from the registry.
+        /// Apply EC fan control configuration loaded from the registry.
         /// </summary>
-        private void ApplyConfiguration()
+        private void ApplyEcFanControlConfiguration()
         {
-            // Consistency mode settings.
-            int? lowerTemperatureThreshold = _configurationStore.GetIntOption(ConfigurationOption.ConsistencyModeLowerTemperatureThreshold);
-            int? upperTemperatureThreshold = _configurationStore.GetIntOption(ConfigurationOption.ConsistencyModeUpperTemperatureThreshold);
-            int? rpmThreshold = _configurationStore.GetIntOption(ConfigurationOption.ConsistencyModeRpmThreshold);
-            
-
-            // Read previous operation mode from configuration.
-            bool modeSet = false;
-            if (Enum.TryParse(_configurationStore.GetStringOption(ConfigurationOption.OperationMode), out OperationMode operationMode))
+            int? ecFanControlEnabled = _configurationStore.GetIntOption(ConfigurationOption.EcFanControlEnabled);
+            if (ecFanControlEnabled == 0)
             {
-                switch (operationMode)
-                {
-                    case OperationMode.Automatic:
-                        operationModeRadioButtonAutomatic.Checked = true;
-                        modeSet = true;
-                        break;
-                    case OperationMode.Manual:
-                        if (operationModeRadioButtonManual.Enabled)
-                        {
-                            operationModeRadioButtonManual.Checked = true;
-                            modeSet = true;
-                        }
-                        break;
-                    case OperationMode.Consistency:
-                        
-                        break;
-                }
+                ecFanControlRadioButtonOff.Checked = true;
             }
-            if (!modeSet)
+            else
             {
-                // Default to automatic mode.
-                operationModeRadioButtonAutomatic.Checked = true;
-            }
-        }
-
-        /// <summary>
-        /// Apply manual mode configuration from the registry.
-        /// </summary>
-        private void ApplyManualModeConfiguration()
-        {
-            if (operationModeRadioButtonManual.Checked)
-            {
-                // Apply saved manual mode configuration.
-                if (_configurationStore.GetIntOption(ConfigurationOption.ManualModeEcFanControlEnabled) == 0)
-                {
-                    ecFanControlRadioButtonOff.Checked = true;
-
-                    if (Enum.TryParse(_configurationStore.GetStringOption(ConfigurationOption.ManualModeFan1Level), out FanLevel fan1Level))
-                    {
-                        switch (fan1Level)
-                        {
-                            case FanLevel.Off:
-                                manualFan1RadioButtonOff.Checked = true;
-                                break;
-                            case FanLevel.Medium:
-                                manualFan1RadioButtonMedium.Checked = true;
-                                break;
-                            case FanLevel.High:
-                                manualFan1RadioButtonHigh.Checked = true;
-                                break;
-                        }
-                    }
-
-                    if (Enum.TryParse(_configurationStore.GetStringOption(ConfigurationOption.ManualModeFan2Level), out FanLevel fan2Level))
-                    {
-                        switch (fan2Level)
-                        {
-                            case FanLevel.Off:
-                                manualFan2RadioButtonOff.Checked = true;
-                                break;
-                            case FanLevel.Medium:
-                                manualFan2RadioButtonMedium.Checked = true;
-                                break;
-                            case FanLevel.High:
-                                manualFan2RadioButtonHigh.Checked = true;
-                                break;
-                        }
-                    }
-                }
+                ecFanControlRadioButtonOn.Checked = true;
             }
         }
 
@@ -262,22 +154,10 @@ namespace DellFanManagement.App
         }
 
         /// <summary>
-        /// Clear the manual operation mode configuration (when we switch to a different mode, it should be reset).
-        /// </summary>
-        private void ClearManualControlConfiguration()
-        {
-            _configurationStore.SetOption(ConfigurationOption.ManualModeEcFanControlEnabled, null);
-            _configurationStore.SetOption(ConfigurationOption.ManualModeFan1Level, null);
-            _configurationStore.SetOption(ConfigurationOption.ManualModeFan2Level, null);
-        }
-
-        /// <summary>
         /// Update the form based on the current state.
         /// </summary>
         public void UpdateForm()
         {
-            // This method does not write to the state, but we should still make sure that the state is not changing
-            // during the update.
             _state.WaitOne();
 
             // Fan RPM.
@@ -287,11 +167,6 @@ namespace DellFanManagement.App
             {
                 fan2RpmLabel.Text = string.Format("Fan 2 RPM: {0}", _state.Fan2Rpm != null ? _state.Fan2Rpm : "(Error)");
                 fan2RpmLabel.Enabled = true;
-
-                if (_core.IsIndividualFanControlSupported)
-                {
-                    manualFan2GroupBox.Enabled = true;
-                }
             }
             else
             {
@@ -327,16 +202,15 @@ namespace DellFanManagement.App
                 }
             }
 
-            // 系统监测数据 - CPU和GPU频率已经是GHz单位，内存显示为 已用/总内存 (GB)
-            cpuFrequencyLabel.Text = _state.CpuFrequency.HasValue 
-                ? string.Format("CPU 频率: {0:F1} GHz", _state.CpuFrequency.Value / 1000.0) 
+            // System monitor data
+            cpuFrequencyLabel.Text = _state.CpuFrequency.HasValue
+                ? string.Format("CPU 频率: {0:F1} GHz", _state.CpuFrequency.Value / 1000.0)
                 : "CPU 频率: --";
 
-            gpuFrequencyLabel.Text = _state.GpuFrequency.HasValue 
-                ? string.Format("GPU 频率: {0:F1} GHz", _state.GpuFrequency.Value / 1000.0) 
+            gpuFrequencyLabel.Text = _state.GpuFrequency.HasValue
+                ? string.Format("GPU 频率: {0:F1} GHz", _state.GpuFrequency.Value / 1000.0)
                 : "GPU 频率: --";
 
-            // 内存显示：已用内存/总内存 (GB) 使用率百分比
             if (_state.UsedMemoryMB.HasValue && _state.TotalMemoryMB.HasValue)
             {
                 float usedGB = _state.UsedMemoryMB.Value / 1024.0f;
@@ -348,22 +222,6 @@ namespace DellFanManagement.App
             {
                 memoryLabel.Text = "内存: --";
             }
-
-            // EC fan control enabled?
-            if (_state.OperationMode != OperationMode.Manual)
-            {
-                if (_state.EcFanControlEnabled && !ecFanControlRadioButtonOn.Checked)
-                {
-                    ecFanControlRadioButtonOn.Checked = true;
-                }
-                else if (!_state.EcFanControlEnabled && !ecFanControlRadioButtonOff.Checked)
-                {
-                    ecFanControlRadioButtonOff.Checked = true;
-                }
-            }
-
-            // Consistency mode status.
-            //consistencyModeStatusLabel.Text = _state.ConsistencyModeStatus;
 
             // Thermal setting.
             if (_core.RequestedThermalSetting == null)
@@ -392,8 +250,6 @@ namespace DellFanManagement.App
                 }
             }
 
-            // Restart background thread button removed.
-
             // Tray icon hover text.
             if (_state.Fan2Present)
             {
@@ -410,7 +266,7 @@ namespace DellFanManagement.App
             if (_state.Error != null)
             {
                 MessageBox.Show(_state.Error, "Error in background thread", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                _state.Error = null; // ...The one place where the state is actually updated.
+                _state.Error = null;
             }
 
             // Power profiles management.
@@ -426,7 +282,6 @@ namespace DellFanManagement.App
                     {
                         Log.Write(string.Format("Power profile changed from {0} to {1}", _registeredPowerProfile, _state.ActivePowerProfile));
 
-                        // Check to see if we should change the thermal setting.
                         ThermalSetting? thermalSettingOverride = _configurationStore.GetThermalSettingOverride((Guid)_state.ActivePowerProfile);
                         if (thermalSettingOverride != null)
                         {
@@ -434,22 +289,20 @@ namespace DellFanManagement.App
                             Log.Write(string.Format("Thermal setting override: {0}", thermalSettingOverride));
                         }
 
-                        // Check to see if we should change the power mode.
                         Guid? powerMode = _configurationStore.GetPowerModeOverride((Guid)_state.ActivePowerProfile);
                         if (powerMode != null)
                         {
-                            Utility.PowerSetActiveOverlayScheme((Guid)powerMode); // NULL check above.
+                            Utility.PowerSetActiveOverlayScheme((Guid)powerMode);
                             Log.Write(string.Format("Power mode overrode: {0}", powerMode));
                         }
 
-                        // Check to see if we should change the NVIDIAGPU P-state.
                         int? nvPstate = _configurationStore.GetNvPstateOverride((Guid)_state.ActivePowerProfile);
                         if (nvPstate != null)
                         {
                             string nvInspectorPath = _configurationStore.GetStringOption(ConfigurationOption.NVPStateApplicationPath);
                             if (nvInspectorPath != null)
                             {
-                                Utility.SetNvidiaGpuPstate(nvInspectorPath, (int)nvPstate); // NULL check above.
+                                Utility.SetNvidiaGpuPstate(nvInspectorPath, (int)nvPstate);
                                 Log.Write(string.Format("NVIDIA P-state override: {0}", nvPstate));
                             }
                         }
@@ -458,94 +311,7 @@ namespace DellFanManagement.App
                 }
             }
 
-            //Console.WriteLine("Finished updating form.");
-
             _state.Release();
-        }
-
-        /// <summary>
-        /// Called when "Automatic" configuration radio button is clicked.
-        /// </summary>
-        private void ConfigurationRadioButtonAutomaticEventHandler(Object sender, EventArgs e)
-        {
-            _core.SetAutomaticMode();
-            _configurationStore.SetOption(ConfigurationOption.OperationMode, OperationMode.Automatic);
-            ClearManualControlConfiguration();
-
-            SetFanControlsAvailability(false);
-            SetConsistencyModeControlsAvailability(false);
-            SetEcFanControlsAvailability(false);
-
-            UpdateTrayIcon(false);
-        }
-
-        /// <summary>
-        /// Called when "Manual" configuration radio button is clicked.
-        /// </summary>
-        private void ConfigurationRadioButtonManualEventHandler(Object sender, EventArgs e)
-        {
-            ecFanControlRadioButtonOn.Checked = true;
-            _core.SetManualMode();
-            _configurationStore.SetOption(ConfigurationOption.OperationMode, OperationMode.Manual);
-
-            SetFanControlsAvailability(false);
-            SetConsistencyModeControlsAvailability(false);
-            SetEcFanControlsAvailability(true);
-
-            UpdateTrayIcon(false);
-        }
-
-        /// <summary>
-        /// Enable or disable the manual fan control controls.
-        /// </summary>
-        /// <param name="enabled">Indicates whether to enable or disable the controls</param>
-        private void SetFanControlsAvailability(bool enabled)
-        {
-            manualGroupBox.Enabled = enabled;
-
-            if (!enabled)
-            {
-                manualFan1RadioButtonOff.Checked = false;
-                manualFan1RadioButtonMedium.Checked = false;
-                manualFan1RadioButtonHigh.Checked = false;
-                manualFan2RadioButtonOff.Checked = false;
-                manualFan2RadioButtonMedium.Checked = false;
-                manualFan2RadioButtonHigh.Checked = false;
-            }
-            else
-            {
-                // Disable manual fan control fields if needed.
-                if (!_core.IsIndividualFanControlSupported)
-                {
-                    manualFan2GroupBox.Enabled = false;
-                }
-                if (!_state.Fan2Present)
-                {
-                    manualFan2GroupBox.Enabled = false;
-                    manualFan2RadioButtonOff.Checked = false;
-                    manualFan2RadioButtonMedium.Checked = false;
-                    manualFan2RadioButtonHigh.Checked = false;
-                }
-            }
-        }
-
-        /// <summary>
-        /// Enable or disbale the consistency mode configuration controls.
-        /// </summary>
-        /// <param name="enabled">Indicates whether to enable or disable the controls</param>
-        private void SetConsistencyModeControlsAvailability(bool enabled)
-        {
-            //consistencyModeGroupBox.Enabled = enabled;
-        }
-
-        /// <summary>
-        /// Enable or disable the EC fan control on/off controls.
-        /// </summary>
-        /// <param name="enabled">Indicates whether to enable or disable the controls</param>
-        private void SetEcFanControlsAvailability(bool enabled)
-        {
-            ecFanControlRadioButtonOn.Enabled = enabled;
-            ecFanControlRadioButtonOff.Enabled = enabled;
         }
 
         /// <summary>
@@ -573,17 +339,9 @@ namespace DellFanManagement.App
             _formClosed = true;
 
             _state.WaitOne();
-            _state.BackgroundThreadRunning = false; // Request termination of background thread.
+            _state.BackgroundThreadRunning = false;
             _state.FormClosed = true;
             _state.Release();
-        }
-
-        /// <summary>
-        /// Called when the "Restart BG Thread" button is clicked.  Just starts the background thread.
-        /// </summary>
-        private void RestartBackgroundThreadButtonClickedEventHandler(Object sender, EventArgs e)
-        {
-            _core.StartBackgroundThread();
         }
 
         /// <summary>
@@ -617,103 +375,13 @@ namespace DellFanManagement.App
             if (ecFanControlRadioButtonOn.Checked)
             {
                 _core.RequestEcFanControl(true);
-                SetFanControlsAvailability(false);
-                if (operationModeRadioButtonManual.Checked && _initializationComplete)
-                {
-                    _configurationStore.SetOption(ConfigurationOption.ManualModeEcFanControlEnabled, 1);
-                    _configurationStore.SetOption(ConfigurationOption.ManualModeFan1Level, null);
-                    _configurationStore.SetOption(ConfigurationOption.ManualModeFan2Level, null);
-                }
+                _configurationStore.SetOption(ConfigurationOption.EcFanControlEnabled, 1);
             }
             else if (ecFanControlRadioButtonOff.Checked)
             {
                 _core.RequestEcFanControl(false);
-                if (operationModeRadioButtonManual.Checked)
-                {
-                    SetFanControlsAvailability(true);
-                    _configurationStore.SetOption(ConfigurationOption.ManualModeEcFanControlEnabled, 0);
-                }
+                _configurationStore.SetOption(ConfigurationOption.EcFanControlEnabled, 0);
             }
-        }
-
-        /// <summary>
-        /// Called when one of the manual fan control level radio buttons is clicked.
-        /// </summary>
-        private void FanLevelChangedEventHandler(Object sender, EventArgs e)
-        {
-            // Fan 1.
-            FanLevel? fan1LevelRequested = null;
-            if (manualFan1RadioButtonOff.Checked)
-            {
-                fan1LevelRequested = FanLevel.Off;
-                if (!_core.IsIndividualFanControlSupported)
-                {
-                    manualFan2RadioButtonOff.Checked = true;
-                }
-            }
-            else if (manualFan1RadioButtonMedium.Checked)
-            {
-                fan1LevelRequested = FanLevel.Medium;
-                if (!_core.IsIndividualFanControlSupported)
-                {
-                    manualFan2RadioButtonMedium.Checked = true;
-                }
-            }
-            else if (manualFan1RadioButtonHigh.Checked)
-            {
-                fan1LevelRequested = FanLevel.High;
-                if (!_core.IsIndividualFanControlSupported)
-                {
-                    manualFan2RadioButtonHigh.Checked = true;
-                }
-            }
-
-            if (fan1LevelRequested != null)
-            {
-                _core.RequestFan1Level(fan1LevelRequested);
-                _configurationStore.SetOption(ConfigurationOption.ManualModeFan1Level, fan1LevelRequested);
-            }
-
-            // Fan 2.
-            FanLevel? fan2LevelRequested = null;
-            if (manualFan2RadioButtonOff.Checked)
-            {
-                fan2LevelRequested = FanLevel.Off;
-            }
-            else if (manualFan2RadioButtonMedium.Checked)
-            {
-                fan2LevelRequested = FanLevel.Medium;
-            }
-            else if (manualFan2RadioButtonHigh.Checked)
-            {
-                fan2LevelRequested = FanLevel.High;
-            }
-
-            if (fan2LevelRequested != null && _core.IsIndividualFanControlSupported)
-            {
-                _core.RequestFan2Level(fan2LevelRequested);
-                _configurationStore.SetOption(ConfigurationOption.ManualModeFan2Level, fan2LevelRequested);
-            }
-        }
-
-        /// <summary>
-        /// Called when the consistency mode configuration text boxes are modified.
-        /// </summary>
-        private void ConsistencyModeTextBoxesChangedEventHandler(Object sender, EventArgs e)
-        {
-            if (Regex.IsMatch(frequencyTextBox.Text, "[^0-9]"))
-            {
-                frequencyTextBox.Text = Regex.Replace(frequencyTextBox.Text, "[^0-9]", "");
-            }
-
-        }
-
-        /// <summary>
-        /// Called when the consistency mode "Apply changes" button is clicked.
-        /// </summary>
-        private void ConsistencyApplyChangesButtonClickedEventHandler(Object sender, EventArgs e)
-        {
-            //WriteConsistencyModeConfiguration();
         }
 
         /// <summary>
@@ -721,8 +389,6 @@ namespace DellFanManagement.App
         /// </summary>
         private void TrayIconOnClickEventHandler(object sender, EventArgs e)
         {
-            // 只显示上下文菜单，不恢复窗口
-            // 这样用户必须通过"Dell控制面板"菜单项来恢复窗口
         }
 
         /// <summary>
@@ -760,7 +426,6 @@ namespace DellFanManagement.App
         /// <param name="advance">Whether or not to advance a frame</param>
         private void UpdateTrayIcon(bool advance)
         {
-            // Tray icon is always visible
             trayIcon.Visible = true;
 
             int offset = _core.TrayIconColor switch
@@ -810,9 +475,8 @@ namespace DellFanManagement.App
 
                 while (!_formClosed)
                 {
-                    int waitTime = 1000; // One second.
+                    int waitTime = 1000;
 
-                    // Always animate
                     uint? averageRpm;
                     if (_state.Fan2Present)
                     {
@@ -831,11 +495,8 @@ namespace DellFanManagement.App
                         }
                         catch (Exception)
                         {
-                            // If the window handle is not here (not open yet, or closing), there could be an error.
-                            // Silently ignore.
                         }
 
-                        // Higher RPM = lower wait time = faster animation.
                         waitTime = 250000 / (int)averageRpm;
                     }
 
@@ -858,7 +519,7 @@ namespace DellFanManagement.App
 
         private void EppTrackBarScrollEventHandler(object sender, EventArgs e)
         {
-            uint result= CpuPowerApi.SetGuidByState(CpuPowerApi.GUID_PROCESSOR_PERFEPP, (uint)eppTrackBar.Value);
+            uint result = CpuPowerApi.SetGuidByState(CpuPowerApi.GUID_PROCESSOR_PERFEPP, (uint)eppTrackBar.Value);
             eppLabel.Text = string.Format("EPP: {0}", eppTrackBar.Value);
         }
 
@@ -883,10 +544,9 @@ namespace DellFanManagement.App
         /// </summary>
         private void TrayMenuItemExitClickEventHandler(object sender, EventArgs e)
         {
-            // 调用退出处理方法
             ExitApplication();
         }
-        
+
         /// <summary>
         /// 重写WndProc以拦截关闭消息，将其转为最小化
         /// </summary>
@@ -894,19 +554,18 @@ namespace DellFanManagement.App
         protected override void WndProc(ref Message m)
         {
             const int WM_CLOSE = 0x0010;
-            
+
             if (m.Msg == WM_CLOSE)
             {
-                // 最小化到托盘而不是关闭
                 WindowState = FormWindowState.Minimized;
                 ShowInTaskbar = false;
                 Visible = false;
                 return;
             }
-            
+
             base.WndProc(ref m);
         }
-        
+
         /// <summary>
         /// 当窗体关闭时的事件处理程序
         /// </summary>
@@ -914,7 +573,7 @@ namespace DellFanManagement.App
         {
             ExitApplication();
         }
-        
+
         /// <summary>
         /// 退出应用程序的处理方法
         /// </summary>
@@ -923,33 +582,28 @@ namespace DellFanManagement.App
             _formClosed = true;
 
             _state.WaitOne();
-            _state.BackgroundThreadRunning = false; // Request termination of background thread.
+            _state.BackgroundThreadRunning = false;
             _state.FormClosed = true;
             _state.Release();
-            
-            // 确保所有子进程都被终止
+
             try
             {
-                // 获取当前进程的所有子进程
                 Process currentProcess = Process.GetCurrentProcess();
                 Process[] processes = Process.GetProcesses();
-                
+
                 foreach (Process process in processes)
                 {
-                    // 检查是否是当前进程的子进程
                     if (process.MainModule != null && process.MainModule.FileName == currentProcess.MainModule.FileName)
                     {
-                        // 如果是同一个进程的实例，终止它
                         if (process.Id != currentProcess.Id)
                         {
                             try
                             {
                                 process.Kill();
-                                process.WaitForExit(5000); // 等待最多5秒
+                                process.WaitForExit(5000);
                             }
                             catch (Exception)
                             {
-                                // 忽略终止失败的进程
                             }
                         }
                     }
@@ -959,8 +613,7 @@ namespace DellFanManagement.App
             {
                 Log.Write($"Error terminating child processes: {ex.Message}");
             }
-            
-            // 退出应用程序
+
             Application.Exit();
         }
     }

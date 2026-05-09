@@ -55,19 +55,24 @@ namespace DellFanManagement.App
         private FanLevel? _fan2LevelRequested;
 
         /// <summary>
-        /// Lower temperature threshold for consistency mode.
+        /// CPU temperature threshold for manual mode (default 45 degrees).
         /// </summary>
-        public int? LowerTemperatureThreshold { get; private set; }
+        public int CpuTemperatureThreshold { get; private set; } = 45;
 
         /// <summary>
-        /// Upper temperature threshold for consistency mode.
+        /// GPU temperature threshold for manual mode (default 45 degrees).
         /// </summary>
-        public int? UpperTemperatureThreshold { get; private set; }
+        public int GpuTemperatureThreshold { get; private set; } = 45;
 
         /// <summary>
-        /// Fan RPM threshold for consistency mode.
+        /// Temperature check interval in seconds for manual mode (default 30 seconds).
         /// </summary>
-        public ulong? RpmThreshold { get; private set; }
+        public int CheckIntervalSeconds { get; private set; } = 30;
+
+        /// <summary>
+        /// Counter for temperature check interval.
+        /// </summary>
+        private int _temperatureCheckCounter = 0;
 
         public TrayIconColor TrayIconColor { get; set; }
 
@@ -107,6 +112,11 @@ namespace DellFanManagement.App
         private const int ForceUpdateInterval = 5;
 
         /// <summary>
+        /// Configuration store for reading settings.
+        /// </summary>
+        private readonly ConfigurationStore _configurationStore;
+
+        /// <summary>
         /// Constructor.
         /// </summary>
         /// <param name="state">Shared state object</param>
@@ -117,45 +127,41 @@ namespace DellFanManagement.App
             _form = form;
             _fanController = FanControllerFactory.GetFanFanController();
             _requestSemaphore = new(1, 1);
+            _configurationStore = new ConfigurationStore();
 
             RequestedThermalSetting = null;
             _ecFanControlRequested = true;
             _fan1LevelRequested = null;
             _fan2LevelRequested = null;
 
-            LowerTemperatureThreshold = null;
-            UpperTemperatureThreshold = null;
-            RpmThreshold = null;
             TrayIconColor = TrayIconColor.Gray;
+
+            // Load configuration values.
+            LoadConfiguration();
         }
 
         /// <summary>
-        /// Switch configuration to automatic mode.
+        /// Load configuration values from registry.
         /// </summary>
-        public void SetAutomaticMode()
+        private void LoadConfiguration()
         {
-            _state.WaitOne();
-            _state.OperationMode = OperationMode.Automatic;
-            _state.ConsistencyModeStatus = " ";
-            _state.Release();
-            TrayIconColor = TrayIconColor.Gray;
-        }
+            int? cpuThreshold = _configurationStore.GetIntOption(ConfigurationOption.ManualModeCpuTemperatureThreshold);
+            if (cpuThreshold.HasValue && cpuThreshold.Value > 0)
+            {
+                CpuTemperatureThreshold = cpuThreshold.Value;
+            }
 
-        /// <summary>
-        /// Switch configuration to manual mode.
-        /// </summary>
-        public void SetManualMode()
-        {
-            _state.WaitOne();
-            _state.OperationMode = OperationMode.Manual;
-            _ecFanControlRequested = _state.EcFanControlEnabled;
-            _state.ConsistencyModeStatus = " ";
-            _state.Fan1Level = null;
-            _state.Fan2Level = null;
-            _fan1LevelRequested = null;
-            _fan2LevelRequested = null;
-            _state.Release();
-            TrayIconColor = TrayIconColor.Gray;
+            int? gpuThreshold = _configurationStore.GetIntOption(ConfigurationOption.ManualModeGpuTemperatureThreshold);
+            if (gpuThreshold.HasValue && gpuThreshold.Value > 0)
+            {
+                GpuTemperatureThreshold = gpuThreshold.Value;
+            }
+
+            int? checkInterval = _configurationStore.GetIntOption(ConfigurationOption.ManualModeCheckIntervalSeconds);
+            if (checkInterval.HasValue && checkInterval.Value > 0)
+            {
+                CheckIntervalSeconds = checkInterval.Value;
+            }
         }
 
         /// <summary>
@@ -244,71 +250,70 @@ namespace DellFanManagement.App
                     // Update state.
                     _state.Update();
 
-                    // Take action based on configuration.
-                    if (_state.OperationMode == OperationMode.Automatic)
+                    // Handle EC fan control state changes.
+                    if (_ecFanControlRequested && !_state.EcFanControlEnabled)
                     {
-                        if (!_state.EcFanControlEnabled && IsAutomaticFanControlDisableSupported)
-                        {
-                            _state.EcFanControlEnabled = true;
-                            _fanController.EnableAutomaticFanControl();
-                            Log.Write("Enabled EC fan control – automatic mode");
-                        }
+                        _state.EcFanControlEnabled = true;
+                        _fanController.EnableAutomaticFanControl();
+                        Log.Write("Enabled EC fan control – automatic mode");
+
+                        _state.Fan1Level = null;
+                        _state.Fan2Level = null;
+                        _fan1LevelRequested = null;
+                        _fan2LevelRequested = null;
                     }
-                    else if (_state.OperationMode == OperationMode.Manual && IsAutomaticFanControlDisableSupported && IsSpecificFanControlSupported)
+                    else if (!_ecFanControlRequested && _state.EcFanControlEnabled)
                     {
-                        // Check for EC control state changes that need to be applied.
-                        if (_ecFanControlRequested && !_state.EcFanControlEnabled)
-                        {
-                            _state.EcFanControlEnabled = true;
-                            _fanController.EnableAutomaticFanControl();
-                            Log.Write("Enabled EC fan control – manual mode");
+                        _state.EcFanControlEnabled = false;
+                        _fanController.DisableAutomaticFanControl();
+                        Log.Write("Disabled EC fan control – manual mode");
 
-                            _state.Fan1Level = null;
-                            _state.Fan2Level = null;
-                            _fan1LevelRequested = null;
-                            _fan2LevelRequested = null;
-                        }
-                        else if (!_ecFanControlRequested && _state.EcFanControlEnabled)
+                        // Immediately apply temperature-based fan control when switching to manual mode.
+                        if (IsAutomaticFanControlDisableSupported && IsSpecificFanControlSupported)
                         {
-                            _state.EcFanControlEnabled = false;
-                            _fanController.DisableAutomaticFanControl();
-                            Log.Write("Disabled EC fan control – manual mode");
-                        }
-
-                        // Check for fan control state changes that need to be applied.
-                        if (!_state.EcFanControlEnabled)
-                        {
-                            if (_state.Fan1Level != _fan1LevelRequested)
-                            {
-                                _state.Fan1Level = _fan1LevelRequested;
-                                if (_fan1LevelRequested != null)
-                                {
-                                    _fanController.SetFanLevel((FanLevel)_fan1LevelRequested, IsIndividualFanControlSupported ? FanIndex.Fan1 : FanIndex.AllFans);
-                                }
-                            }
-
-                            if (_state.Fan2Present && IsIndividualFanControlSupported && _state.Fan2Level != _fan2LevelRequested)
-                            {
-                                _state.Fan2Level = _fan2LevelRequested;
-                                if (_fan2LevelRequested != null)
-                                {
-                                    _fanController.SetFanLevel((FanLevel)_fan2LevelRequested, FanIndex.Fan2);
-                                }
-                            }
-                        }
-
-                        // Warn if a fan is set to completely off.
-                        if (!_state.EcFanControlEnabled && (_state.Fan1Level == FanLevel.Off || (_state.Fan2Present && _state.Fan2Level == FanLevel.Off)))
-                        {
-                            _state.ConsistencyModeStatus = "Warning: Fans set to \"off\" will not turn on regardless of temperature or load on the system";
-                        }
-                        else
-                        {
-                            _state.ConsistencyModeStatus = " ";
+                            _temperatureCheckCounter = 0;
+                            ApplyTemperatureBasedFanControl();
                         }
                     }
 
-                    // 应用用户请求的热设置
+                    // In manual mode (EC fan control disabled), apply temperature-based fan control.
+                    if (!_state.EcFanControlEnabled && IsAutomaticFanControlDisableSupported && IsSpecificFanControlSupported)
+                    {
+                        _temperatureCheckCounter++;
+                        bool shouldCheckTemperature = _temperatureCheckCounter >= CheckIntervalSeconds;
+
+                        if (shouldCheckTemperature)
+                        {
+                            _temperatureCheckCounter = 0;
+                            ApplyTemperatureBasedFanControl();
+                        }
+                    }
+                    else
+                    {
+                        _temperatureCheckCounter = 0;
+                    }
+
+                    // Apply user requested fan levels (if any).
+                    if (!_state.EcFanControlEnabled)
+                    {
+                        if (_fan1LevelRequested != null && _state.Fan1Level != _fan1LevelRequested)
+                        {
+                            _state.Fan1Level = _fan1LevelRequested;
+                            _fanController.SetFanLevel((FanLevel)_fan1LevelRequested, IsIndividualFanControlSupported ? FanIndex.Fan1 : FanIndex.AllFans);
+                        }
+                        // Clear the one-shot request so temperature-based control can resume.
+                        _fan1LevelRequested = null;
+
+                        if (_state.Fan2Present && IsIndividualFanControlSupported && _fan2LevelRequested != null && _state.Fan2Level != _fan2LevelRequested)
+                        {
+                            _state.Fan2Level = _fan2LevelRequested;
+                            _fanController.SetFanLevel((FanLevel)_fan2LevelRequested, FanIndex.Fan2);
+                        }
+                        // Clear the one-shot request so temperature-based control can resume.
+                        _fan2LevelRequested = null;
+                    }
+
+                    // Apply user requested thermal setting.
                     if (RequestedThermalSetting != null && RequestedThermalSetting != _state.ThermalSetting)
                     {
                         if (DellSmbiosSmi.SetThermalSetting(RequestedThermalSetting.Value))
@@ -327,7 +332,7 @@ namespace DellFanManagement.App
                     _state.Release();
                     releaseSemaphore = false;
 
-                    // 智能UI更新：只在数据变化或达到强制更新间隔时更新
+                    // Smart UI update.
                     _forceUpdateCounter++;
                     bool forceUpdate = _forceUpdateCounter >= ForceUpdateInterval;
                     bool dataChanged = HasDataChanged();
@@ -373,6 +378,69 @@ namespace DellFanManagement.App
         }
 
         /// <summary>
+        /// Apply temperature-based fan control in manual mode.
+        /// CPU: above threshold -> Fan1 Medium, below threshold -> Fan1 Off.
+        /// GPU: above threshold -> Fan2 Medium, below threshold -> Fan2 Off.
+        /// </summary>
+        private void ApplyTemperatureBasedFanControl()
+        {
+            int cpuTemp = GetCpuTemperature();
+            int gpuTemp = GetGpuTemperature();
+
+            // CPU temperature control for Fan 1.
+            if (cpuTemp >= 0)
+            {
+                if (cpuTemp >= CpuTemperatureThreshold)
+                {
+                    if (_state.Fan1Level != FanLevel.Medium)
+                    {
+                        _state.Fan1Level = FanLevel.Medium;
+                        _fanController.SetFanLevel(FanLevel.Medium, IsIndividualFanControlSupported ? FanIndex.Fan1 : FanIndex.AllFans);
+                        Log.Write($"Manual mode: CPU temp {cpuTemp}°C >= {CpuTemperatureThreshold}°C, Fan 1 set to Medium");
+                    }
+                }
+                else
+                {
+                    if (_state.Fan1Level != FanLevel.Off)
+                    {
+                        _state.Fan1Level = FanLevel.Off;
+                        _fanController.SetFanLevel(FanLevel.Off, IsIndividualFanControlSupported ? FanIndex.Fan1 : FanIndex.AllFans);
+                        Log.Write($"Manual mode: CPU temp {cpuTemp}°C < {CpuTemperatureThreshold}°C, Fan 1 set to Off");
+                    }
+                }
+            }
+
+            // GPU temperature control for Fan 2.
+            if (_state.Fan2Present && gpuTemp >= 0)
+            {
+                if (gpuTemp >= GpuTemperatureThreshold)
+                {
+                    if (_state.Fan2Level != FanLevel.Medium)
+                    {
+                        _state.Fan2Level = FanLevel.Medium;
+                        if (IsIndividualFanControlSupported)
+                        {
+                            _fanController.SetFanLevel(FanLevel.Medium, FanIndex.Fan2);
+                        }
+                        Log.Write($"Manual mode: GPU temp {gpuTemp}°C >= {GpuTemperatureThreshold}°C, Fan 2 set to Medium");
+                    }
+                }
+                else
+                {
+                    if (_state.Fan2Level != FanLevel.Off)
+                    {
+                        _state.Fan2Level = FanLevel.Off;
+                        if (IsIndividualFanControlSupported)
+                        {
+                            _fanController.SetFanLevel(FanLevel.Off, FanIndex.Fan2);
+                        }
+                        Log.Write($"Manual mode: GPU temp {gpuTemp}°C < {GpuTemperatureThreshold}°C, Fan 2 set to Off");
+                    }
+                }
+            }
+        }
+
+        /// <summary>
         /// Request that the GUI form update using current values from the state.
         /// </summary>
         private void UpdateForm()
@@ -388,7 +456,6 @@ namespace DellFanManagement.App
                 catch (Exception)
                 {
                     // Take no action.
-                    // (There could be an error if trying to update the form after it has been closed... let it slide.)
                 }
             }
         }
@@ -401,42 +468,31 @@ namespace DellFanManagement.App
         {
             bool changed = false;
 
-            // 获取当前温度数据
             int currentCpuTemp = GetCpuTemperature();
             int currentGpuTemp = GetGpuTemperature();
 
-            // 检查CPU温度变化（超过1度才更新）
             if (currentCpuTemp >= 0 && Math.Abs(currentCpuTemp - _lastCpuTemperature) >= 1)
             {
                 changed = true;
                 _lastCpuTemperature = currentCpuTemp;
             }
 
-            // 检查GPU温度变化（超过1度才更新）
             if (currentGpuTemp >= 0 && Math.Abs(currentGpuTemp - _lastGpuTemperature) >= 1)
             {
                 changed = true;
                 _lastGpuTemperature = currentGpuTemp;
             }
 
-            // 检查风扇1转速变化（超过50 RPM才更新）
             if (_state.Fan1Rpm.HasValue)
             {
-                // if (!_lastFan1Rpm.HasValue || Math.Abs((int)(_state.Fan1Rpm.Value - _lastFan1Rpm.Value)) >= 10)
-                // {
-                    changed = true;
-                    _lastFan1Rpm = _state.Fan1Rpm;
-                //}
+                changed = true;
+                _lastFan1Rpm = _state.Fan1Rpm;
             }
 
-            // 检查风扇2转速变化（超过50 RPM才更新）
             if (_state.Fan2Rpm.HasValue)
             {
-                // if (!_lastFan2Rpm.HasValue || Math.Abs((int)(_state.Fan2Rpm.Value - _lastFan2Rpm.Value)) >= 10)
-                // {
-                    changed = true;
-                    _lastFan2Rpm = _state.Fan2Rpm;
-                //}
+                changed = true;
+                _lastFan2Rpm = _state.Fan2Rpm;
             }
 
             return changed;
@@ -461,7 +517,6 @@ namespace DellFanManagement.App
             }
             catch (Exception)
             {
-                // 忽略异常
             }
             return -1;
         }
@@ -479,28 +534,14 @@ namespace DellFanManagement.App
                     var gpuTemps = _state.Temperatures[TemperatureComponent.GPU];
                     foreach (var temp in gpuTemps.Values)
                     {
-                        return temp; // 返回第一个GPU温度
+                        return temp;
                     }
                 }
             }
             catch (Exception)
             {
-                // 忽略异常
             }
             return -1;
-        }
-
-        /// <summary>
-        /// Write the consistency mode configuration.
-        /// </summary>
-        /// <param name="lowerTemperatureThreshold">Lower temperature threshold</param>
-        /// <param name="upperTemperatureThreshold">Upper temperature threshold</param>
-        /// <param name="rpmThreshold">Fan speed threshold</param>
-        public void WriteConsistencyModeConfiguration(int lowerTemperatureThreshold, int upperTemperatureThreshold, int rpmThreshold)
-        {
-            LowerTemperatureThreshold = lowerTemperatureThreshold;
-            UpperTemperatureThreshold = upperTemperatureThreshold;
-            RpmThreshold = ulong.Parse(rpmThreshold.ToString());
         }
 
         /// <summary>
