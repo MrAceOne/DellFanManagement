@@ -1,5 +1,4 @@
-﻿using DellFanManagement.App.TemperatureReaders;
-using DellFanManagement.DellSmbiosSmiLib;
+﻿using DellFanManagement.DellSmbiosSmiLib;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -31,7 +30,7 @@ namespace DellFanManagement.App
         private readonly ConfigurationStore _configurationStore;
 
         /// <summary>
-        /// Pre-loaded icons to use in the system tray.
+        /// Pre-loaded icons to use in the system tray (only current color theme, 16 icons).
         /// </summary>
         private readonly Icon[] _trayIcons;
 
@@ -39,6 +38,16 @@ namespace DellFanManagement.App
         /// Next tray icon animation to be displayed.
         /// </summary>
         private int _trayIconIndex;
+
+        /// <summary>
+        /// Current tray icon color theme.
+        /// </summary>
+        private TrayIconColor _currentTrayIconColor;
+
+        /// <summary>
+        /// Timer for tray icon animation (replaces background thread).
+        /// </summary>
+        private System.Windows.Forms.Timer _trayIconTimer;
 
         /// <summary>
         /// Indicates that the program is closing, so background threads should stop.
@@ -68,9 +77,10 @@ namespace DellFanManagement.App
             _core = new Core(_state, this);
             _formClosed = false;
 
-            _trayIcons = new Icon[48];
+            _trayIcons = new Icon[16];
             _trayIconIndex = 0;
-            LoadTrayIcons();
+            _currentTrayIconColor = TrayIconColor.Gray;
+            LoadTrayIcons(_currentTrayIconColor);
 
             // Disclaimer.
             if (_configurationStore.GetIntOption(ConfigurationOption.DisclaimerShown) != 1)
@@ -92,9 +102,9 @@ namespace DellFanManagement.App
             thermalSettingRadioButtonQuiet.CheckedChanged += new EventHandler(ThermalSettingChangedEventHandler);
             thermalSettingRadioButtonPerformance.CheckedChanged += new EventHandler(ThermalSettingChangedEventHandler);
 
-            // ...EC fan control radio buttons...
-            ecFanControlRadioButtonOn.CheckedChanged += new EventHandler(EcFanControlSettingChangedEventHandler);
-            ecFanControlRadioButtonOff.CheckedChanged += new EventHandler(EcFanControlSettingChangedEventHandler);
+            // ...Fan mode radio buttons...
+            fanModeRadioButtonAutomatic.CheckedChanged += new EventHandler(FanModeSettingChangedEventHandler);
+            fanModeRadioButtonManual.CheckedChanged += new EventHandler(FanModeSettingChangedEventHandler);
 
             eppTrackBar.Scroll += new EventHandler(EppTrackBarScrollEventHandler);
 
@@ -102,8 +112,8 @@ namespace DellFanManagement.App
             temperatureLabel1.Text = string.Empty;
             temperatureLabel2.Text = string.Empty;
 
-            // EC fan control is always available.
-            ecFanControlGroupBox.Enabled = true;
+            // Fan mode is always available.
+            fanModeGroupBox.Enabled = true;
 
             // Initial update of the tray icon (required for it to appear for display).
             UpdateTrayIcon(false);
@@ -117,36 +127,96 @@ namespace DellFanManagement.App
             // Apply EC fan control configuration from registry.
             ApplyEcFanControlConfiguration();
 
-            // Start threads to do background work.
-            _core.StartBackgroundThread();
-            StartTrayIconThread();
-        }
+            // Initialize thermal setting UI once on startup.
+            InitializeThermalSettingUi();
 
-        /// <summary>
-        /// Apply EC fan control configuration loaded from the registry.
-        /// </summary>
-        private void ApplyEcFanControlConfiguration()
-        {
-            int? ecFanControlEnabled = _configurationStore.GetIntOption(ConfigurationOption.EcFanControlEnabled);
-            if (ecFanControlEnabled == 0)
+            // Start background work.
+            _core.StartBackgroundThread();
+            StartTrayIconTimer();
+
+            // Apply acrylic glass effect after the window handle is created.
+            if (IsHandleCreated)
             {
-                ecFanControlRadioButtonOff.Checked = true;
+                ApplyAcrylicEffect();
             }
             else
             {
-                ecFanControlRadioButtonOn.Checked = true;
+                HandleCreated += (s, e) => ApplyAcrylicEffect();
+            }
+        }
+
+        /// <summary>
+        /// Apply acrylic blur-behind effect to the form.
+        /// </summary>
+        private void ApplyAcrylicEffect()
+        {
+            // 0xC8FFFFFF = semi-transparent white (200 alpha)
+            DwmHelper.EnableAcrylic(Handle, unchecked((int)0xC8FFFFFF));
+        }
+
+        /// <summary>
+        /// Apply fan mode configuration loaded from the registry.
+        /// </summary>
+        private void ApplyEcFanControlConfiguration()
+        {
+            // Temporarily remove event handlers to avoid triggering events during initialization
+            fanModeRadioButtonAutomatic.CheckedChanged -= FanModeSettingChangedEventHandler;
+            fanModeRadioButtonManual.CheckedChanged -= FanModeSettingChangedEventHandler;
+
+            // 启动时始终默认使用自动模式
+            fanModeRadioButtonAutomatic.Checked = true;
+            _core.RequestFanMode(FanMode.Automatic);
+
+            // Restore event handlers
+            fanModeRadioButtonAutomatic.CheckedChanged += FanModeSettingChangedEventHandler;
+            fanModeRadioButtonManual.CheckedChanged += FanModeSettingChangedEventHandler;
+        }
+
+        /// <summary>
+        /// Initialize thermal setting UI once on startup based on current state.
+        /// </summary>
+        private void InitializeThermalSettingUi()
+        {
+            if (_state.FanMode == FanMode.Manual)
+            {
+                // 手动模式下禁用散热管理，不选中任何选项
+                SetThermalSettingAvaiability(false);
+                return;
+            }
+
+            switch (_state.ThermalSetting)
+            {
+                case ThermalSetting.Optimized:
+                    SetThermalSettingAvaiability(true);
+                    thermalSettingRadioButtonOptimized.Checked = true;
+                    break;
+                case ThermalSetting.Cool:
+                    SetThermalSettingAvaiability(true);
+                    thermalSettingRadioButtonCool.Checked = true;
+                    break;
+                case ThermalSetting.Quiet:
+                    SetThermalSettingAvaiability(true);
+                    thermalSettingRadioButtonQuiet.Checked = true;
+                    break;
+                case ThermalSetting.Performance:
+                    SetThermalSettingAvaiability(true);
+                    thermalSettingRadioButtonPerformance.Checked = true;
+                    break;
+                case ThermalSetting.Error:
+                    SetThermalSettingAvaiability(false);
+                    break;
             }
         }
 
         private void UpdatePowerForm()
         {
-            if (CpuPowerApi.GetGuidByState(CpuPowerApi.GUID_PROCESSOR_PERFEPP, out uint epp) == 0)
+            if (CpuPowerManager.GetGuidByState(CpuPowerManager.GUID_PROCESSOR_PERFEPP, out uint epp) == 0)
             {
                 eppTrackBar.Value = (int)epp;
                 eppLabel.Text = string.Format("EPP: {0}", epp);
             }
 
-            if (CpuPowerApi.GetGuidByState(CpuPowerApi.GUID_PROCESSOR_FREQUENCYMAX, out uint frequencyMax) == 0)
+            if (CpuPowerManager.GetGuidByState(CpuPowerManager.GUID_PROCESSOR_FREQUENCYMAX, out uint frequencyMax) == 0)
             {
                 frequencyTextBox.Text = frequencyMax.ToString();
             }
@@ -223,32 +293,6 @@ namespace DellFanManagement.App
                 memoryLabel.Text = "内存: --";
             }
 
-            // Thermal setting.
-            if (_core.RequestedThermalSetting == null)
-            {
-                switch (_state.ThermalSetting)
-                {
-                    case ThermalSetting.Optimized:
-                        SetThermalSettingAvaiability(true);
-                        thermalSettingRadioButtonOptimized.Checked = true;
-                        break;
-                    case ThermalSetting.Cool:
-                        SetThermalSettingAvaiability(true);
-                        thermalSettingRadioButtonCool.Checked = true;
-                        break;
-                    case ThermalSetting.Quiet:
-                        SetThermalSettingAvaiability(true);
-                        thermalSettingRadioButtonQuiet.Checked = true;
-                        break;
-                    case ThermalSetting.Performance:
-                        SetThermalSettingAvaiability(true);
-                        thermalSettingRadioButtonPerformance.Checked = true;
-                        break;
-                    case ThermalSetting.Error:
-                        SetThermalSettingAvaiability(false);
-                        break;
-                }
-            }
 
             // Tray icon hover text.
             if (_state.Fan2Present)
@@ -321,14 +365,6 @@ namespace DellFanManagement.App
         private void SetThermalSettingAvaiability(bool enabled)
         {
             thermalSettingGroupBox.Enabled = enabled;
-
-            if (!enabled)
-            {
-                thermalSettingRadioButtonOptimized.Checked = false;
-                thermalSettingRadioButtonCool.Checked = false;
-                thermalSettingRadioButtonQuiet.Checked = false;
-                thermalSettingRadioButtonPerformance.Checked = false;
-            }
         }
 
         /// <summary>
@@ -368,19 +404,53 @@ namespace DellFanManagement.App
         }
 
         /// <summary>
-        /// Called when the EC fan control on/off radio buttons are clicked.
+        /// Called when the fan mode radio buttons are clicked.
         /// </summary>
-        private void EcFanControlSettingChangedEventHandler(Object sender, EventArgs e)
+        private void FanModeSettingChangedEventHandler(Object sender, EventArgs e)
         {
-            if (ecFanControlRadioButtonOn.Checked)
+            if (fanModeRadioButtonAutomatic.Checked)
             {
-                _core.RequestEcFanControl(true);
+                _core.RequestFanMode(FanMode.Automatic);
                 _configurationStore.SetOption(ConfigurationOption.EcFanControlEnabled, 1);
+                // 自动模式：启用散热模式选择
+                SetThermalSettingAvaiability(true);
+                // 恢复用户之前选择的散热模式到UI
+                RestoreThermalSettingSelection();
             }
-            else if (ecFanControlRadioButtonOff.Checked)
+            else if (fanModeRadioButtonManual.Checked)
             {
-                _core.RequestEcFanControl(false);
+                _core.RequestFanMode(FanMode.Manual);
                 _configurationStore.SetOption(ConfigurationOption.EcFanControlEnabled, 0);
+                // 手动模式：禁用散热模式选择（变为灰色）
+                SetThermalSettingAvaiability(false);
+            }
+        }
+
+        /// <summary>
+        /// 恢复用户之前选择的散热模式到UI
+        /// </summary>
+        private void RestoreThermalSettingSelection()
+        {
+            ThermalSetting? userSetting = _core.UserSelectedThermalSetting;
+            if (!userSetting.HasValue)
+            {
+                return;
+            }
+
+            switch (userSetting.Value)
+            {
+                case ThermalSetting.Optimized:
+                    thermalSettingRadioButtonOptimized.Checked = true;
+                    break;
+                case ThermalSetting.Cool:
+                    thermalSettingRadioButtonCool.Checked = true;
+                    break;
+                case ThermalSetting.Quiet:
+                    thermalSettingRadioButtonQuiet.Checked = true;
+                    break;
+                case ThermalSetting.Performance:
+                    thermalSettingRadioButtonPerformance.Checked = true;
+                    break;
             }
         }
 
@@ -405,19 +475,34 @@ namespace DellFanManagement.App
         }
 
         /// <summary>
-        /// Load system tray icons.
+        /// Load system tray icons for the specified color theme.
+        /// Disposes old icons before loading new ones to free memory.
         /// </summary>
-        private void LoadTrayIcons()
+        /// <param name="color">Color theme to load</param>
+        private void LoadTrayIcons(TrayIconColor color)
         {
-            int globalIndex = 0;
-
-            foreach (string color in new string[] { "Grey", "Blue", "Red" })
+            // Dispose old icons to free GDI+ resources.
+            for (int i = 0; i < _trayIcons.Length; i++)
             {
-                for (int index = 1; index <= 16; index++)
-                {
-                    _trayIcons[globalIndex++] = new Icon(string.Format(@"Resources\Fan-{0}-{1}.ico", color, index));
-                }
+                _trayIcons[i]?.Dispose();
+                _trayIcons[i] = null;
             }
+
+            string colorName = color switch
+            {
+                TrayIconColor.Gray => "Grey",
+                TrayIconColor.Blue => "Blue",
+                TrayIconColor.Red => "Red",
+                _ => "Grey"
+            };
+
+            for (int index = 1; index <= 16; index++)
+            {
+                _trayIcons[index - 1] = new Icon(string.Format(@"Resources\Fan-{0}-{1}.ico", colorName, index));
+            }
+
+            _currentTrayIconColor = color;
+            _trayIconIndex = 0;
         }
 
         /// <summary>
@@ -428,20 +513,18 @@ namespace DellFanManagement.App
         {
             trayIcon.Visible = true;
 
-            int offset = _core.TrayIconColor switch
+            // If color theme changed, reload icons for the new theme.
+            if (_core.TrayIconColor != _currentTrayIconColor)
             {
-                TrayIconColor.Gray => 0,
-                TrayIconColor.Blue => 16,
-                TrayIconColor.Red => 32,
-                _ => 0
-            };
+                LoadTrayIcons(_core.TrayIconColor);
+            }
 
             if (advance)
             {
-                _trayIconIndex = (_trayIconIndex + 1) % (_trayIcons.Length / 3);
+                _trayIconIndex = (_trayIconIndex + 1) % _trayIcons.Length;
             }
 
-            Icon newIcon = _trayIcons[_trayIconIndex + offset];
+            Icon newIcon = _trayIcons[_trayIconIndex];
             if (trayIcon.Icon != newIcon)
             {
                 trayIcon.Icon = newIcon;
@@ -457,55 +540,47 @@ namespace DellFanManagement.App
         }
 
         /// <summary>
-        /// Kicks off the thread that handles the tray icon animation.
+        /// Starts the timer that handles the tray icon animation.
+        /// Replaces the background thread with a UI thread timer for lower resource usage.
         /// </summary>
-        private void StartTrayIconThread()
+        private void StartTrayIconTimer()
         {
-            new Thread(new ThreadStart(TrayIconThread)).Start();
+            _trayIconTimer = new System.Windows.Forms.Timer();
+            _trayIconTimer.Tick += TrayIconTimer_Tick;
+            _trayIconTimer.Interval = 1000;
+            _trayIconTimer.Start();
         }
 
         /// <summary>
-        /// Update the tray icon, changing speed with the fan RPM.
+        /// Timer tick handler for tray icon animation.
+        /// Adjusts interval based on fan RPM.
         /// </summary>
-        private void TrayIconThread()
+        private void TrayIconTimer_Tick(object sender, EventArgs e)
         {
-            try
+            if (_formClosed)
             {
-                MethodInvoker updateInvoker = new(UpdateTrayIcon);
-
-                while (!_formClosed)
-                {
-                    int waitTime = 1000;
-
-                    uint? averageRpm;
-                    if (_state.Fan2Present)
-                    {
-                        averageRpm = (_state.Fan1Rpm + _state.Fan2Rpm) / 2;
-                    }
-                    else
-                    {
-                        averageRpm = _state.Fan1Rpm;
-                    }
-
-                    if (averageRpm > 250 && averageRpm < 10000)
-                    {
-                        try
-                        {
-                            BeginInvoke(updateInvoker);
-                        }
-                        catch (Exception)
-                        {
-                        }
-
-                        waitTime = 250000 / (int)averageRpm;
-                    }
-
-                    Thread.Sleep(Math.Min(waitTime, 1000));
-                }
+                _trayIconTimer?.Stop();
+                return;
             }
-            catch (Exception exception)
+
+            uint? averageRpm;
+            if (_state.Fan2Present)
             {
-                Log.Write(exception);
+                averageRpm = (_state.Fan1Rpm + _state.Fan2Rpm) / 2;
+            }
+            else
+            {
+                averageRpm = _state.Fan1Rpm;
+            }
+
+            if (averageRpm > 250 && averageRpm < 10000)
+            {
+                UpdateTrayIcon();
+                _trayIconTimer.Interval = Math.Min(250000 / (int)averageRpm, 1000);
+            }
+            else
+            {
+                _trayIconTimer.Interval = 1000;
             }
         }
 
@@ -519,14 +594,14 @@ namespace DellFanManagement.App
 
         private void EppTrackBarScrollEventHandler(object sender, EventArgs e)
         {
-            uint result = CpuPowerApi.SetGuidByState(CpuPowerApi.GUID_PROCESSOR_PERFEPP, (uint)eppTrackBar.Value);
+            uint result = CpuPowerManager.SetGuidByState(CpuPowerManager.GUID_PROCESSOR_PERFEPP, (uint)eppTrackBar.Value);
             eppLabel.Text = string.Format("EPP: {0}", eppTrackBar.Value);
         }
 
         private void PowerApplyButtonClickedEventHandler(object sender, EventArgs e)
         {
-            CpuPowerApi.SetGuidByState(CpuPowerApi.GUID_PROCESSOR_PERFEPP, (uint)eppTrackBar.Value);
-            CpuPowerApi.SetGuidByState(CpuPowerApi.GUID_PROCESSOR_FREQUENCYMAX, uint.Parse(frequencyTextBox.Text));
+            CpuPowerManager.SetGuidByState(CpuPowerManager.GUID_PROCESSOR_PERFEPP, (uint)eppTrackBar.Value);
+            CpuPowerManager.SetGuidByState(CpuPowerManager.GUID_PROCESSOR_FREQUENCYMAX, uint.Parse(frequencyTextBox.Text));
         }
 
         /// <summary>
@@ -548,18 +623,26 @@ namespace DellFanManagement.App
         }
 
         /// <summary>
-        /// 重写WndProc以拦截关闭消息，将其转为最小化
+        /// 重写WndProc以拦截关闭消息，将其转为最小化；并阻止背景绘制以显示Acrylic效果。
         /// </summary>
         /// <param name="m">Windows消息</param>
         protected override void WndProc(ref Message m)
         {
             const int WM_CLOSE = 0x0010;
+            const int WM_ERASEBKGND = 0x0014;
 
             if (m.Msg == WM_CLOSE)
             {
                 WindowState = FormWindowState.Minimized;
                 ShowInTaskbar = false;
                 Visible = false;
+                return;
+            }
+
+            // 阻止 WinForms 绘制纯色背景，让 DWM Acrylic 效果透出来
+            if (m.Msg == WM_ERASEBKGND)
+            {
+                m.Result = (IntPtr)1;
                 return;
             }
 

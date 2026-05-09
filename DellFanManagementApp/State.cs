@@ -1,5 +1,4 @@
 ﻿using DellFanManagement.App.FanSpeedReaders;
-using DellFanManagement.App.TemperatureReaders;
 using DellFanManagement.DellSmbiosSmiLib;
 using System;
 using System.Collections.Generic;
@@ -8,23 +7,34 @@ using System.Threading;
 namespace DellFanManagement.App
 {
     /// <summary>
+    /// Defines types of components that have temperatures that we care about.
+    /// </summary>
+    public enum TemperatureComponent
+    {
+        /// <summary>
+        /// CPU temperatures.
+        /// </summary>
+        CPU,
+
+        /// <summary>
+        /// GPU temperatures.
+        /// </summary>
+        GPU
+    }
+
+    /// <summary>
     /// Represents, basically, the current state of the application.  Used for sharing data between the UI and
     /// background threads.
     /// </summary>
     public class State
     {
         /// <summary>
-        /// Object for reading CPU and GPU temperatures from the system.
-        /// </summary>
-        private readonly Dictionary<TemperatureComponent, TemperatureReader> _temperatureReaders;
-
-        /// <summary>
         /// Object for reading the fan speeds from the system.
         /// </summary>
         private readonly IFanSpeedReader _fanSpeedReader;
 
         /// <summary>
-        /// Object for reading system monitor data (CPU frequency, GPU frequency, memory, etc.)
+        /// Object for reading system monitor data (CPU/GPU temperatures, frequency, memory, etc.)
         /// </summary>
         private readonly SystemMonitor _systemMonitor;
 
@@ -69,6 +79,11 @@ namespace DellFanManagement.App
         private bool _ecFanControlEnabled;
 
         /// <summary>
+        /// User-selected fan control mode on the UI (decoupled from actual EC state).
+        /// </summary>
+        private FanMode _fanMode;
+
+        /// <summary>
         /// Current level manually set for fan 1.
         /// </summary>
         private FanLevel? _fan1Level;
@@ -103,6 +118,7 @@ namespace DellFanManagement.App
             _audioThreadRunning = false;
             _formClosed = false;
             _ecFanControlEnabled = true;
+            _fanMode = FanMode.Automatic;
             _error = null;
 
             _semaphore = new(1, 1);
@@ -112,26 +128,6 @@ namespace DellFanManagement.App
 
             _consecutiveThermalSettingFailures = 0;
             _thermalSettingReadBackoff = 0;
-
-            // Initialize temperature readers.
-
-            _temperatureReaders = new();
-
-            int? cpuDisabled = configurationStore.GetIntOption(ConfigurationOption.DisableCpuTemperatures);
-            if (cpuDisabled == null || cpuDisabled == 0)
-            {
-                _temperatureReaders.Add(TemperatureComponent.CPU, new CpuTemperatureReader());
-            }
-
-            if (NvidiaGpuTemperatureReader.IsNvapiSupported())
-            {
-                // Use NVAPI if it is available.
-                _temperatureReaders.Add(TemperatureComponent.GPU, new NvidiaGpuTemperatureReader());
-            }
-            else
-            {
-                _temperatureReaders.Add(TemperatureComponent.GPU, new GenericGpuTemperatureReader());
-            }
 
             // Initialize fan speed reader.
             _fanSpeedReader = FanSpeedReaderFactory.GetFanSpeedReader();
@@ -239,39 +235,59 @@ namespace DellFanManagement.App
         }
 
         /// <summary>
-        /// Update temperatures.
+        /// Update temperatures from SystemMonitor.
         /// </summary>
-        /// <param name="reader">A temperature reader</param>
         private void UpdateTemperatures()
         {
-            foreach (TemperatureComponent component in _temperatureReaders.Keys)
+            SystemMonitorData monitorData = _systemMonitor.GetMonitorData();
+
+            // Update CPU temperature.
+            if (monitorData.CpuTemperature.HasValue)
             {
-                Temperatures[component] = _temperatureReaders[component].ReadTemperatures();
+                int cpuTemp = monitorData.CpuTemperature.Value;
+                Temperatures[TemperatureComponent.CPU] = new Dictionary<string, int> { { "CPU", cpuTemp } };
 
-                // Check minimum and maximum temperatures.
-                if (!MinimumTemperatures.ContainsKey(component))
+                if (!MinimumTemperatures.ContainsKey(TemperatureComponent.CPU))
                 {
-                    MinimumTemperatures[component] = new();
+                    MinimumTemperatures[TemperatureComponent.CPU] = new();
+                }
+                if (!MaximumTemperatures.ContainsKey(TemperatureComponent.CPU))
+                {
+                    MaximumTemperatures[TemperatureComponent.CPU] = new();
                 }
 
-                if (!MaximumTemperatures.ContainsKey(component))
+                if (!MinimumTemperatures[TemperatureComponent.CPU].ContainsKey("CPU") || (cpuTemp < MinimumTemperatures[TemperatureComponent.CPU]["CPU"] && cpuTemp > 0))
                 {
-                    MaximumTemperatures[component] = new();
+                    MinimumTemperatures[TemperatureComponent.CPU]["CPU"] = cpuTemp;
+                }
+                if (!MaximumTemperatures[TemperatureComponent.CPU].ContainsKey("CPU") || (cpuTemp > MaximumTemperatures[TemperatureComponent.CPU]["CPU"] && cpuTemp > 0))
+                {
+                    MaximumTemperatures[TemperatureComponent.CPU]["CPU"] = cpuTemp;
+                }
+            }
+
+            // Update GPU temperature.
+            if (monitorData.GpuTemperature.HasValue)
+            {
+                int gpuTemp = monitorData.GpuTemperature.Value;
+                Temperatures[TemperatureComponent.GPU] = new Dictionary<string, int> { { "GPU", gpuTemp } };
+
+                if (!MinimumTemperatures.ContainsKey(TemperatureComponent.GPU))
+                {
+                    MinimumTemperatures[TemperatureComponent.GPU] = new();
+                }
+                if (!MaximumTemperatures.ContainsKey(TemperatureComponent.GPU))
+                {
+                    MaximumTemperatures[TemperatureComponent.GPU] = new();
                 }
 
-                foreach (string key in Temperatures[component].Keys)
+                if (!MinimumTemperatures[TemperatureComponent.GPU].ContainsKey("GPU") || (gpuTemp < MinimumTemperatures[TemperatureComponent.GPU]["GPU"] && gpuTemp > 0))
                 {
-                    int temperature = Temperatures[component][key];
-
-                    if (!MinimumTemperatures[component].ContainsKey(key) || (temperature < MinimumTemperatures[component][key] && temperature > 0))
-                    {
-                        MinimumTemperatures[component][key] = temperature;
-                    }
-
-                    if (!MaximumTemperatures[component].ContainsKey(key) || (temperature > MaximumTemperatures[component][key] && temperature > 0))
-                    {
-                        MaximumTemperatures[component][key] = temperature;
-                    }
+                    MinimumTemperatures[TemperatureComponent.GPU]["GPU"] = gpuTemp;
+                }
+                if (!MaximumTemperatures[TemperatureComponent.GPU].ContainsKey("GPU") || (gpuTemp > MaximumTemperatures[TemperatureComponent.GPU]["GPU"] && gpuTemp > 0))
+                {
+                    MaximumTemperatures[TemperatureComponent.GPU]["GPU"] = gpuTemp;
                 }
             }
         }
@@ -281,7 +297,7 @@ namespace DellFanManagement.App
         /// </summary>
         private void UpdatePowerProfile()
         {
-            Guid? activeProfile = CpuPowerApi.GetActivePowerProfile();
+            Guid? activeProfile = CpuPowerManager.GetActivePowerProfile();
             if (activeProfile != null)
             {
                 ActivePowerProfile = activeProfile;
@@ -373,6 +389,15 @@ namespace DellFanManagement.App
         {
             get { return _ecFanControlEnabled; }
             set { AccessCheck(); _ecFanControlEnabled = value; }
+        }
+
+        /// <summary>
+        /// User-selected fan control mode on the UI (decoupled from actual EC state).
+        /// </summary>
+        public FanMode FanMode
+        {
+            get { return _fanMode; }
+            set { AccessCheck(); _fanMode = value; }
         }
 
         /// <summary>

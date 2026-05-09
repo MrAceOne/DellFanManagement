@@ -57,11 +57,14 @@ namespace DellFanManagement.App
         
         private readonly LibreHardwareMonitor.Hardware.Computer _computer;
         private readonly PerformanceCounter _memoryAvailableCounter;
-        private readonly PerformanceCounter _commitLimitCounter;
-        private readonly Dictionary<string, int> _cachedTemperatures;
         private SystemMonitorData _lastData;
         private readonly object _lockObject = new object();
         private bool _disposed;
+        
+        /// <summary>
+        /// Cached total physical memory in MB (does not change during runtime).
+        /// </summary>
+        private readonly long _cachedTotalMemoryMB;
 
         /// <summary>
         /// 获取共享的SystemMonitor实例（单例模式）
@@ -94,7 +97,6 @@ namespace DellFanManagement.App
         /// </summary>
         private SystemMonitor()
         {
-            _cachedTemperatures = new Dictionary<string, int>();
             _lastData = new SystemMonitorData();
 
             // 初始化LibreHardwareMonitor（只创建一个实例）
@@ -102,33 +104,44 @@ namespace DellFanManagement.App
             {
                 IsCpuEnabled = true,
                 IsGpuEnabled = true,
-                // IsMemoryEnabled = true
             };
             _computer.Open();
 
-            // 初始化性能计数器用于内存监测（备用方案）
+            // 初始化性能计数器用于内存监测
             try
             {
                 _memoryAvailableCounter = new PerformanceCounter("Memory", "Available MBytes");
-                _commitLimitCounter = new PerformanceCounter("Memory", "Commit Limit");
             }
             catch (Exception)
             {
-                // 如果性能计数器初始化失败，将使用LibreHardwareMonitor
                 _memoryAvailableCounter = null;
-                _commitLimitCounter = null;
             }
+            
+            // 缓存总物理内存（运行期间不会变化）
+            _cachedTotalMemoryMB = GetTotalPhysicalMemoryMB();
         }
 
         /// <summary>
         /// 获取所有系统监测数据
         /// </summary>
         /// <returns>SystemMonitorData对象包含所有监测数据</returns>
+        /// <summary>
+        /// Reusable data object to reduce GC pressure.
+        /// </summary>
+        private readonly SystemMonitorData _reusableData = new SystemMonitorData();
+
         public SystemMonitorData GetMonitorData()
         {
             lock (_lockObject)
             {
-                var data = new SystemMonitorData();
+                // Reset reusable data
+                _reusableData.CpuFrequency = null;
+                _reusableData.GpuFrequency = null;
+                _reusableData.MemoryUsagePercent = null;
+                _reusableData.UsedMemoryMB = null;
+                _reusableData.TotalMemoryMB = null;
+                _reusableData.CpuTemperature = null;
+                _reusableData.GpuTemperature = null;
 
                 try
                 {
@@ -136,22 +149,32 @@ namespace DellFanManagement.App
                     foreach (IHardware hardware in _computer.Hardware)
                     {
                         hardware.Update();
-                        ProcessHardware(hardware, data);
+                        ProcessHardware(hardware, _reusableData);
                     }
 
                     // 获取内存信息
-                    GetMemoryInfo(data);
+                    GetMemoryInfo(_reusableData);
 
-                    _lastData = data;
+                    // Copy to lastData for fallback
+                    _lastData = new SystemMonitorData
+                    {
+                        CpuFrequency = _reusableData.CpuFrequency,
+                        GpuFrequency = _reusableData.GpuFrequency,
+                        MemoryUsagePercent = _reusableData.MemoryUsagePercent,
+                        UsedMemoryMB = _reusableData.UsedMemoryMB,
+                        TotalMemoryMB = _reusableData.TotalMemoryMB,
+                        CpuTemperature = _reusableData.CpuTemperature,
+                        GpuTemperature = _reusableData.GpuTemperature
+                    };
                 }
                 catch (Exception ex)
                 {
                     Log.Write($"Error getting monitor data: {ex.Message}");
                     // 返回上次成功的数据
-                    return _lastData ?? data;
+                    return _lastData ?? _reusableData;
                 }
 
-                return data;
+                return _reusableData;
             }
         }
 
@@ -169,9 +192,6 @@ namespace DellFanManagement.App
                 case HardwareType.GpuAmd:
                 case HardwareType.GpuIntel:
                     ProcessGpu(hardware, data);
-                    break;
-                case HardwareType.Memory:
-                    ProcessMemory(hardware, data);
                     break;
             }
 
@@ -242,15 +262,6 @@ namespace DellFanManagement.App
         }
 
         /// <summary>
-        /// 处理内存信息
-        /// </summary>
-        private void ProcessMemory(IHardware hardware, SystemMonitorData data)
-        {
-            // 移除 LibreHardwareMonitor 的内存数据处理，仅使用性能计数器
-            // 此方法现在为空，因为内存数据完全由 GetMemoryInfo() 提供
-        }
-
-        /// <summary>
         /// 获取内存信息（主方案）
         /// </summary>
         private void GetMemoryInfo(SystemMonitorData data)
@@ -258,19 +269,13 @@ namespace DellFanManagement.App
             try
             {
                 // 使用性能计数器获取可用内存
-                if (_memoryAvailableCounter != null)
+                if (_memoryAvailableCounter != null && _cachedTotalMemoryMB > 0)
                 {
                     long availableMB = (long)_memoryAvailableCounter.NextValue();
                     
-                    // 获取总物理内存（使用 ComputerInfo 获取准确的总物理内存）
-                    long totalMemoryMB = GetTotalPhysicalMemoryMB();
-                    
-                    if (totalMemoryMB > 0)
-                    {
-                        data.TotalMemoryMB = totalMemoryMB;
-                        data.UsedMemoryMB = totalMemoryMB - availableMB;
-                        data.MemoryUsagePercent = (float)((double)data.UsedMemoryMB / totalMemoryMB * 100);
-                    }
+                    data.TotalMemoryMB = _cachedTotalMemoryMB;
+                    data.UsedMemoryMB = _cachedTotalMemoryMB - availableMB;
+                    data.MemoryUsagePercent = (float)((double)data.UsedMemoryMB / _cachedTotalMemoryMB * 100);
                 }
                 else
                 {
@@ -279,16 +284,14 @@ namespace DellFanManagement.App
                     ulong totalMemoryBytes = computerInfo.TotalPhysicalMemory;
                     long totalMemoryMB = (long)(totalMemoryBytes / (1024 * 1024));
                     
-                    // 由于性能计数器不可用，我们无法准确获取可用内存，因此使用总内存作为近似值
                     data.TotalMemoryMB = totalMemoryMB;
-                    data.UsedMemoryMB = totalMemoryMB; // 近似值
-                    data.MemoryUsagePercent = 100.0f; // 近似值
+                    data.UsedMemoryMB = totalMemoryMB;
+                    data.MemoryUsagePercent = 100.0f;
                 }
             }
             catch (Exception ex)
             {
                 Log.Write($"Error getting memory info: {ex.Message}");
-                // 如果获取失败，使用默认值
                 data.TotalMemoryMB = 0;
                 data.UsedMemoryMB = 0;
                 data.MemoryUsagePercent = 0.0f;
@@ -325,7 +328,6 @@ namespace DellFanManagement.App
             try
             {
                 _memoryAvailableCounter?.Dispose();
-                _commitLimitCounter?.Dispose();
                 _computer?.Close();
             }
             catch (Exception)

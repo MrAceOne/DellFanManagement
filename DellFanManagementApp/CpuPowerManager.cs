@@ -1,4 +1,4 @@
-﻿using HidSharp.Utility;
+using HidSharp.Utility;
 using System;
 using System.Runtime.InteropServices;
 using System.Security.Authentication.ExtendedProtection;
@@ -7,7 +7,7 @@ using System.Windows.Forms;
 
 namespace DellFanManagement.App
 {
-    public static class CpuPowerApi
+    public static class CpuPowerManager
     {
         public const uint Epp = 1;
         public const uint FrequencyMax = 2;
@@ -70,7 +70,7 @@ namespace DellFanManagement.App
         [DllImport("kernel32.dll", SetLastError = true)]
         private static extern IntPtr LocalFree(IntPtr hMem);
 
-        static CpuPowerApi()
+        static CpuPowerManager()
         {
             GetActivePowerProfile();
         }

@@ -1,5 +1,4 @@
 ﻿using DellFanManagement.App.FanControllers;
-using DellFanManagement.App.TemperatureReaders;
 using DellFanManagement.DellSmbiosSmiLib;
 using System;
 using System.Threading;
@@ -40,9 +39,9 @@ namespace DellFanManagement.App
         private readonly Semaphore _requestSemaphore;
 
         /// <summary>
-        /// Indicates whether or not the user has requested that EC fan control be enabled.
+        /// User-selected fan control mode (decoupled from actual EC state).
         /// </summary>
-        private bool _ecFanControlRequested;
+        private FanMode _fanMode;
 
         /// <summary>
         /// User requested level for fan 1.
@@ -55,12 +54,12 @@ namespace DellFanManagement.App
         private FanLevel? _fan2LevelRequested;
 
         /// <summary>
-        /// CPU temperature threshold for manual mode (default 45 degrees).
+        /// CPU temperature threshold for manual mode fan control (default 45 degrees).
         /// </summary>
         public int CpuTemperatureThreshold { get; private set; } = 45;
 
         /// <summary>
-        /// GPU temperature threshold for manual mode (default 45 degrees).
+        /// GPU temperature threshold for manual mode fan control (default 45 degrees).
         /// </summary>
         public int GpuTemperatureThreshold { get; private set; } = 45;
 
@@ -73,6 +72,38 @@ namespace DellFanManagement.App
         /// Counter for temperature check interval.
         /// </summary>
         private int _temperatureCheckCounter = 0;
+
+        // ========== EC自动模式温度触发/恢复配置（统一可配置） ==========
+
+        /// <summary>
+        /// 手动模式下触发EC自动控制的CPU温度阈值（默认80度）
+        /// </summary>
+        public int EcAutoTriggerCpuTemp { get; private set; } = 90;
+
+        /// <summary>
+        /// 手动模式下触发EC自动控制的GPU温度阈值（默认60度）
+        /// </summary>
+        public int EcAutoTriggerGpuTemp { get; private set; } = 80;
+
+        /// <summary>
+        /// 从EC自动恢复到手动的CPU温度上限（默认80度）
+        /// </summary>
+        public int EcAutoRecoveryCpuTemp { get; private set; } = 80;
+
+        /// <summary>
+        /// 从EC自动恢复到手动的GPU温度上限（默认60度）
+        /// </summary>
+        public int EcAutoRecoveryGpuTemp { get; private set; } = 70;
+
+        /// <summary>
+        /// 恢复手动模式前需要持续满足低温条件的秒数（默认30秒）
+        /// </summary>
+        public int EcAutoRecoveryDurationSeconds { get; private set; } = 20;
+
+        /// <summary>
+        /// 持续低温计数器（用于恢复手动模式）
+        /// </summary>
+        private int _ecAutoRecoveryCounter = 0;
 
         public TrayIconColor TrayIconColor { get; set; }
 
@@ -117,6 +148,26 @@ namespace DellFanManagement.App
         private readonly ConfigurationStore _configurationStore;
 
         /// <summary>
+        /// 用户界面选择的散热模式（用于自动模式恢复）
+        /// </summary>
+        private ThermalSetting? _userSelectedThermalSetting;
+
+        /// <summary>
+        /// 获取用户界面选择的散热模式（用于自动模式恢复UI）
+        /// </summary>
+        public ThermalSetting? UserSelectedThermalSetting => _userSelectedThermalSetting;
+
+        /// <summary>
+        /// 是否因为高温而强制启用了EC自动模式
+        /// </summary>
+        private bool _ecAutoOverrideByTemperature;
+
+        /// <summary>
+        /// 是否已经在手动模式下应用了Quiet散热模式
+        /// </summary>
+        private bool _manualModeQuietApplied;
+
+        /// <summary>
         /// Constructor.
         /// </summary>
         /// <param name="state">Shared state object</param>
@@ -130,9 +181,13 @@ namespace DellFanManagement.App
             _configurationStore = new ConfigurationStore();
 
             RequestedThermalSetting = null;
-            _ecFanControlRequested = true;
+            _fanMode = FanMode.Automatic;
             _fan1LevelRequested = null;
             _fan2LevelRequested = null;
+
+            _userSelectedThermalSetting = _state.ThermalSetting == ThermalSetting.Error ? null : _state.ThermalSetting;
+            _ecAutoOverrideByTemperature = false;
+            _manualModeQuietApplied = false;
 
             TrayIconColor = TrayIconColor.Gray;
 
@@ -165,13 +220,13 @@ namespace DellFanManagement.App
         }
 
         /// <summary>
-        /// Request that EC fan control be enabled or disabled.
+        /// Request that fan control mode be changed.
         /// </summary>
-        /// <param name="enabled">True to enable EC fan control, false to disable it</param>
-        public void RequestEcFanControl(bool enabled)
+        /// <param name="fanMode">Fan mode to set</param>
+        public void RequestFanMode(FanMode fanMode)
         {
             _requestSemaphore.WaitOne();
-            _ecFanControlRequested = enabled;
+            _fanMode = fanMode;
             _requestSemaphore.Release();
         }
 
@@ -209,6 +264,9 @@ namespace DellFanManagement.App
             {
                 RequestedThermalSetting = requestedThermalSetting;
             }
+
+            // 记录用户界面选择的散热模式
+            _userSelectedThermalSetting = requestedThermalSetting;
 
             _requestSemaphore.Release();
         }
@@ -250,42 +308,145 @@ namespace DellFanManagement.App
                     // Update state.
                     _state.Update();
 
+                    // 获取当前温度
+                    int cpuTemp = GetCpuTemperature();
+                    int gpuTemp = GetGpuTemperature();
+
                     // Handle EC fan control state changes.
-                    if (_ecFanControlRequested && !_state.EcFanControlEnabled)
+                    if (_ecAutoOverrideByTemperature)
                     {
-                        _state.EcFanControlEnabled = true;
-                        _fanController.EnableAutomaticFanControl();
-                        Log.Write("Enabled EC fan control – automatic mode");
-
-                        _state.Fan1Level = null;
-                        _state.Fan2Level = null;
-                        _fan1LevelRequested = null;
-                        _fan2LevelRequested = null;
-                    }
-                    else if (!_ecFanControlRequested && _state.EcFanControlEnabled)
-                    {
-                        _state.EcFanControlEnabled = false;
-                        _fanController.DisableAutomaticFanControl();
-                        Log.Write("Disabled EC fan control – manual mode");
-
-                        // Immediately apply temperature-based fan control when switching to manual mode.
-                        if (IsAutomaticFanControlDisableSupported && IsSpecificFanControlSupported)
+                        // 当前因为高温而强制EC自动
+                        if (_fanMode == FanMode.Manual)
                         {
-                            _temperatureCheckCounter = 0;
-                            ApplyTemperatureBasedFanControl();
+                            // 用户还是手动模式，检查温度是否降低
+                            bool cpuCooled = cpuTemp < 0 || cpuTemp < EcAutoRecoveryCpuTemp;
+                            bool gpuCooled = gpuTemp < 0 || gpuTemp < EcAutoRecoveryGpuTemp;
+                            if (cpuCooled && gpuCooled)
+                            {
+                                _ecAutoRecoveryCounter++;
+                                if (_ecAutoRecoveryCounter >= EcAutoRecoveryDurationSeconds)
+                                {
+                                    // 持续低温达到设定时间，恢复手动模式
+                                    _state.EcFanControlEnabled = false;
+                                    _fanController.DisableAutomaticFanControl();
+                                    _ecAutoOverrideByTemperature = false;
+                                    _ecAutoRecoveryCounter = 0;
+                                    _temperatureCheckCounter = 0;
+
+                                    // 重置风扇级别状态，强制重新应用温度控制
+                                    _state.Fan1Level = null;
+                                    _state.Fan2Level = null;
+
+                                    // 重新应用Quiet散热模式
+                                    if (DellSmbiosSmi.SetThermalSetting(ThermalSetting.Quiet))
+                                    {
+                                        _state.SetThermalSetting(ThermalSetting.Quiet);
+                                        Log.Write("Re-applied Quiet thermal setting after temperature recovery");
+                                    }
+
+                                    ApplyTemperatureBasedFanControl();
+                                    Log.Write($"Temperature stayed below recovery thresholds for {EcAutoRecoveryDurationSeconds}s, disabled EC fan control");
+                                }
+                            }
+                            else
+                            {
+                                // 温度又升高了，重置计数器
+                                if (_ecAutoRecoveryCounter > 0)
+                                {
+                                    _ecAutoRecoveryCounter = 0;
+                                    Log.Write("Temperature rose again, resetting recovery counter");
+                                }
+                            }
+                        }
+                        else
+                        {
+                            // 用户切换到了自动模式，清除覆盖标记
+                            _ecAutoOverrideByTemperature = false;
+                            _manualModeQuietApplied = false;
+                            _ecAutoRecoveryCounter = 0;
+                            _state.FanMode = FanMode.Automatic;
+                        }
+                    }
+                    else
+                    {
+                        // 正常处理用户请求的EC模式
+                        if (_fanMode == FanMode.Automatic && !_state.EcFanControlEnabled)
+                        {
+                            _state.EcFanControlEnabled = true;
+                            _state.FanMode = FanMode.Automatic;
+                            _fanController.EnableAutomaticFanControl();
+                            Log.Write("Enabled EC fan control – automatic mode");
+
+                            // 恢复用户选择的散热模式
+                            if (_manualModeQuietApplied)
+                            {
+                                if (_userSelectedThermalSetting.HasValue && _userSelectedThermalSetting.Value != _state.ThermalSetting && _userSelectedThermalSetting.Value != ThermalSetting.Error)
+                                {
+                                    RequestedThermalSetting = _userSelectedThermalSetting;
+                                }
+                                _manualModeQuietApplied = false;
+                            }
+
+                            _state.Fan1Level = null;
+                            _state.Fan2Level = null;
+                            _fan1LevelRequested = null;
+                            _fan2LevelRequested = null;
+                        }
+                        else if (_fanMode == FanMode.Manual && _state.EcFanControlEnabled)
+                        {
+                            _state.EcFanControlEnabled = false;
+                            _state.FanMode = FanMode.Manual;
+                            _fanController.DisableAutomaticFanControl();
+                            Log.Write("Disabled EC fan control – manual mode");
+
+                            // 保存用户之前选择的散热模式（在应用Quiet之前）
+                            if (!_userSelectedThermalSetting.HasValue)
+                            {
+                                _userSelectedThermalSetting = _state.ThermalSetting == ThermalSetting.Error ? null : _state.ThermalSetting;
+                            }
+
+                            // 进入手动模式，应用quiet散热模式
+                            if (DellSmbiosSmi.SetThermalSetting(ThermalSetting.Quiet))
+                            {
+                                Log.Write("Applied Quiet thermal setting for manual mode");
+                                _state.SetThermalSetting(ThermalSetting.Quiet);
+                                _manualModeQuietApplied = true;
+                            }
+
+                            // Immediately apply temperature-based fan control when switching to manual mode.
+                            if (IsAutomaticFanControlDisableSupported && IsSpecificFanControlSupported)
+                            {
+                                _temperatureCheckCounter = 0;
+                                ApplyTemperatureBasedFanControl();
+                            }
                         }
                     }
 
                     // In manual mode (EC fan control disabled), apply temperature-based fan control.
                     if (!_state.EcFanControlEnabled && IsAutomaticFanControlDisableSupported && IsSpecificFanControlSupported)
                     {
-                        _temperatureCheckCounter++;
-                        bool shouldCheckTemperature = _temperatureCheckCounter >= CheckIntervalSeconds;
-
-                        if (shouldCheckTemperature)
+                        // 检查是否需要因为高温而强制启用EC自动
+                        bool cpuHot = cpuTemp >= EcAutoTriggerCpuTemp;
+                        bool gpuHot = gpuTemp >= EcAutoTriggerGpuTemp;
+                        if (cpuHot || gpuHot)
                         {
-                            _temperatureCheckCounter = 0;
-                            ApplyTemperatureBasedFanControl();
+                            Log.Write($"High temperature detected (CPU: {cpuTemp}°C, GPU: {gpuTemp}°C), enabling EC automatic fan control");
+                            _state.EcFanControlEnabled = true;
+                            _fanController.EnableAutomaticFanControl();
+                            _ecAutoOverrideByTemperature = true;
+                            _ecAutoRecoveryCounter = 0;
+                        }
+                        else
+                        {
+                            // 原有逻辑：基于配置阈值的温度控制
+                            _temperatureCheckCounter++;
+                            bool shouldCheckTemperature = _temperatureCheckCounter >= CheckIntervalSeconds;
+
+                            if (shouldCheckTemperature)
+                            {
+                                _temperatureCheckCounter = 0;
+                                ApplyTemperatureBasedFanControl();
+                            }
                         }
                     }
                     else
@@ -313,8 +474,8 @@ namespace DellFanManagement.App
                         _fan2LevelRequested = null;
                     }
 
-                    // Apply user requested thermal setting.
-                    if (RequestedThermalSetting != null && RequestedThermalSetting != _state.ThermalSetting)
+                    // Apply user requested thermal setting (only in automatic mode).
+                    if (_state.EcFanControlEnabled && RequestedThermalSetting != null && RequestedThermalSetting != _state.ThermalSetting)
                     {
                         if (DellSmbiosSmi.SetThermalSetting(RequestedThermalSetting.Value))
                         {
@@ -325,6 +486,19 @@ namespace DellFanManagement.App
                         else
                         {
                             Log.Write($"Failed to apply thermal setting: {RequestedThermalSetting.Value}");
+                        }
+                    }
+
+                    // 在手动模式下保持Quiet散热模式
+                    if (!_state.EcFanControlEnabled && _manualModeQuietApplied)
+                    {
+                        if (_state.ThermalSetting != ThermalSetting.Quiet)
+                        {
+                            if (DellSmbiosSmi.SetThermalSetting(ThermalSetting.Quiet))
+                            {
+                                _state.SetThermalSetting(ThermalSetting.Quiet);
+                                Log.Write("Maintained Quiet thermal setting in manual mode");
+                            }
                         }
                     }
 
@@ -471,25 +645,25 @@ namespace DellFanManagement.App
             int currentCpuTemp = GetCpuTemperature();
             int currentGpuTemp = GetGpuTemperature();
 
-            if (currentCpuTemp >= 0 && Math.Abs(currentCpuTemp - _lastCpuTemperature) >= 1)
+            if (currentCpuTemp >= 0 && currentCpuTemp != _lastCpuTemperature)
             {
                 changed = true;
                 _lastCpuTemperature = currentCpuTemp;
             }
 
-            if (currentGpuTemp >= 0 && Math.Abs(currentGpuTemp - _lastGpuTemperature) >= 1)
+            if (currentGpuTemp >= 0 && currentGpuTemp != _lastGpuTemperature)
             {
                 changed = true;
                 _lastGpuTemperature = currentGpuTemp;
             }
 
-            if (_state.Fan1Rpm.HasValue)
+            if (_state.Fan1Rpm != _lastFan1Rpm)
             {
                 changed = true;
                 _lastFan1Rpm = _state.Fan1Rpm;
             }
 
-            if (_state.Fan2Rpm.HasValue)
+            if (_state.Fan2Rpm != _lastFan2Rpm)
             {
                 changed = true;
                 _lastFan2Rpm = _state.Fan2Rpm;
