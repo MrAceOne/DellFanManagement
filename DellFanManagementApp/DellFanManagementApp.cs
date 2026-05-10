@@ -75,7 +75,7 @@ namespace DellFanManagement.App
                             Process.GetCurrentProcess().PriorityClass = ProcessPriorityClass.High;
 
                             // Boilerplate code to start the app.
-                            Application.SetHighDpiMode(HighDpiMode.DpiUnaware);
+                            Application.SetHighDpiMode(HighDpiMode.SystemAware);
                             Application.EnableVisualStyles();
                             Application.SetCompatibleTextRenderingDefault(false);
                             Application.Run(new DellFanManagementGuiForm());

@@ -293,7 +293,34 @@ namespace DellFanManagement.App
 
             try
             {
-                if (_state.EcFanControlEnabled && IsAutomaticFanControlDisableSupported)
+                // 启动时：先获取状态锁，检查当前散热模式
+                _state.WaitOne();
+                bool isQuietMode = _state.ThermalSetting == ThermalSetting.Quiet;
+                _state.Release();
+
+                if (isQuietMode && IsAutomaticFanControlDisableSupported)
+                {
+                    _fanController.DisableAutomaticFanControl();
+                    _fanMode = FanMode.Manual;
+
+                    _state.WaitOne();
+                    _state.EcFanControlEnabled = false;
+                    _state.FanMode = FanMode.Manual;
+                    _state.Release();
+
+                    _manualModeQuietApplied = true;
+                    Log.Write("Started in Quiet mode – disabled EC fan control, using manual mode");
+
+                    // 应用基于温度的风扇控制
+                    if (IsSpecificFanControlSupported)
+                    {
+                        _temperatureCheckCounter = 0;
+                        _state.WaitOne();
+                        ApplyTemperatureBasedFanControl();
+                        _state.Release();
+                    }
+                }
+                else if (_state.EcFanControlEnabled && IsAutomaticFanControlDisableSupported)
                 {
                     _fanController.EnableAutomaticFanControl();
                     Log.Write("Enabled EC fan control – startup");
@@ -521,10 +548,15 @@ namespace DellFanManagement.App
                 }
 
                 // If we got out of the loop without error, the program is terminating.
-                if (IsAutomaticFanControlDisableSupported)
+                // 退出时：如果当前是静音/手动模式，保持EC状态不变，不自动开启EC控制
+                if (IsAutomaticFanControlDisableSupported && _fanMode != FanMode.Manual)
                 {
                     _fanController.EnableAutomaticFanControl();
                     Log.Write("Enabled EC fan control – shutdown");
+                }
+                else if (_fanMode == FanMode.Manual)
+                {
+                    Log.Write("Shutdown in manual/Quiet mode – keeping EC fan control disabled");
                 }
 
                 // Clean up as the program terminates.

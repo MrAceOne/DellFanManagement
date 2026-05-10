@@ -11,6 +11,9 @@ namespace DellFanManagement.App
         [DllImport("dwmapi.dll")]
         private static extern int DwmSetWindowAttribute(IntPtr hwnd, int attr, ref int attrValue, int attrSize);
 
+        [DllImport("dwmapi.dll")]
+        private static extern int DwmExtendFrameIntoClientArea(IntPtr hwnd, ref MARGINS pMarInset);
+
         [DllImport("user32.dll")]
         internal static extern int SetWindowCompositionAttribute(IntPtr hwnd, ref WindowCompositionAttributeData data);
 
@@ -21,6 +24,15 @@ namespace DellFanManagement.App
         private const int DWMSBT_TRANSIENTWINDOW = 3; // Acrylic
         private const int DWMWCP_ROUND = 2;
         private const int DWM_COLOR_DEFAULT = unchecked((int)0xFFFFFFFF);
+
+        [StructLayout(LayoutKind.Sequential)]
+        internal struct MARGINS
+        {
+            public int cxLeftWidth;
+            public int cxRightWidth;
+            public int cyTopHeight;
+            public int cyBottomHeight;
+        }
 
         internal enum AccentState
         {
@@ -65,10 +77,11 @@ namespace DellFanManagement.App
             // This is system-managed and does not cover window contents.
             if (Environment.OSVersion.Version.Build >= 22621)
             {
+                // Windows 11: 使用 DWM 原生 Acrylic 背景
                 int backdropType = DWMSBT_TRANSIENTWINDOW;
                 DwmSetWindowAttribute(hwnd, DWMWA_SYSTEMBACKDROP_TYPE, ref backdropType, sizeof(int));
 
-                // Use light mode so Acrylic appears as white/bright frosted glass.
+                // 使用亮色模式，与白色窗体背景匹配
                 int useDarkMode = 0;
                 DwmSetWindowAttribute(hwnd, DWMWA_USE_IMMERSIVE_DARK_MODE, ref useDarkMode, sizeof(int));
 
@@ -76,10 +89,16 @@ namespace DellFanManagement.App
                 int cornerPreference = DWMWCP_ROUND;
                 DwmSetWindowAttribute(hwnd, DWMWA_WINDOW_CORNER_PREFERENCE, ref cornerPreference, sizeof(int));
 
-                // 设置浅蓝色边框颜色，确保 Acrylic 窗口边框可见
-                // 0xFFADD8E6 = LightBlue (ARGB)
-                int borderColor = unchecked((int)0xFFADD8E6);
-                DwmSetWindowAttribute(hwnd, DWMWA_BORDER_COLOR, ref borderColor, sizeof(int));
+                // 将 DWM 玻璃边框扩展到客户区边缘，形成毛玻璃边框效果
+                // 这样客户区边缘会显示出 Acrylic 毛玻璃质感
+                var margins = new MARGINS
+                {
+                    cxLeftWidth = 8,
+                    cxRightWidth = 8,
+                    cyTopHeight = 8,
+                    cyBottomHeight = 8
+                };
+                DwmExtendFrameIntoClientArea(hwnd, ref margins);
                 return;
             }
 

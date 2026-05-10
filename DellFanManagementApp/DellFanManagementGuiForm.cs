@@ -102,18 +102,11 @@ namespace DellFanManagement.App
             thermalSettingRadioButtonQuiet.CheckedChanged += new EventHandler(ThermalSettingChangedEventHandler);
             thermalSettingRadioButtonPerformance.CheckedChanged += new EventHandler(ThermalSettingChangedEventHandler);
 
-            // ...Fan mode radio buttons...
-            fanModeRadioButtonAutomatic.CheckedChanged += new EventHandler(FanModeSettingChangedEventHandler);
-            fanModeRadioButtonManual.CheckedChanged += new EventHandler(FanModeSettingChangedEventHandler);
-
             eppTrackBar.Scroll += new EventHandler(EppTrackBarScrollEventHandler);
 
             // Empty out pre-populated temperature label text fields.
             temperatureLabel1.Text = string.Empty;
             temperatureLabel2.Text = string.Empty;
-
-            // Fan mode is always available.
-            fanModeGroupBox.Enabled = true;
 
             // Initial update of the tray icon (required for it to appear for display).
             UpdateTrayIcon(false);
@@ -123,9 +116,6 @@ namespace DellFanManagement.App
             // Update form with default state values.
             UpdateForm();
             _state.UpdateThermalSetting();
-
-            // Apply EC fan control configuration from registry.
-            ApplyEcFanControlConfiguration();
 
             // Initialize thermal setting UI once on startup.
             InitializeThermalSettingUi();
@@ -155,35 +145,10 @@ namespace DellFanManagement.App
         }
 
         /// <summary>
-        /// Apply fan mode configuration loaded from the registry.
-        /// </summary>
-        private void ApplyEcFanControlConfiguration()
-        {
-            // Temporarily remove event handlers to avoid triggering events during initialization
-            fanModeRadioButtonAutomatic.CheckedChanged -= FanModeSettingChangedEventHandler;
-            fanModeRadioButtonManual.CheckedChanged -= FanModeSettingChangedEventHandler;
-
-            // 启动时始终默认使用自动模式
-            fanModeRadioButtonAutomatic.Checked = true;
-            _core.RequestFanMode(FanMode.Automatic);
-
-            // Restore event handlers
-            fanModeRadioButtonAutomatic.CheckedChanged += FanModeSettingChangedEventHandler;
-            fanModeRadioButtonManual.CheckedChanged += FanModeSettingChangedEventHandler;
-        }
-
-        /// <summary>
         /// Initialize thermal setting UI once on startup based on current state.
         /// </summary>
         private void InitializeThermalSettingUi()
         {
-            if (_state.FanMode == FanMode.Manual)
-            {
-                // 手动模式下禁用散热管理，不选中任何选项
-                SetThermalSettingAvaiability(false);
-                return;
-            }
-
             switch (_state.ThermalSetting)
             {
                 case ThermalSetting.Optimized:
@@ -382,75 +347,29 @@ namespace DellFanManagement.App
 
         /// <summary>
         /// Called when any of the "thermal setting" radio buttons are clicked.
+        /// 静音模式绑定到手动风扇控制，其他模式使用自动风扇控制。
         /// </summary>
         private void ThermalSettingChangedEventHandler(Object sender, EventArgs e)
         {
             if (thermalSettingRadioButtonOptimized.Checked)
             {
+                _core.RequestFanMode(FanMode.Automatic);
                 _core.RequestThermalSetting(ThermalSetting.Optimized);
             }
             else if (thermalSettingRadioButtonCool.Checked)
             {
+                _core.RequestFanMode(FanMode.Automatic);
                 _core.RequestThermalSetting(ThermalSetting.Cool);
             }
             else if (thermalSettingRadioButtonQuiet.Checked)
             {
+                _core.RequestFanMode(FanMode.Manual);
                 _core.RequestThermalSetting(ThermalSetting.Quiet);
             }
             else if (thermalSettingRadioButtonPerformance.Checked)
             {
-                _core.RequestThermalSetting(ThermalSetting.Performance);
-            }
-        }
-
-        /// <summary>
-        /// Called when the fan mode radio buttons are clicked.
-        /// </summary>
-        private void FanModeSettingChangedEventHandler(Object sender, EventArgs e)
-        {
-            if (fanModeRadioButtonAutomatic.Checked)
-            {
                 _core.RequestFanMode(FanMode.Automatic);
-                _configurationStore.SetOption(ConfigurationOption.EcFanControlEnabled, 1);
-                // 自动模式：启用散热模式选择
-                SetThermalSettingAvaiability(true);
-                // 恢复用户之前选择的散热模式到UI
-                RestoreThermalSettingSelection();
-            }
-            else if (fanModeRadioButtonManual.Checked)
-            {
-                _core.RequestFanMode(FanMode.Manual);
-                _configurationStore.SetOption(ConfigurationOption.EcFanControlEnabled, 0);
-                // 手动模式：禁用散热模式选择（变为灰色）
-                SetThermalSettingAvaiability(false);
-            }
-        }
-
-        /// <summary>
-        /// 恢复用户之前选择的散热模式到UI
-        /// </summary>
-        private void RestoreThermalSettingSelection()
-        {
-            ThermalSetting? userSetting = _core.UserSelectedThermalSetting;
-            if (!userSetting.HasValue)
-            {
-                return;
-            }
-
-            switch (userSetting.Value)
-            {
-                case ThermalSetting.Optimized:
-                    thermalSettingRadioButtonOptimized.Checked = true;
-                    break;
-                case ThermalSetting.Cool:
-                    thermalSettingRadioButtonCool.Checked = true;
-                    break;
-                case ThermalSetting.Quiet:
-                    thermalSettingRadioButtonQuiet.Checked = true;
-                    break;
-                case ThermalSetting.Performance:
-                    thermalSettingRadioButtonPerformance.Checked = true;
-                    break;
+                _core.RequestThermalSetting(ThermalSetting.Performance);
             }
         }
 
@@ -623,26 +542,18 @@ namespace DellFanManagement.App
         }
 
         /// <summary>
-        /// 重写WndProc以拦截关闭消息，将其转为最小化；并阻止背景绘制以显示Acrylic效果。
+        /// 重写WndProc以拦截关闭消息，将其转为最小化。
         /// </summary>
         /// <param name="m">Windows消息</param>
         protected override void WndProc(ref Message m)
         {
             const int WM_CLOSE = 0x0010;
-            const int WM_ERASEBKGND = 0x0014;
 
             if (m.Msg == WM_CLOSE)
             {
                 WindowState = FormWindowState.Minimized;
                 ShowInTaskbar = false;
                 Visible = false;
-                return;
-            }
-
-            // 阻止 WinForms 绘制纯色背景，让 DWM Acrylic 效果透出来
-            if (m.Msg == WM_ERASEBKGND)
-            {
-                m.Result = (IntPtr)1;
                 return;
             }
 
