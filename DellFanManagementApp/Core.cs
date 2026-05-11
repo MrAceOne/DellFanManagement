@@ -68,30 +68,30 @@ namespace DellFanManagement.App
         /// </summary>
         private int _temperatureCheckCounter = 0;
 
-        // ========== EC自动模式温度触发/恢复配置（统一可配置） ==========
+        // ========== 高温禁用睿频触发/恢复配置（统一可配置） ==========
 
         /// <summary>
-        /// 手动模式下触发EC自动控制的CPU温度阈值（默认80度）
+        /// 手动模式下触发禁用睿频的CPU温度阈值（默认90度）
         /// </summary>
         public int EcAutoTriggerCpuTemp { get; private set; } = 90;
 
         /// <summary>
-        /// 手动模式下触发EC自动控制的GPU温度阈值（默认60度）
+        /// 手动模式下触发禁用睿频的GPU温度阈值（默认80度）
         /// </summary>
         public int EcAutoTriggerGpuTemp { get; private set; } = 80;
 
         /// <summary>
-        /// 从EC自动恢复到手动的CPU温度上限（默认80度）
+        /// 恢复睿频的CPU温度上限（默认80度）
         /// </summary>
         public int EcAutoRecoveryCpuTemp { get; private set; } = 80;
 
         /// <summary>
-        /// 从EC自动恢复到手动的GPU温度上限（默认60度）
+        /// 恢复睿频的GPU温度上限（默认70度）
         /// </summary>
         public int EcAutoRecoveryGpuTemp { get; private set; } = 70;
 
         /// <summary>
-        /// 恢复手动模式前需要持续满足低温条件的秒数（默认30秒）
+        /// 恢复睿频前需要持续满足低温条件的秒数（默认20秒）
         /// </summary>
         public int EcAutoRecoveryDurationSeconds { get; private set; } = 20;
 
@@ -143,7 +143,7 @@ namespace DellFanManagement.App
         private readonly ConfigurationStore _configurationStore;
 
         /// <summary>
-        /// 是否因为高温而强制启用了EC自动模式
+        /// 是否因为高温而禁用了睿频
         /// </summary>
         private bool _ecAutoOverrideByTemperature;
 
@@ -284,17 +284,8 @@ namespace DellFanManagement.App
 
             try
             {
-                // 启动时：根据保存的风扇控制模式应用对应设置
-                if (_fanMode == FanMode.Manual && IsAutomaticFanControlDisableSupported)
-                {
-                    _fanController.DisableAutomaticFanControl();
-                    _state.WaitOne();
-                    _state.EcFanControlEnabled = false;
-                    _state.FanMode = FanMode.Manual;
-                    _state.Release();
-                    Log.Write("Started in manual mode – disabled EC fan control");
-                }
-                else if (_fanMode == FanMode.Automatic && IsAutomaticFanControlDisableSupported)
+                // 启动时：强制启用EC自动控制
+                if (IsAutomaticFanControlDisableSupported)
                 {
                     _fanController.EnableAutomaticFanControl();
                     _state.WaitOne();
@@ -303,6 +294,16 @@ namespace DellFanManagement.App
                     _state.Release();
                     Log.Write("Started in automatic mode – enabled EC fan control");
                 }
+                else
+                {
+                    _state.WaitOne();
+                    _state.FanMode = FanMode.Automatic;
+                    _state.Release();
+                }
+                // 同步 _fanMode 字段，防止循环中因保存的旧配置而切回手动模式
+                _fanMode = FanMode.Automatic;
+                // 强制同步UI，确保启动后立即显示自动模式
+                UpdateForm();
 
                 while (_state.BackgroundThreadRunning)
                 {
@@ -317,10 +318,10 @@ namespace DellFanManagement.App
                     int cpuTemp = GetCpuTemperature();
                     int gpuTemp = GetGpuTemperature();
 
-                    // Handle EC fan control state changes.
+                    // Handle turbo boost state changes.
                     if (_ecAutoOverrideByTemperature)
                     {
-                        // 当前因为高温而强制EC自动
+                        // 当前因为高温而禁用了睿频
                         if (_fanMode == FanMode.Manual)
                         {
                             // 用户还是手动模式，检查温度是否降低
@@ -331,27 +332,18 @@ namespace DellFanManagement.App
                                 _ecAutoRecoveryCounter++;
                                 if (_ecAutoRecoveryCounter >= EcAutoRecoveryDurationSeconds)
                                 {
-                                    // 持续低温达到设定时间，恢复手动模式
-                                    bool disableResult = _fanController.DisableAutomaticFanControl();
-                                    if (disableResult)
-                                    {
-                                        _state.EcFanControlEnabled = false;
-                                        _ecAutoOverrideByTemperature = false;
-                                        _ecAutoRecoveryCounter = 0;
-                                        _temperatureCheckCounter = 0;
+                                    // 持续低温达到设定时间，恢复睿频
+                                    CpuPowerManager.SetGuid(CpuPowerManager.GUID_PROCESSOR_TURBOBOOST, 2);
+                                    _ecAutoOverrideByTemperature = false;
+                                    _ecAutoRecoveryCounter = 0;
+                                    _temperatureCheckCounter = 0;
 
-                                        // 重置风扇级别状态，强制重新应用温度控制
-                                        _state.Fan1Level = null;
-                                        _state.Fan2Level = null;
+                                    // 重置风扇级别状态，强制重新应用温度控制
+                                    _state.Fan1Level = null;
+                                    _state.Fan2Level = null;
 
-                                        ApplyTemperatureBasedFanControl();
-                                        Log.Write($"Temperature stayed below recovery thresholds for {EcAutoRecoveryDurationSeconds}s, disabled EC fan control");
-                                    }
-                                    else
-                                    {
-                                        Log.Write("Failed to disable EC fan control during temperature recovery, resetting recovery counter");
-                                        _ecAutoRecoveryCounter = 0;
-                                    }
+                                    ApplyTemperatureBasedFanControl();
+                                    Log.Write($"Temperature stayed below recovery thresholds for {EcAutoRecoveryDurationSeconds}s, restored turbo boost");
                                 }
                             }
                             else
@@ -366,7 +358,8 @@ namespace DellFanManagement.App
                         }
                         else
                         {
-                            // 用户切换到了自动模式，清除覆盖标记
+                            // 用户切换到了自动模式，清除覆盖标记并恢复睿频
+                            CpuPowerManager.SetGuid(CpuPowerManager.GUID_PROCESSOR_TURBOBOOST, 2);
                             _ecAutoOverrideByTemperature = false;
                             _ecAutoRecoveryCounter = 0;
                             _state.FanMode = FanMode.Automatic;
@@ -406,14 +399,13 @@ namespace DellFanManagement.App
                     // In manual mode (EC fan control disabled), apply temperature-based fan control.
                     if (!_state.EcFanControlEnabled && IsAutomaticFanControlDisableSupported && IsSpecificFanControlSupported)
                     {
-                        // 检查是否需要因为高温而强制启用EC自动
+                        // 检查是否需要因为高温而禁用睿频
                         bool cpuHot = cpuTemp >= EcAutoTriggerCpuTemp;
                         bool gpuHot = gpuTemp >= EcAutoTriggerGpuTemp;
                         if (cpuHot || gpuHot)
                         {
-                            Log.Write($"High temperature detected (CPU: {cpuTemp}°C, GPU: {gpuTemp}°C), enabling EC automatic fan control");
-                            _state.EcFanControlEnabled = true;
-                            _fanController.EnableAutomaticFanControl();
+                            Log.Write($"High temperature detected (CPU: {cpuTemp}°C, GPU: {gpuTemp}°C), disabling turbo boost");
+                            CpuPowerManager.SetGuid(CpuPowerManager.GUID_PROCESSOR_TURBOBOOST, 0);
                             _ecAutoOverrideByTemperature = true;
                             _ecAutoRecoveryCounter = 0;
                         }
@@ -489,16 +481,14 @@ namespace DellFanManagement.App
                 }
 
                 // If we got out of the loop without error, the program is terminating.
-                // 退出时：如果当前是静音/手动模式，保持EC状态不变，不自动开启EC控制
-                if (IsAutomaticFanControlDisableSupported && _fanMode != FanMode.Manual)
+                // 退出时：强制开启EC自动控制，恢复睿频
+                if (IsAutomaticFanControlDisableSupported)
                 {
                     _fanController.EnableAutomaticFanControl();
                     Log.Write("Enabled EC fan control – shutdown");
                 }
-                else if (_fanMode == FanMode.Manual)
-                {
-                    Log.Write("Shutdown in manual/Quiet mode – keeping EC fan control disabled");
-                }
+                CpuPowerManager.SetGuid(CpuPowerManager.GUID_PROCESSOR_TURBOBOOST, 2);
+                Log.Write("Restored turbo boost – shutdown");
 
                 // Clean up as the program terminates.
                 _fanController.Shutdown();

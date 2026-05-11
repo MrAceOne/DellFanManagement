@@ -16,7 +16,7 @@ namespace DellFanManagement.App
         private static Guid GUID_PROCESSOR_SETTINGS_SUBGROUP = new Guid("54533251-82be-4824-96c1-47b60b740d00"); //CPU性能增强功能相关的 GUID
         public static Guid GUID_PROCESSOR_PERFEPP = new Guid("36687f9e-e3a5-4dbf-b1dc-15eb381c6863"); //EPP（Energy Performance Preference）设置的 GUID
         public static Guid GUID_PROCESSOR_FREQUENCYMAX = new Guid("75b0ae3f-bce0-45a7-8c89-c9611c25e100");// 处理器频率上限设置的 GUID
-        public static Guid GUID_PROCESSOR_TURBOBOOST = new Guid("bc5038f7-23e0-4960-96da-33abaf5935ec"); //处理器睿频
+        public static Guid GUID_PROCESSOR_TURBOBOOST = new Guid("be337238-0d82-4146-a960-4f3749d470c7"); //处理器睿频
 
         // 修改 API 声明，使用 [In] 特性
         [DllImport("powrprof.dll", SetLastError = true)]
@@ -103,6 +103,7 @@ namespace DellFanManagement.App
                 ref type,
                 value
             );
+            PowerSetActiveScheme(IntPtr.Zero, ref GUID_ACTIVE_SCHEME);
         }
 
         public static uint SetGuidByState(Guid type,uint value)

@@ -184,6 +184,7 @@ namespace DellFanManagement.App
                     SetThermalSettingAvaiability(false);
                     break;
             }
+
         }
 
         private void UpdatePowerForm()
@@ -454,8 +455,6 @@ namespace DellFanManagement.App
                     _core.RequestThermalSetting(savedThermalSetting.Value);
                 }
 
-                // 恢复 CPU 睿频
-                CpuPowerManager.SetGuid(CpuPowerManager.GUID_PROCESSOR_TURBOBOOST, 1);
             }
             else if (manuButton.Checked)
             {
@@ -464,9 +463,6 @@ namespace DellFanManagement.App
 
                 // 禁用散热管理控件（UI上保留原选中状态）
                 SetThermalSettingAvaiability(false);
-
-                // 禁用 CPU 睿频
-                CpuPowerManager.SetGuid(CpuPowerManager.GUID_PROCESSOR_TURBOBOOST, 0);
             }
         }
 
