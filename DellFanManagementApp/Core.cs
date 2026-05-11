@@ -171,16 +171,9 @@ namespace DellFanManagement.App
             // Load configuration values.
             LoadConfiguration();
 
-            // Load saved fan control mode from configuration.
-            int? savedFanMode = _configurationStore.GetIntOption(ConfigurationOption.FanControlMode);
-            if (savedFanMode.HasValue)
-            {
-                _fanMode = (FanMode)savedFanMode.Value;
-            }
-            else
-            {
-                _fanMode = FanMode.Automatic;
-            }
+            // 强制启动为自动模式，忽略之前保存的配置
+            _fanMode = FanMode.Automatic;
+            _configurationStore.SetOption(ConfigurationOption.FanControlMode, (int)FanMode.Automatic);
 
             // 同步风扇模式到 State，确保启动时 UI 状态一致
             _state.WaitOne();
