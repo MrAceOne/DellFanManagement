@@ -14,11 +14,6 @@ namespace DellFanManagement.App
         private static readonly int RefreshInterval = 1000;
 
         /// <summary>
-        /// RPM values above this are most likely bogus.
-        /// </summary>
-        public static readonly ulong RpmSanityCheck = 6500;
-
-        /// <summary>
         /// Shared object which contains the state of the application.
         /// </summary>
         private readonly State _state;
@@ -148,24 +143,9 @@ namespace DellFanManagement.App
         private readonly ConfigurationStore _configurationStore;
 
         /// <summary>
-        /// 用户界面选择的散热模式（用于自动模式恢复）
-        /// </summary>
-        private ThermalSetting? _userSelectedThermalSetting;
-
-        /// <summary>
-        /// 获取用户界面选择的散热模式（用于自动模式恢复UI）
-        /// </summary>
-        public ThermalSetting? UserSelectedThermalSetting => _userSelectedThermalSetting;
-
-        /// <summary>
         /// 是否因为高温而强制启用了EC自动模式
         /// </summary>
         private bool _ecAutoOverrideByTemperature;
-
-        /// <summary>
-        /// 是否已经在手动模式下应用了Quiet散热模式
-        /// </summary>
-        private bool _manualModeQuietApplied;
 
         /// <summary>
         /// Constructor.
@@ -181,18 +161,31 @@ namespace DellFanManagement.App
             _configurationStore = new ConfigurationStore();
 
             RequestedThermalSetting = null;
-            _fanMode = FanMode.Automatic;
             _fan1LevelRequested = null;
             _fan2LevelRequested = null;
 
-            _userSelectedThermalSetting = _state.ThermalSetting == ThermalSetting.Error ? null : _state.ThermalSetting;
             _ecAutoOverrideByTemperature = false;
-            _manualModeQuietApplied = false;
 
             TrayIconColor = TrayIconColor.Gray;
 
             // Load configuration values.
             LoadConfiguration();
+
+            // Load saved fan control mode from configuration.
+            int? savedFanMode = _configurationStore.GetIntOption(ConfigurationOption.FanControlMode);
+            if (savedFanMode.HasValue)
+            {
+                _fanMode = (FanMode)savedFanMode.Value;
+            }
+            else
+            {
+                _fanMode = FanMode.Automatic;
+            }
+
+            // 同步风扇模式到 State，确保启动时 UI 状态一致
+            _state.WaitOne();
+            _state.FanMode = _fanMode;
+            _state.Release();
         }
 
         /// <summary>
@@ -227,6 +220,7 @@ namespace DellFanManagement.App
         {
             _requestSemaphore.WaitOne();
             _fanMode = fanMode;
+            _configurationStore.SetOption(ConfigurationOption.FanControlMode, (int)fanMode);
             _requestSemaphore.Release();
         }
 
@@ -265,9 +259,6 @@ namespace DellFanManagement.App
                 RequestedThermalSetting = requestedThermalSetting;
             }
 
-            // 记录用户界面选择的散热模式
-            _userSelectedThermalSetting = requestedThermalSetting;
-
             _requestSemaphore.Release();
         }
 
@@ -293,37 +284,24 @@ namespace DellFanManagement.App
 
             try
             {
-                // 启动时：先获取状态锁，检查当前散热模式
-                _state.WaitOne();
-                bool isQuietMode = _state.ThermalSetting == ThermalSetting.Quiet;
-                _state.Release();
-
-                if (isQuietMode && IsAutomaticFanControlDisableSupported)
+                // 启动时：根据保存的风扇控制模式应用对应设置
+                if (_fanMode == FanMode.Manual && IsAutomaticFanControlDisableSupported)
                 {
                     _fanController.DisableAutomaticFanControl();
-                    _fanMode = FanMode.Manual;
-
                     _state.WaitOne();
                     _state.EcFanControlEnabled = false;
                     _state.FanMode = FanMode.Manual;
                     _state.Release();
-
-                    _manualModeQuietApplied = true;
-                    Log.Write("Started in Quiet mode – disabled EC fan control, using manual mode");
-
-                    // 应用基于温度的风扇控制
-                    if (IsSpecificFanControlSupported)
-                    {
-                        _temperatureCheckCounter = 0;
-                        _state.WaitOne();
-                        ApplyTemperatureBasedFanControl();
-                        _state.Release();
-                    }
+                    Log.Write("Started in manual mode – disabled EC fan control");
                 }
-                else if (_state.EcFanControlEnabled && IsAutomaticFanControlDisableSupported)
+                else if (_fanMode == FanMode.Automatic && IsAutomaticFanControlDisableSupported)
                 {
                     _fanController.EnableAutomaticFanControl();
-                    Log.Write("Enabled EC fan control – startup");
+                    _state.WaitOne();
+                    _state.EcFanControlEnabled = true;
+                    _state.FanMode = FanMode.Automatic;
+                    _state.Release();
+                    Log.Write("Started in automatic mode – enabled EC fan control");
                 }
 
                 while (_state.BackgroundThreadRunning)
@@ -354,25 +332,26 @@ namespace DellFanManagement.App
                                 if (_ecAutoRecoveryCounter >= EcAutoRecoveryDurationSeconds)
                                 {
                                     // 持续低温达到设定时间，恢复手动模式
-                                    _state.EcFanControlEnabled = false;
-                                    _fanController.DisableAutomaticFanControl();
-                                    _ecAutoOverrideByTemperature = false;
-                                    _ecAutoRecoveryCounter = 0;
-                                    _temperatureCheckCounter = 0;
-
-                                    // 重置风扇级别状态，强制重新应用温度控制
-                                    _state.Fan1Level = null;
-                                    _state.Fan2Level = null;
-
-                                    // 重新应用Quiet散热模式
-                                    if (DellSmbiosSmi.SetThermalSetting(ThermalSetting.Quiet))
+                                    bool disableResult = _fanController.DisableAutomaticFanControl();
+                                    if (disableResult)
                                     {
-                                        _state.SetThermalSetting(ThermalSetting.Quiet);
-                                        Log.Write("Re-applied Quiet thermal setting after temperature recovery");
-                                    }
+                                        _state.EcFanControlEnabled = false;
+                                        _ecAutoOverrideByTemperature = false;
+                                        _ecAutoRecoveryCounter = 0;
+                                        _temperatureCheckCounter = 0;
 
-                                    ApplyTemperatureBasedFanControl();
-                                    Log.Write($"Temperature stayed below recovery thresholds for {EcAutoRecoveryDurationSeconds}s, disabled EC fan control");
+                                        // 重置风扇级别状态，强制重新应用温度控制
+                                        _state.Fan1Level = null;
+                                        _state.Fan2Level = null;
+
+                                        ApplyTemperatureBasedFanControl();
+                                        Log.Write($"Temperature stayed below recovery thresholds for {EcAutoRecoveryDurationSeconds}s, disabled EC fan control");
+                                    }
+                                    else
+                                    {
+                                        Log.Write("Failed to disable EC fan control during temperature recovery, resetting recovery counter");
+                                        _ecAutoRecoveryCounter = 0;
+                                    }
                                 }
                             }
                             else
@@ -389,7 +368,6 @@ namespace DellFanManagement.App
                         {
                             // 用户切换到了自动模式，清除覆盖标记
                             _ecAutoOverrideByTemperature = false;
-                            _manualModeQuietApplied = false;
                             _ecAutoRecoveryCounter = 0;
                             _state.FanMode = FanMode.Automatic;
                         }
@@ -404,16 +382,6 @@ namespace DellFanManagement.App
                             _fanController.EnableAutomaticFanControl();
                             Log.Write("Enabled EC fan control – automatic mode");
 
-                            // 恢复用户选择的散热模式
-                            if (_manualModeQuietApplied)
-                            {
-                                if (_userSelectedThermalSetting.HasValue && _userSelectedThermalSetting.Value != _state.ThermalSetting && _userSelectedThermalSetting.Value != ThermalSetting.Error)
-                                {
-                                    RequestedThermalSetting = _userSelectedThermalSetting;
-                                }
-                                _manualModeQuietApplied = false;
-                            }
-
                             _state.Fan1Level = null;
                             _state.Fan2Level = null;
                             _fan1LevelRequested = null;
@@ -425,20 +393,6 @@ namespace DellFanManagement.App
                             _state.FanMode = FanMode.Manual;
                             _fanController.DisableAutomaticFanControl();
                             Log.Write("Disabled EC fan control – manual mode");
-
-                            // 保存用户之前选择的散热模式（在应用Quiet之前）
-                            if (!_userSelectedThermalSetting.HasValue)
-                            {
-                                _userSelectedThermalSetting = _state.ThermalSetting == ThermalSetting.Error ? null : _state.ThermalSetting;
-                            }
-
-                            // 进入手动模式，应用quiet散热模式
-                            if (DellSmbiosSmi.SetThermalSetting(ThermalSetting.Quiet))
-                            {
-                                Log.Write("Applied Quiet thermal setting for manual mode");
-                                _state.SetThermalSetting(ThermalSetting.Quiet);
-                                _manualModeQuietApplied = true;
-                            }
 
                             // Immediately apply temperature-based fan control when switching to manual mode.
                             if (IsAutomaticFanControlDisableSupported && IsSpecificFanControlSupported)
@@ -516,19 +470,6 @@ namespace DellFanManagement.App
                         }
                     }
 
-                    // 在手动模式下保持Quiet散热模式
-                    if (!_state.EcFanControlEnabled && _manualModeQuietApplied)
-                    {
-                        if (_state.ThermalSetting != ThermalSetting.Quiet)
-                        {
-                            if (DellSmbiosSmi.SetThermalSetting(ThermalSetting.Quiet))
-                            {
-                                _state.SetThermalSetting(ThermalSetting.Quiet);
-                                Log.Write("Maintained Quiet thermal setting in manual mode");
-                            }
-                        }
-                    }
-
                     _requestSemaphore.Release();
                     _state.Release();
                     releaseSemaphore = false;
@@ -600,18 +541,30 @@ namespace DellFanManagement.App
                 {
                     if (_state.Fan1Level != FanLevel.Medium)
                     {
-                        _state.Fan1Level = FanLevel.Medium;
-                        _fanController.SetFanLevel(FanLevel.Medium, IsIndividualFanControlSupported ? FanIndex.Fan1 : FanIndex.AllFans);
-                        Log.Write($"Manual mode: CPU temp {cpuTemp}°C >= {CpuTemperatureThreshold}°C, Fan 1 set to Medium");
+                        if (_fanController.SetFanLevel(FanLevel.Medium, IsIndividualFanControlSupported ? FanIndex.Fan1 : FanIndex.AllFans))
+                        {
+                            _state.Fan1Level = FanLevel.Medium;
+                            Log.Write($"Manual mode: CPU temp {cpuTemp}°C >= {CpuTemperatureThreshold}°C, Fan 1 set to Medium");
+                        }
+                        else
+                        {
+                            Log.Write($"Manual mode: Failed to set Fan 1 to Medium");
+                        }
                     }
                 }
                 else
                 {
                     if (_state.Fan1Level != FanLevel.Off)
                     {
-                        _state.Fan1Level = FanLevel.Off;
-                        _fanController.SetFanLevel(FanLevel.Off, IsIndividualFanControlSupported ? FanIndex.Fan1 : FanIndex.AllFans);
-                        Log.Write($"Manual mode: CPU temp {cpuTemp}°C < {CpuTemperatureThreshold}°C, Fan 1 set to Off");
+                        if (_fanController.SetFanLevel(FanLevel.Off, IsIndividualFanControlSupported ? FanIndex.Fan1 : FanIndex.AllFans))
+                        {
+                            _state.Fan1Level = FanLevel.Off;
+                            Log.Write($"Manual mode: CPU temp {cpuTemp}°C < {CpuTemperatureThreshold}°C, Fan 1 set to Off");
+                        }
+                        else
+                        {
+                            Log.Write($"Manual mode: Failed to set Fan 1 to Off");
+                        }
                     }
                 }
             }
@@ -623,24 +576,40 @@ namespace DellFanManagement.App
                 {
                     if (_state.Fan2Level != FanLevel.Medium)
                     {
-                        _state.Fan2Level = FanLevel.Medium;
+                        bool result = true;
                         if (IsIndividualFanControlSupported)
                         {
-                            _fanController.SetFanLevel(FanLevel.Medium, FanIndex.Fan2);
+                            result = _fanController.SetFanLevel(FanLevel.Medium, FanIndex.Fan2);
                         }
-                        Log.Write($"Manual mode: GPU temp {gpuTemp}°C >= {GpuTemperatureThreshold}°C, Fan 2 set to Medium");
+                        if (result)
+                        {
+                            _state.Fan2Level = FanLevel.Medium;
+                            Log.Write($"Manual mode: GPU temp {gpuTemp}°C >= {GpuTemperatureThreshold}°C, Fan 2 set to Medium");
+                        }
+                        else
+                        {
+                            Log.Write($"Manual mode: Failed to set Fan 2 to Medium");
+                        }
                     }
                 }
                 else
                 {
                     if (_state.Fan2Level != FanLevel.Off)
                     {
-                        _state.Fan2Level = FanLevel.Off;
+                        bool result = true;
                         if (IsIndividualFanControlSupported)
                         {
-                            _fanController.SetFanLevel(FanLevel.Off, FanIndex.Fan2);
+                            result = _fanController.SetFanLevel(FanLevel.Off, FanIndex.Fan2);
                         }
-                        Log.Write($"Manual mode: GPU temp {gpuTemp}°C < {GpuTemperatureThreshold}°C, Fan 2 set to Off");
+                        if (result)
+                        {
+                            _state.Fan2Level = FanLevel.Off;
+                            Log.Write($"Manual mode: GPU temp {gpuTemp}°C < {GpuTemperatureThreshold}°C, Fan 2 set to Off");
+                        }
+                        else
+                        {
+                            Log.Write($"Manual mode: Failed to set Fan 2 to Off");
+                        }
                     }
                 }
             }

@@ -71,6 +71,11 @@
         public static readonly ConfigurationOption EcFanControlEnabled = new(ConfigurationOptionType.Integer, "EcFanControlEnabled");
 
         /// <summary>
+        /// Store the user-selected fan control mode (0 = Automatic, 1 = Manual).
+        /// </summary>
+        public static readonly ConfigurationOption FanControlMode = new(ConfigurationOptionType.Integer, "FanControlMode");
+
+        /// <summary>
         /// CPU temperature threshold for manual mode fan control (default 45 degrees).
         /// </summary>
         public static readonly ConfigurationOption ManualModeCpuTemperatureThreshold = new(ConfigurationOptionType.Integer, "ManualModeCpuTemperatureThreshold");

@@ -65,6 +65,16 @@ namespace DellFanManagement.App
         public ThermalSetting ThermalSetting { get; private set; }
 
         /// <summary>
+        /// 防止在UpdateForm同步UI时触发FanMode事件递归
+        /// </summary>
+        private bool _isProgrammaticallyUpdatingFanMode;
+
+        /// <summary>
+        /// 用户最近选择的风扇模式（用于在background thread处理前保持UI状态）
+        /// </summary>
+        private FanMode? _pendingFanMode;
+
+        /// <summary>
         /// Constructor.  Get everything set up before the window is displayed.
         /// </summary>
         public DellFanManagementGuiForm()
@@ -101,6 +111,10 @@ namespace DellFanManagement.App
             thermalSettingRadioButtonCool.CheckedChanged += new EventHandler(ThermalSettingChangedEventHandler);
             thermalSettingRadioButtonQuiet.CheckedChanged += new EventHandler(ThermalSettingChangedEventHandler);
             thermalSettingRadioButtonPerformance.CheckedChanged += new EventHandler(ThermalSettingChangedEventHandler);
+
+            // ...Fan control radio buttons...
+            autoButton.CheckedChanged += new EventHandler(FanModeChangedEventHandler);
+            manuButton.CheckedChanged += new EventHandler(FanModeChangedEventHandler);
 
             eppTrackBar.Scroll += new EventHandler(EppTrackBarScrollEventHandler);
 
@@ -149,22 +163,21 @@ namespace DellFanManagement.App
         /// </summary>
         private void InitializeThermalSettingUi()
         {
+            // 根据风扇模式设置散热管理的可用性
+            SetThermalSettingAvaiability(_state.FanMode == FanMode.Automatic);
+
             switch (_state.ThermalSetting)
             {
                 case ThermalSetting.Optimized:
-                    SetThermalSettingAvaiability(true);
                     thermalSettingRadioButtonOptimized.Checked = true;
                     break;
                 case ThermalSetting.Cool:
-                    SetThermalSettingAvaiability(true);
                     thermalSettingRadioButtonCool.Checked = true;
                     break;
                 case ThermalSetting.Quiet:
-                    SetThermalSettingAvaiability(true);
                     thermalSettingRadioButtonQuiet.Checked = true;
                     break;
                 case ThermalSetting.Performance:
-                    SetThermalSettingAvaiability(true);
                     thermalSettingRadioButtonPerformance.Checked = true;
                     break;
                 case ThermalSetting.Error:
@@ -271,6 +284,53 @@ namespace DellFanManagement.App
 
             UpdateTrayIcon(false);
 
+            // Fan mode radio buttons - sync with state (without triggering events).
+            // 如果用户有pending选择，且state还没跟上，保持UI不变
+            bool shouldSyncFanMode = true;
+            if (_pendingFanMode.HasValue)
+            {
+                if (_state.FanMode == _pendingFanMode.Value)
+                {
+                    // Background thread已处理完成，清除pending状态
+                    _pendingFanMode = null;
+                }
+                else
+                {
+                    // Background thread还没处理完，不要覆盖用户的选择
+                    shouldSyncFanMode = false;
+                }
+            }
+
+            if (shouldSyncFanMode)
+            {
+                _isProgrammaticallyUpdatingFanMode = true;
+                try
+                {
+                    switch (_state.FanMode)
+                    {
+                        case FanMode.Automatic:
+                            if (!autoButton.Checked)
+                            {
+                                autoButton.Checked = true;
+                            }
+                            break;
+                        case FanMode.Manual:
+                            if (!manuButton.Checked)
+                            {
+                                manuButton.Checked = true;
+                            }
+                            break;
+                    }
+                }
+                finally
+                {
+                    _isProgrammaticallyUpdatingFanMode = false;
+                }
+            }
+
+            // 根据风扇模式同步散热管理的可用状态
+            SetThermalSettingAvaiability(_state.FanMode == FanMode.Automatic);
+
             // Error message.
             if (_state.Error != null)
             {
@@ -347,30 +407,83 @@ namespace DellFanManagement.App
 
         /// <summary>
         /// Called when any of the "thermal setting" radio buttons are clicked.
-        /// 静音模式绑定到手动风扇控制，其他模式使用自动风扇控制。
         /// </summary>
         private void ThermalSettingChangedEventHandler(Object sender, EventArgs e)
         {
             if (thermalSettingRadioButtonOptimized.Checked)
             {
-                _core.RequestFanMode(FanMode.Automatic);
                 _core.RequestThermalSetting(ThermalSetting.Optimized);
             }
             else if (thermalSettingRadioButtonCool.Checked)
             {
-                _core.RequestFanMode(FanMode.Automatic);
                 _core.RequestThermalSetting(ThermalSetting.Cool);
             }
             else if (thermalSettingRadioButtonQuiet.Checked)
             {
-                _core.RequestFanMode(FanMode.Manual);
                 _core.RequestThermalSetting(ThermalSetting.Quiet);
             }
             else if (thermalSettingRadioButtonPerformance.Checked)
             {
-                _core.RequestFanMode(FanMode.Automatic);
                 _core.RequestThermalSetting(ThermalSetting.Performance);
             }
+        }
+
+        /// <summary>
+        /// Called when any of the "fan control" radio buttons are clicked.
+        /// </summary>
+        private void FanModeChangedEventHandler(Object sender, EventArgs e)
+        {
+            // 忽略由UpdateForm触发的程序化更新
+            if (_isProgrammaticallyUpdatingFanMode)
+            {
+                return;
+            }
+
+            if (autoButton.Checked)
+            {
+                _pendingFanMode = FanMode.Automatic;
+                _core.RequestFanMode(FanMode.Automatic);
+
+                // 恢复散热管理可用状态
+                SetThermalSettingAvaiability(true);
+
+                // 直接读取UI上保留的散热模式并恢复
+                ThermalSetting? savedThermalSetting = GetCurrentThermalSettingFromUi();
+                if (savedThermalSetting.HasValue)
+                {
+                    _core.RequestThermalSetting(savedThermalSetting.Value);
+                }
+
+                // 恢复 CPU 睿频
+                CpuPowerManager.SetGuid(CpuPowerManager.GUID_PROCESSOR_TURBOBOOST, 1);
+            }
+            else if (manuButton.Checked)
+            {
+                _pendingFanMode = FanMode.Manual;
+                _core.RequestFanMode(FanMode.Manual);
+
+                // 禁用散热管理控件（UI上保留原选中状态）
+                SetThermalSettingAvaiability(false);
+
+                // 禁用 CPU 睿频
+                CpuPowerManager.SetGuid(CpuPowerManager.GUID_PROCESSOR_TURBOBOOST, 0);
+            }
+        }
+
+        /// <summary>
+        /// 从UI获取当前选中的散热模式
+        /// </summary>
+        private ThermalSetting? GetCurrentThermalSettingFromUi()
+        {
+            if (thermalSettingRadioButtonOptimized.Checked)
+                return ThermalSetting.Optimized;
+            if (thermalSettingRadioButtonCool.Checked)
+                return ThermalSetting.Cool;
+            if (thermalSettingRadioButtonQuiet.Checked)
+                return ThermalSetting.Quiet;
+            if (thermalSettingRadioButtonPerformance.Checked)
+                return ThermalSetting.Performance;
+            return null;
         }
 
         /// <summary>

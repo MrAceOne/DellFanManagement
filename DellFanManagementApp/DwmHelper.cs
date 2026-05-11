@@ -93,10 +93,10 @@ namespace DellFanManagement.App
                 // 这样客户区边缘会显示出 Acrylic 毛玻璃质感
                 var margins = new MARGINS
                 {
-                    cxLeftWidth = 8,
-                    cxRightWidth = 8,
-                    cyTopHeight = 8,
-                    cyBottomHeight = 8
+                    cxLeftWidth = 16,
+                    cxRightWidth = 16,
+                    cyTopHeight = 16,
+                    cyBottomHeight = 16
                 };
                 DwmExtendFrameIntoClientArea(hwnd, ref margins);
                 return;

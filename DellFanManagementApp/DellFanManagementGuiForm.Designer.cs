@@ -58,6 +58,9 @@ namespace DellFanManagement.App
             label1 = new System.Windows.Forms.Label();
             eppLabel = new System.Windows.Forms.Label();
             eppTrackBar = new System.Windows.Forms.TrackBar();
+            fanControlGroupBox = new System.Windows.Forms.GroupBox();
+            manuButton = new System.Windows.Forms.RadioButton();
+            autoButton = new System.Windows.Forms.RadioButton();
             fansGroupBox.SuspendLayout();
             thermalSettingGroupBox.SuspendLayout();
             temperatureGroupBox.SuspendLayout();
@@ -65,6 +68,7 @@ namespace DellFanManagement.App
             trayContextMenu.SuspendLayout();
             groupBox1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)eppTrackBar).BeginInit();
+            fanControlGroupBox.SuspendLayout();
             SuspendLayout();
             // 
             // fansGroupBox
@@ -104,7 +108,7 @@ namespace DellFanManagement.App
             thermalSettingGroupBox.Controls.Add(thermalSettingRadioButtonOptimized);
             thermalSettingGroupBox.Location = new System.Drawing.Point(193, 12);
             thermalSettingGroupBox.Name = "thermalSettingGroupBox";
-            thermalSettingGroupBox.Size = new System.Drawing.Size(122, 71);
+            thermalSettingGroupBox.Size = new System.Drawing.Size(122, 134);
             thermalSettingGroupBox.TabIndex = 6;
             thermalSettingGroupBox.TabStop = false;
             thermalSettingGroupBox.Text = "散热管理:";
@@ -113,7 +117,7 @@ namespace DellFanManagement.App
             // 
             thermalSettingRadioButtonPerformance.AutoSize = true;
             thermalSettingRadioButtonPerformance.Font = new System.Drawing.Font("Microsoft YaHei UI", 8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-            thermalSettingRadioButtonPerformance.Location = new System.Drawing.Point(56, 47);
+            thermalSettingRadioButtonPerformance.Location = new System.Drawing.Point(6, 99);
             thermalSettingRadioButtonPerformance.Name = "thermalSettingRadioButtonPerformance";
             thermalSettingRadioButtonPerformance.Size = new System.Drawing.Size(47, 20);
             thermalSettingRadioButtonPerformance.TabIndex = 3;
@@ -125,7 +129,7 @@ namespace DellFanManagement.App
             // 
             thermalSettingRadioButtonQuiet.AutoSize = true;
             thermalSettingRadioButtonQuiet.Font = new System.Drawing.Font("Microsoft YaHei UI", 8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-            thermalSettingRadioButtonQuiet.Location = new System.Drawing.Point(56, 22);
+            thermalSettingRadioButtonQuiet.Location = new System.Drawing.Point(6, 73);
             thermalSettingRadioButtonQuiet.Name = "thermalSettingRadioButtonQuiet";
             thermalSettingRadioButtonQuiet.Size = new System.Drawing.Size(47, 20);
             thermalSettingRadioButtonQuiet.TabIndex = 2;
@@ -322,6 +326,41 @@ namespace DellFanManagement.App
             eppTrackBar.TickStyle = System.Windows.Forms.TickStyle.None;
             eppTrackBar.Value = 50;
             // 
+            // fanControlGroupBox
+            // 
+            fanControlGroupBox.Controls.Add(manuButton);
+            fanControlGroupBox.Controls.Add(autoButton);
+            fanControlGroupBox.Location = new System.Drawing.Point(193, 152);
+            fanControlGroupBox.Name = "fanControlGroupBox";
+            fanControlGroupBox.Size = new System.Drawing.Size(122, 98);
+            fanControlGroupBox.TabIndex = 16;
+            fanControlGroupBox.TabStop = false;
+            fanControlGroupBox.Text = "风扇控制:";
+            // 
+            // manuButton
+            // 
+            manuButton.AutoSize = true;
+            manuButton.Font = new System.Drawing.Font("Microsoft YaHei UI", 8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            manuButton.Location = new System.Drawing.Point(6, 47);
+            manuButton.Name = "manuButton";
+            manuButton.Size = new System.Drawing.Size(47, 20);
+            manuButton.TabIndex = 1;
+            manuButton.TabStop = true;
+            manuButton.Text = "手动";
+            manuButton.UseVisualStyleBackColor = true;
+            // 
+            // autoButton
+            // 
+            autoButton.AutoSize = true;
+            autoButton.Font = new System.Drawing.Font("Microsoft YaHei UI", 8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            autoButton.Location = new System.Drawing.Point(6, 22);
+            autoButton.Name = "autoButton";
+            autoButton.Size = new System.Drawing.Size(47, 20);
+            autoButton.TabIndex = 0;
+            autoButton.TabStop = true;
+            autoButton.Text = "自动";
+            autoButton.UseVisualStyleBackColor = true;
+            // 
             // DellFanManagementGuiForm
             // 
             AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
@@ -329,6 +368,7 @@ namespace DellFanManagement.App
             BackColor = System.Drawing.Color.White;
             BackgroundImageLayout = System.Windows.Forms.ImageLayout.None;
             ClientSize = new System.Drawing.Size(524, 275);
+            Controls.Add(fanControlGroupBox);
             Controls.Add(groupBox1);
             Controls.Add(systemMonitorGroupBox);
             Controls.Add(statusStrip);
@@ -337,7 +377,10 @@ namespace DellFanManagement.App
             Controls.Add(fansGroupBox);
             ForeColor = System.Drawing.SystemColors.ControlText;
             Icon = (System.Drawing.Icon)resources.GetObject("$this.Icon");
-            MinimumSize = new System.Drawing.Size(408, 219);
+            MaximizeBox = false;
+            MaximumSize = new System.Drawing.Size(540, 314);
+            MinimizeBox = false;
+            MinimumSize = new System.Drawing.Size(540, 314);
             Name = "DellFanManagementGuiForm";
             Text = "Dell 风扇管理";
             fansGroupBox.ResumeLayout(false);
@@ -352,6 +395,8 @@ namespace DellFanManagement.App
             groupBox1.ResumeLayout(false);
             groupBox1.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)eppTrackBar).EndInit();
+            fanControlGroupBox.ResumeLayout(false);
+            fanControlGroupBox.PerformLayout();
             ResumeLayout(false);
             PerformLayout();
 
@@ -385,5 +430,8 @@ namespace DellFanManagement.App
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.TextBox frequencyTextBox;
         private System.Windows.Forms.Button powerApplyButton;
+        private System.Windows.Forms.GroupBox fanControlGroupBox;
+        private System.Windows.Forms.RadioButton manuButton;
+        private System.Windows.Forms.RadioButton autoButton;
     }
 }

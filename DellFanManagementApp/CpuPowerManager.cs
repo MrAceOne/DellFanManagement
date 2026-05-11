@@ -16,6 +16,7 @@ namespace DellFanManagement.App
         private static Guid GUID_PROCESSOR_SETTINGS_SUBGROUP = new Guid("54533251-82be-4824-96c1-47b60b740d00"); //CPU性能增强功能相关的 GUID
         public static Guid GUID_PROCESSOR_PERFEPP = new Guid("36687f9e-e3a5-4dbf-b1dc-15eb381c6863"); //EPP（Energy Performance Preference）设置的 GUID
         public static Guid GUID_PROCESSOR_FREQUENCYMAX = new Guid("75b0ae3f-bce0-45a7-8c89-c9611c25e100");// 处理器频率上限设置的 GUID
+        public static Guid GUID_PROCESSOR_TURBOBOOST = new Guid("bc5038f7-23e0-4960-96da-33abaf5935ec"); //处理器睿频
 
         // 修改 API 声明，使用 [In] 特性
         [DllImport("powrprof.dll", SetLastError = true)]
@@ -85,46 +86,23 @@ namespace DellFanManagement.App
             return GUID_ACTIVE_SCHEME;
         }
 
-        public static bool SetGuid(Guid type, int? acValue = null, int? dcValue = null)
+        public static void SetGuid(Guid type, uint value)
         {
-            if (acValue.HasValue && (acValue.Value < 0 || acValue.Value > 100))
-                return false;
-            if (dcValue.HasValue && (dcValue.Value < 0 || dcValue.Value > 100))
-                return false;
-
-            uint result;
-            bool success = true;
-
-            if (acValue.HasValue)
-            {
-                result = PowerWriteACValueIndex(
-                    IntPtr.Zero,
-                    ref GUID_ACTIVE_SCHEME,
-                    ref GUID_PROCESSOR_SETTINGS_SUBGROUP,
-                    ref type,
-                    (uint)acValue.Value
-                );
-                if (result != 0) success = false;
-            }
-
-            if (dcValue.HasValue && success)
-            {
-                result = PowerWriteDCValueIndex(
-                    IntPtr.Zero,
-                    ref GUID_ACTIVE_SCHEME,
-                    ref GUID_PROCESSOR_SETTINGS_SUBGROUP,
-                    ref type,
-                    (uint)dcValue.Value
-                );
-                if (result != 0) success = false;
-            }
-
-            if (success)
-            {
-                result = PowerSetActiveScheme(IntPtr.Zero, ref GUID_ACTIVE_SCHEME);
-                if (result != 0) success = false;
-            }
-            return success;
+            PowerWriteACValueIndex(
+                IntPtr.Zero,
+                ref GUID_ACTIVE_SCHEME,
+                ref GUID_PROCESSOR_SETTINGS_SUBGROUP,
+                ref type,
+                value
+            );
+                
+            PowerWriteDCValueIndex(
+                IntPtr.Zero,
+                ref GUID_ACTIVE_SCHEME,
+                ref GUID_PROCESSOR_SETTINGS_SUBGROUP,
+                ref type,
+                value
+            );
         }
 
         public static uint SetGuidByState(Guid type,uint value)
