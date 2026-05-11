@@ -116,8 +116,6 @@ namespace DellFanManagement.App
             autoButton.CheckedChanged += new EventHandler(FanModeChangedEventHandler);
             manuButton.CheckedChanged += new EventHandler(FanModeChangedEventHandler);
 
-            eppTrackBar.Scroll += new EventHandler(EppTrackBarScrollEventHandler);
-
             // Empty out pre-populated temperature label text fields.
             temperatureLabel1.Text = string.Empty;
             temperatureLabel2.Text = string.Empty;
@@ -125,8 +123,6 @@ namespace DellFanManagement.App
             // Initial update of the tray icon (required for it to appear for display).
             UpdateTrayIcon(false);
 
-            // Initialize power management related UI elements.
-            UpdatePowerForm();
             // Update form with default state values.
             UpdateForm();
             _state.UpdateThermalSetting();
@@ -185,21 +181,6 @@ namespace DellFanManagement.App
                     break;
             }
 
-        }
-
-        private void UpdatePowerForm()
-        {
-            if (CpuPowerManager.GetGuidByState(CpuPowerManager.GUID_PROCESSOR_PERFEPP, out uint epp) == 0)
-            {
-                eppTrackBar.Value = (int)epp;
-                eppLabel.Text = string.Format("EPP: {0}", epp);
-            }
-
-            if (CpuPowerManager.GetGuidByState(CpuPowerManager.GUID_PROCESSOR_FREQUENCYMAX, out uint frequencyMax) == 0)
-            {
-                frequencyTextBox.Text = frequencyMax.ToString();
-            }
-            Console.WriteLine("Finished updating power form.");
         }
 
         /// <summary>
@@ -618,18 +599,6 @@ namespace DellFanManagement.App
         private static void ShowDisclaimer()
         {
             MessageBox.Show("Note: While every has been made to make this program safe to use, it does interact with the embedded controller and system BIOS using undocumented methods and may have adverse effects on your system.  Use at your own risk.  If you experience odd behavior, a full system shutdown should restore everything back to the original state.  This program is not created by or affiliated with Dell Inc. or Dell Technologies Inc.", "Dell Fan Management – Disclaimer");
-        }
-
-        private void EppTrackBarScrollEventHandler(object sender, EventArgs e)
-        {
-            uint result = CpuPowerManager.SetGuidByState(CpuPowerManager.GUID_PROCESSOR_PERFEPP, (uint)eppTrackBar.Value);
-            eppLabel.Text = string.Format("EPP: {0}", eppTrackBar.Value);
-        }
-
-        private void PowerApplyButtonClickedEventHandler(object sender, EventArgs e)
-        {
-            CpuPowerManager.SetGuidByState(CpuPowerManager.GUID_PROCESSOR_PERFEPP, (uint)eppTrackBar.Value);
-            CpuPowerManager.SetGuidByState(CpuPowerManager.GUID_PROCESSOR_FREQUENCYMAX, uint.Parse(frequencyTextBox.Text));
         }
 
         /// <summary>

@@ -52,12 +52,6 @@ namespace DellFanManagement.App
             trayContextMenu = new System.Windows.Forms.ContextMenuStrip(components);
             trayMenuItemShow = new System.Windows.Forms.ToolStripMenuItem();
             trayMenuItemExit = new System.Windows.Forms.ToolStripMenuItem();
-            groupBox1 = new System.Windows.Forms.GroupBox();
-            powerApplyButton = new System.Windows.Forms.Button();
-            frequencyTextBox = new System.Windows.Forms.TextBox();
-            label1 = new System.Windows.Forms.Label();
-            eppLabel = new System.Windows.Forms.Label();
-            eppTrackBar = new System.Windows.Forms.TrackBar();
             fanControlGroupBox = new System.Windows.Forms.GroupBox();
             manuButton = new System.Windows.Forms.RadioButton();
             autoButton = new System.Windows.Forms.RadioButton();
@@ -66,8 +60,6 @@ namespace DellFanManagement.App
             temperatureGroupBox.SuspendLayout();
             systemMonitorGroupBox.SuspendLayout();
             trayContextMenu.SuspendLayout();
-            groupBox1.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)eppTrackBar).BeginInit();
             fanControlGroupBox.SuspendLayout();
             SuspendLayout();
             // 
@@ -198,7 +190,7 @@ namespace DellFanManagement.App
             systemMonitorGroupBox.Controls.Add(memoryLabel);
             systemMonitorGroupBox.Location = new System.Drawing.Point(12, 152);
             systemMonitorGroupBox.Name = "systemMonitorGroupBox";
-            systemMonitorGroupBox.Size = new System.Drawing.Size(175, 98);
+            systemMonitorGroupBox.Size = new System.Drawing.Size(175, 84);
             systemMonitorGroupBox.TabIndex = 15;
             systemMonitorGroupBox.TabStop = false;
             systemMonitorGroupBox.Text = "系统监测:";
@@ -233,9 +225,9 @@ namespace DellFanManagement.App
             // statusStrip
             // 
             statusStrip.ImageScalingSize = new System.Drawing.Size(32, 32);
-            statusStrip.Location = new System.Drawing.Point(0, 253);
+            statusStrip.Location = new System.Drawing.Point(0, 249);
             statusStrip.Name = "statusStrip";
-            statusStrip.Size = new System.Drawing.Size(524, 22);
+            statusStrip.Size = new System.Drawing.Size(329, 22);
             statusStrip.TabIndex = 13;
             // 
             // trayIcon
@@ -263,76 +255,13 @@ namespace DellFanManagement.App
             trayMenuItemExit.Size = new System.Drawing.Size(146, 22);
             trayMenuItemExit.Text = "退出";
             // 
-            // groupBox1
-            // 
-            groupBox1.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right;
-            groupBox1.Controls.Add(powerApplyButton);
-            groupBox1.Controls.Add(frequencyTextBox);
-            groupBox1.Controls.Add(label1);
-            groupBox1.Controls.Add(eppLabel);
-            groupBox1.Controls.Add(eppTrackBar);
-            groupBox1.Location = new System.Drawing.Point(320, 12);
-            groupBox1.Name = "groupBox1";
-            groupBox1.Size = new System.Drawing.Size(192, 238);
-            groupBox1.TabIndex = 14;
-            groupBox1.TabStop = false;
-            groupBox1.Text = "温度优化";
-            // 
-            // powerApplyButton
-            // 
-            powerApplyButton.Location = new System.Drawing.Point(8, 87);
-            powerApplyButton.Name = "powerApplyButton";
-            powerApplyButton.Size = new System.Drawing.Size(176, 23);
-            powerApplyButton.TabIndex = 4;
-            powerApplyButton.Text = "应用";
-            powerApplyButton.UseVisualStyleBackColor = true;
-            // 
-            // frequencyTextBox
-            // 
-            frequencyTextBox.Location = new System.Drawing.Point(86, 44);
-            frequencyTextBox.Name = "frequencyTextBox";
-            frequencyTextBox.Size = new System.Drawing.Size(100, 23);
-            frequencyTextBox.TabIndex = 3;
-            // 
-            // label1
-            // 
-            label1.AutoSize = true;
-            label1.Location = new System.Drawing.Point(8, 50);
-            label1.Name = "label1";
-            label1.Size = new System.Drawing.Size(59, 17);
-            label1.TabIndex = 2;
-            label1.Text = "最大频率:";
-            // 
-            // eppLabel
-            // 
-            eppLabel.AutoSize = true;
-            eppLabel.Location = new System.Drawing.Point(8, 25);
-            eppLabel.Name = "eppLabel";
-            eppLabel.Size = new System.Drawing.Size(60, 17);
-            eppLabel.TabIndex = 1;
-            eppLabel.Text = "EPP 调教:";
-            // 
-            // eppTrackBar
-            // 
-            eppTrackBar.Anchor = System.Windows.Forms.AnchorStyles.None;
-            eppTrackBar.AutoSize = false;
-            eppTrackBar.BackColor = System.Drawing.SystemColors.ButtonFace;
-            eppTrackBar.Location = new System.Drawing.Point(84, 11);
-            eppTrackBar.Margin = new System.Windows.Forms.Padding(0);
-            eppTrackBar.Maximum = 100;
-            eppTrackBar.Name = "eppTrackBar";
-            eppTrackBar.Size = new System.Drawing.Size(100, 20);
-            eppTrackBar.TabIndex = 0;
-            eppTrackBar.TickStyle = System.Windows.Forms.TickStyle.None;
-            eppTrackBar.Value = 50;
-            // 
             // fanControlGroupBox
             // 
             fanControlGroupBox.Controls.Add(manuButton);
             fanControlGroupBox.Controls.Add(autoButton);
             fanControlGroupBox.Location = new System.Drawing.Point(193, 152);
             fanControlGroupBox.Name = "fanControlGroupBox";
-            fanControlGroupBox.Size = new System.Drawing.Size(122, 98);
+            fanControlGroupBox.Size = new System.Drawing.Size(122, 84);
             fanControlGroupBox.TabIndex = 16;
             fanControlGroupBox.TabStop = false;
             fanControlGroupBox.Text = "风扇控制:";
@@ -367,9 +296,8 @@ namespace DellFanManagement.App
             AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
             BackColor = System.Drawing.Color.White;
             BackgroundImageLayout = System.Windows.Forms.ImageLayout.None;
-            ClientSize = new System.Drawing.Size(524, 275);
+            ClientSize = new System.Drawing.Size(329, 271);
             Controls.Add(fanControlGroupBox);
-            Controls.Add(groupBox1);
             Controls.Add(systemMonitorGroupBox);
             Controls.Add(statusStrip);
             Controls.Add(temperatureGroupBox);
@@ -378,9 +306,9 @@ namespace DellFanManagement.App
             ForeColor = System.Drawing.SystemColors.ControlText;
             Icon = (System.Drawing.Icon)resources.GetObject("$this.Icon");
             MaximizeBox = false;
-            MaximumSize = new System.Drawing.Size(540, 314);
+            MaximumSize = new System.Drawing.Size(345, 310);
             MinimizeBox = false;
-            MinimumSize = new System.Drawing.Size(540, 314);
+            MinimumSize = new System.Drawing.Size(345, 310);
             Name = "DellFanManagementGuiForm";
             Text = "Dell 风扇管理";
             fansGroupBox.ResumeLayout(false);
@@ -392,9 +320,6 @@ namespace DellFanManagement.App
             systemMonitorGroupBox.ResumeLayout(false);
             systemMonitorGroupBox.PerformLayout();
             trayContextMenu.ResumeLayout(false);
-            groupBox1.ResumeLayout(false);
-            groupBox1.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)eppTrackBar).EndInit();
             fanControlGroupBox.ResumeLayout(false);
             fanControlGroupBox.PerformLayout();
             ResumeLayout(false);
@@ -424,12 +349,6 @@ namespace DellFanManagement.App
         private System.Windows.Forms.ContextMenuStrip trayContextMenu;
         private System.Windows.Forms.ToolStripMenuItem trayMenuItemShow;
         private System.Windows.Forms.ToolStripMenuItem trayMenuItemExit;
-        private System.Windows.Forms.GroupBox groupBox1;
-        private System.Windows.Forms.TrackBar eppTrackBar;
-        private System.Windows.Forms.Label eppLabel;
-        private System.Windows.Forms.Label label1;
-        private System.Windows.Forms.TextBox frequencyTextBox;
-        private System.Windows.Forms.Button powerApplyButton;
         private System.Windows.Forms.GroupBox fanControlGroupBox;
         private System.Windows.Forms.RadioButton manuButton;
         private System.Windows.Forms.RadioButton autoButton;
