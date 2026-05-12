@@ -73,32 +73,32 @@ namespace DellFanManagement.App
         /// <summary>
         /// 手动模式下触发禁用睿频的CPU温度阈值（默认90度）
         /// </summary>
-        public int EcAutoTriggerCpuTemp { get; private set; } = 90;
+        public int TriggerCpuTemp { get; private set; } = 90;
 
         /// <summary>
         /// 手动模式下触发禁用睿频的GPU温度阈值（默认80度）
         /// </summary>
-        public int EcAutoTriggerGpuTemp { get; private set; } = 80;
+        public int TriggerGpuTemp { get; private set; } = 80;
 
         /// <summary>
         /// 恢复睿频的CPU温度上限（默认80度）
         /// </summary>
-        public int EcAutoRecoveryCpuTemp { get; private set; } = 80;
+        public int RecoveryCpuTemp { get; private set; } = 80;
 
         /// <summary>
         /// 恢复睿频的GPU温度上限（默认70度）
         /// </summary>
-        public int EcAutoRecoveryGpuTemp { get; private set; } = 70;
+        public int RecoveryGpuTemp { get; private set; } = 70;
 
         /// <summary>
         /// 恢复睿频前需要持续满足低温条件的秒数（默认20秒）
         /// </summary>
-        public int EcAutoRecoveryDurationSeconds { get; private set; } = 20;
+        public int RecoveryDurationSeconds { get; private set; } = 20;
 
         /// <summary>
         /// 持续低温计数器（用于恢复手动模式）
         /// </summary>
-        private int _ecAutoRecoveryCounter = 0;
+        private int _recoveryCounter = 0;
 
         public TrayIconColor TrayIconColor { get; set; }
 
@@ -145,7 +145,7 @@ namespace DellFanManagement.App
         /// <summary>
         /// 是否因为高温而禁用了睿频
         /// </summary>
-        private bool _ecAutoOverrideByTemperature;
+        private bool _overrideByTemperature;
 
         /// <summary>
         /// Constructor.
@@ -164,7 +164,7 @@ namespace DellFanManagement.App
             _fan1LevelRequested = null;
             _fan2LevelRequested = null;
 
-            _ecAutoOverrideByTemperature = false;
+            _overrideByTemperature = false;
 
             TrayIconColor = TrayIconColor.Gray;
 
@@ -312,23 +312,23 @@ namespace DellFanManagement.App
                     int gpuTemp = GetGpuTemperature();
 
                     // Handle turbo boost state changes.
-                    if (_ecAutoOverrideByTemperature)
+                    if (_overrideByTemperature)
                     {
                         // 当前因为高温而禁用了睿频
                         if (_fanMode == FanMode.Manual)
                         {
                             // 用户还是手动模式，检查温度是否降低
-                            bool cpuCooled = cpuTemp < 0 || cpuTemp < EcAutoRecoveryCpuTemp;
-                            bool gpuCooled = gpuTemp < 0 || gpuTemp < EcAutoRecoveryGpuTemp;
+                            bool cpuCooled = cpuTemp < 0 || cpuTemp < RecoveryCpuTemp;
+                            bool gpuCooled = gpuTemp < 0 || gpuTemp < RecoveryGpuTemp;
                             if (cpuCooled && gpuCooled)
                             {
-                                _ecAutoRecoveryCounter++;
-                                if (_ecAutoRecoveryCounter >= EcAutoRecoveryDurationSeconds)
+                                _recoveryCounter++;
+                                if (_recoveryCounter >= RecoveryDurationSeconds)
                                 {
                                     // 持续低温达到设定时间，恢复睿频
                                     CpuPowerManager.SetGuid(CpuPowerManager.GUID_PROCESSOR_TURBOBOOST, 2);
-                                    _ecAutoOverrideByTemperature = false;
-                                    _ecAutoRecoveryCounter = 0;
+                                    _overrideByTemperature = false;
+                                    _recoveryCounter = 0;
                                     _temperatureCheckCounter = 0;
 
                                     // 重置风扇级别状态，强制重新应用温度控制
@@ -336,15 +336,15 @@ namespace DellFanManagement.App
                                     _state.Fan2Level = null;
 
                                     ApplyTemperatureBasedFanControl();
-                                    Log.Write($"Temperature stayed below recovery thresholds for {EcAutoRecoveryDurationSeconds}s, restored turbo boost");
+                                    Log.Write($"Temperature stayed below recovery thresholds for {RecoveryDurationSeconds}s, restored turbo boost");
                                 }
                             }
                             else
                             {
                                 // 温度又升高了，重置计数器
-                                if (_ecAutoRecoveryCounter > 0)
+                                if (_recoveryCounter > 0)
                                 {
-                                    _ecAutoRecoveryCounter = 0;
+                                    _recoveryCounter = 0;
                                     Log.Write("Temperature rose again, resetting recovery counter");
                                 }
                             }
@@ -353,8 +353,8 @@ namespace DellFanManagement.App
                         {
                             // 用户切换到了自动模式，清除覆盖标记并恢复睿频
                             CpuPowerManager.SetGuid(CpuPowerManager.GUID_PROCESSOR_TURBOBOOST, 2);
-                            _ecAutoOverrideByTemperature = false;
-                            _ecAutoRecoveryCounter = 0;
+                            _overrideByTemperature = false;
+                            _recoveryCounter = 0;
                             _state.FanMode = FanMode.Automatic;
                         }
                     }
@@ -393,14 +393,14 @@ namespace DellFanManagement.App
                     if (!_state.EcFanControlEnabled && IsAutomaticFanControlDisableSupported && IsSpecificFanControlSupported)
                     {
                         // 检查是否需要因为高温而禁用睿频
-                        bool cpuHot = cpuTemp >= EcAutoTriggerCpuTemp;
-                        bool gpuHot = gpuTemp >= EcAutoTriggerGpuTemp;
+                        bool cpuHot = cpuTemp >= TriggerCpuTemp;
+                        bool gpuHot = gpuTemp >= TriggerGpuTemp;
                         if (cpuHot || gpuHot)
                         {
                             Log.Write($"High temperature detected (CPU: {cpuTemp}°C, GPU: {gpuTemp}°C), disabling turbo boost");
                             CpuPowerManager.SetGuid(CpuPowerManager.GUID_PROCESSOR_TURBOBOOST, 0);
-                            _ecAutoOverrideByTemperature = true;
-                            _ecAutoRecoveryCounter = 0;
+                            _overrideByTemperature = true;
+                            _recoveryCounter = 0;
                         }
                         else
                         {
