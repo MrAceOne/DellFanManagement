@@ -279,8 +279,9 @@ namespace DellFanManagement.App
             manuButton.UseVisualStyleBackColor = true;
             // 
             // autoButton
-            // 
+            //
             autoButton.AutoSize = true;
+            autoButton.Checked = true;
             autoButton.Font = new System.Drawing.Font("Microsoft YaHei UI", 8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
             autoButton.Location = new System.Drawing.Point(6, 22);
             autoButton.Name = "autoButton";
