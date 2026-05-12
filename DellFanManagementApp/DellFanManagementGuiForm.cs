@@ -310,9 +310,6 @@ namespace DellFanManagement.App
                 }
             }
 
-            // 根据风扇模式同步散热管理的可用状态
-            SetThermalSettingAvaiability(_state.FanMode == FanMode.Automatic);
-
             // Error message.
             if (_state.Error != null)
             {
