@@ -252,7 +252,11 @@ namespace DellFanManagement.App
             if (monitorData.CpuTemperature.HasValue)
             {
                 int cpuTemp = monitorData.CpuTemperature.Value;
-                Temperatures[TemperatureComponent.CPU] = new Dictionary<string, int> { { "CPU", cpuTemp } };
+                if (!Temperatures.ContainsKey(TemperatureComponent.CPU))
+                {
+                    Temperatures[TemperatureComponent.CPU] = new Dictionary<string, int>();
+                }
+                Temperatures[TemperatureComponent.CPU]["CPU"] = cpuTemp;
 
                 if (!MinimumTemperatures.ContainsKey(TemperatureComponent.CPU))
                 {
@@ -277,7 +281,11 @@ namespace DellFanManagement.App
             if (monitorData.GpuTemperature.HasValue)
             {
                 int gpuTemp = monitorData.GpuTemperature.Value;
-                Temperatures[TemperatureComponent.GPU] = new Dictionary<string, int> { { "GPU", gpuTemp } };
+                if (!Temperatures.ContainsKey(TemperatureComponent.GPU))
+                {
+                    Temperatures[TemperatureComponent.GPU] = new Dictionary<string, int>();
+                }
+                Temperatures[TemperatureComponent.GPU]["GPU"] = gpuTemp;
 
                 if (!MinimumTemperatures.ContainsKey(TemperatureComponent.GPU))
                 {
@@ -466,7 +474,7 @@ namespace DellFanManagement.App
         /// <summary>
         /// Current temperatures.
         /// </summary>
-        public Dictionary<TemperatureComponent, IReadOnlyDictionary<string, int>> Temperatures { get; private set; }
+        public Dictionary<TemperatureComponent, Dictionary<string, int>> Temperatures { get; private set; }
 
         /// <summary>
         /// Minimum temperatures.

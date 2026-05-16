@@ -226,7 +226,7 @@ namespace DellFanManagement.App
                 }
             }
             string cpuFreqStr = _state.CpuFrequency.HasValue
-                ? string.Format(" {0:F1}GHz", _state.CpuFrequency.Value / 1000.0)
+                ? string.Format(" {0:F1} GHz", _state.CpuFrequency.Value / 1000.0)
                 : " --";
             cpuFrequencyLabel.Text = string.Format("CPU: {0}{1}{2}", cpuTempStr, cpuMinMax, cpuFreqStr);
 
@@ -244,7 +244,7 @@ namespace DellFanManagement.App
                 }
             }
             string gpuFreqStr = _state.GpuFrequency.HasValue
-                ? string.Format(" {0:F1}GHz", _state.GpuFrequency.Value / 1000.0)
+                ? string.Format(" {0:F1} GHz", _state.GpuFrequency.Value / 1000.0)
                 : " --";
             gpuFrequencyLabel.Text = string.Format("GPU: {0}{1}{2}", gpuTempStr, gpuMinMax, gpuFreqStr);
 

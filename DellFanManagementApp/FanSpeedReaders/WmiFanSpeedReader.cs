@@ -26,19 +26,22 @@ namespace DellFanManagement.App.FanSpeedReaders
             {
                 foreach (ManagementObject managementObject in searcher.Get())
                 {
-                    if (managementObject.GetPropertyValue("ElementName").ToString().ToLower().StartsWith("fan"))
+                    using (managementObject)
                     {
-                        // Found a fan sensor.
-                        if (FanSensor1Searcher == null)
+                        if (managementObject.GetPropertyValue("ElementName").ToString().ToLower().StartsWith("fan"))
                         {
-                            Log.Write("Found WMI fan sensor 1");
-                            FanSensor1Searcher = new(Scope, new SelectQuery(string.Format("Select * FROM DCIM_NumericSensor WHERE DeviceID = '{0}'", managementObject.GetPropertyValue("DeviceID"))));
-                        }
-                        else
-                        {
-                            Log.Write("Found WMI fan sensor 2");
-                            FanSensor2Searcher = new(Scope, new SelectQuery(string.Format("Select * FROM DCIM_NumericSensor WHERE DeviceID = '{0}'", managementObject.GetPropertyValue("DeviceID"))));
-                            break;
+                            // Found a fan sensor.
+                            if (FanSensor1Searcher == null)
+                            {
+                                Log.Write("Found WMI fan sensor 1");
+                                FanSensor1Searcher = new(Scope, new SelectQuery(string.Format("Select * FROM DCIM_NumericSensor WHERE DeviceID = '{0}'", managementObject.GetPropertyValue("DeviceID"))));
+                            }
+                            else
+                            {
+                                Log.Write("Found WMI fan sensor 2");
+                                FanSensor2Searcher = new(Scope, new SelectQuery(string.Format("Select * FROM DCIM_NumericSensor WHERE DeviceID = '{0}'", managementObject.GetPropertyValue("DeviceID"))));
+                                break;
+                            }
                         }
                     }
                 }
@@ -58,9 +61,12 @@ namespace DellFanManagement.App.FanSpeedReaders
             {
                 foreach (ManagementObject fanSensor in FanSensor1Searcher.Get())
                 {
-                    if (uint.TryParse(fanSensor.GetPropertyValue("CurrentReading")?.ToString(), out uint value))
+                    using (fanSensor)
                     {
-                        rpm1 = value;
+                        if (uint.TryParse(fanSensor.GetPropertyValue("CurrentReading")?.ToString(), out uint value))
+                        {
+                            rpm1 = value;
+                        }
                     }
                     break;
                 }
@@ -70,9 +76,12 @@ namespace DellFanManagement.App.FanSpeedReaders
             {
                 foreach (ManagementObject fanSensor in FanSensor2Searcher.Get())
                 {
-                    if (uint.TryParse(fanSensor.GetPropertyValue("CurrentReading")?.ToString(), out uint value))
+                    using (fanSensor)
                     {
-                        rpm2 = value;
+                        if (uint.TryParse(fanSensor.GetPropertyValue("CurrentReading")?.ToString(), out uint value))
+                        {
+                            rpm2 = value;
+                        }
                     }
                     break;
                 }

@@ -3,7 +3,7 @@
     /// <summary>
     /// An object for holding the speeds of both system fans.
     /// </summary>
-    public class FanSpeeds
+    public struct FanSpeeds
     {
         /// <summary>
         /// Speed of fan 1.

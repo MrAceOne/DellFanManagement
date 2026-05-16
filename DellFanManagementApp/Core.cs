@@ -165,6 +165,11 @@ namespace DellFanManagement.App
             _requestSemaphore = new(1, 1);
             _configurationStore = new ConfigurationStore();
 
+            // Cache fan controller capabilities (do not change during runtime)
+            IsAutomaticFanControlDisableSupported = _fanController.IsAutomaticFanControlDisableSupported;
+            IsSpecificFanControlSupported = _fanController.IsSpecificFanControlSupported;
+            IsIndividualFanControlSupported = _fanController.IsIndividualFanControlSupported;
+
             RequestedThermalSetting = null;
             _fan1LevelRequested = null;
             _fan2LevelRequested = null;
@@ -325,7 +330,6 @@ namespace DellFanManagement.App
                     }
                     _state.WaitOne();
                     _state.EcFanControlEnabled = true;
-                    _state.FanMode = FanMode.Automatic;
                     _state.Release();
                     Log.Write("Started in automatic mode – enabled EC fan control");
                 }
@@ -337,7 +341,6 @@ namespace DellFanManagement.App
                     }
                     _state.WaitOne();
                     _state.EcFanControlEnabled = false;
-                    _state.FanMode = FanMode.Manual;
 
                     // 手动模式启动后立即应用一次温度控制
                     if (IsAutomaticFanControlDisableSupported && IsSpecificFanControlSupported)
@@ -352,6 +355,9 @@ namespace DellFanManagement.App
                 // 强制同步UI，确保启动后立即显示正确模式
                 UpdateForm();
 
+                int cpuTemp = -1;
+                int gpuTemp = -1;
+
                 while (_state.BackgroundThreadRunning)
                 {
                     _state.WaitOne();
@@ -359,8 +365,6 @@ namespace DellFanManagement.App
                     releaseSemaphore = true;
 
                     bool windowVisible = _state.WindowVisible;
-                    int cpuTemp;
-                    int gpuTemp;
 
                     // 窗口隐藏到托盘时的处理逻辑
                     if (!windowVisible)
@@ -383,9 +387,7 @@ namespace DellFanManagement.App
                             // 仅应用基于温度的风扇控制（高温保护）
                             if (!_state.EcFanControlEnabled && IsAutomaticFanControlDisableSupported && IsSpecificFanControlSupported)
                             {
-                                bool cpuHot = cpuTemp >= TriggerCpuTemp;
-                                bool gpuHot = gpuTemp >= TriggerGpuTemp;
-                                if (_turboBoostEnabled && (cpuHot || gpuHot))
+                                if (_turboBoostEnabled && (cpuTemp >= TriggerCpuTemp || gpuTemp >= TriggerGpuTemp))
                                 {
                                     Log.Write($"High temperature detected (CPU: {cpuTemp}°C, GPU: {gpuTemp}°C), disabling turbo boost");
                                     CpuPowerManager.SetGuid(CpuPowerManager.GUID_PROCESSOR_TURBOBOOST, 0);
@@ -394,9 +396,7 @@ namespace DellFanManagement.App
                                 }
                                 else if (_overrideByTemperature)
                                 {
-                                    bool cpuCooled = cpuTemp < 0 || cpuTemp < RecoveryCpuTemp;
-                                    bool gpuCooled = gpuTemp < 0 || gpuTemp < RecoveryGpuTemp;
-                                    if (cpuCooled && gpuCooled)
+                                    if ((cpuTemp < 0 || cpuTemp < RecoveryCpuTemp) && (gpuTemp < 0 || gpuTemp < RecoveryGpuTemp))
                                     {
                                         _recoveryCounter++;
                                         if (_recoveryCounter >= RecoveryDurationSeconds)
@@ -458,9 +458,7 @@ namespace DellFanManagement.App
                         else if (_fanMode == FanMode.Manual)
                         {
                             // 用户还是手动模式，检查温度是否降低
-                            bool cpuCooled = cpuTemp < 0 || cpuTemp < RecoveryCpuTemp;
-                            bool gpuCooled = gpuTemp < 0 || gpuTemp < RecoveryGpuTemp;
-                            if (cpuCooled && gpuCooled)
+                            if ((cpuTemp < 0 || cpuTemp < RecoveryCpuTemp) && (gpuTemp < 0 || gpuTemp < RecoveryGpuTemp))
                             {
                                 _recoveryCounter++;
                                 if (_recoveryCounter >= RecoveryDurationSeconds)
@@ -495,7 +493,6 @@ namespace DellFanManagement.App
                             CpuPowerManager.SetGuid(CpuPowerManager.GUID_PROCESSOR_TURBOBOOST, 2);
                             _overrideByTemperature = false;
                             _recoveryCounter = 0;
-                            _state.FanMode = FanMode.Automatic;
                         }
                     }
                     else
@@ -504,7 +501,6 @@ namespace DellFanManagement.App
                         if (_fanMode == FanMode.Automatic && !_state.EcFanControlEnabled)
                         {
                             _state.EcFanControlEnabled = true;
-                            _state.FanMode = FanMode.Automatic;
                             _fanController.EnableAutomaticFanControl();
                             Log.Write("Enabled EC fan control – automatic mode");
 
@@ -516,7 +512,6 @@ namespace DellFanManagement.App
                         else if (_fanMode == FanMode.Manual && _state.EcFanControlEnabled)
                         {
                             _state.EcFanControlEnabled = false;
-                            _state.FanMode = FanMode.Manual;
                             _fanController.DisableAutomaticFanControl();
                             Log.Write("Disabled EC fan control – manual mode");
 
@@ -533,9 +528,7 @@ namespace DellFanManagement.App
                     if (!_state.EcFanControlEnabled && IsAutomaticFanControlDisableSupported && IsSpecificFanControlSupported)
                     {
                         // 检查是否需要因为高温而禁用睿频
-                        bool cpuHot = cpuTemp >= TriggerCpuTemp;
-                        bool gpuHot = gpuTemp >= TriggerGpuTemp;
-                        if (_turboBoostEnabled && (cpuHot || gpuHot))
+                        if (_turboBoostEnabled && (cpuTemp >= TriggerCpuTemp || gpuTemp >= TriggerGpuTemp))
                         {
                             Log.Write($"High temperature detected (CPU: {cpuTemp}°C, GPU: {gpuTemp}°C), disabling turbo boost");
                             CpuPowerManager.SetGuid(CpuPowerManager.GUID_PROCESSOR_TURBOBOOST, 0);
@@ -546,9 +539,7 @@ namespace DellFanManagement.App
                         {
                             // 原有逻辑：基于配置阈值的温度控制
                             _temperatureCheckCounter++;
-                            bool shouldCheckTemperature = _temperatureCheckCounter >= CheckIntervalSeconds;
-
-                            if (shouldCheckTemperature)
+                            if (_temperatureCheckCounter >= CheckIntervalSeconds)
                             {
                                 _temperatureCheckCounter = 0;
                                 ApplyTemperatureBasedFanControl();
@@ -843,27 +834,18 @@ namespace DellFanManagement.App
         }
 
         /// <summary>
-        /// Whether or not the system's automatic fan control can be specifically engaged and disengaged.
+        /// Cached: Whether or not the system's automatic fan control can be specifically engaged and disengaged.
         /// </summary>
-        public bool IsAutomaticFanControlDisableSupported
-        {
-            get { return _fanController.IsAutomaticFanControlDisableSupported; }
-        }
+        public bool IsAutomaticFanControlDisableSupported { get; }
 
         /// <summary>
-        /// Whether or not the system fans can be set to run at a specific level.
+        /// Cached: Whether or not the system fans can be set to run at a specific level.
         /// </summary>
-        public bool IsSpecificFanControlSupported
-        {
-            get { return _fanController.IsSpecificFanControlSupported; }
-        }
+        public bool IsSpecificFanControlSupported { get; }
 
         /// <summary>
-        /// Whether or not the system fans may be individually controlled.
+        /// Cached: Whether or not the system fans may be individually controlled.
         /// </summary>
-        public bool IsIndividualFanControlSupported
-        {
-            get { return _fanController.IsIndividualFanControlSupported; }
-        }
+        public bool IsIndividualFanControlSupported { get; }
     }
 }

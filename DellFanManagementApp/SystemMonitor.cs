@@ -156,16 +156,13 @@ namespace DellFanManagement.App
                     GetMemoryInfo(_reusableData);
 
                     // Copy to lastData for fallback
-                    _lastData = new SystemMonitorData
-                    {
-                        CpuFrequency = _reusableData.CpuFrequency,
-                        GpuFrequency = _reusableData.GpuFrequency,
-                        MemoryUsagePercent = _reusableData.MemoryUsagePercent,
-                        UsedMemoryMB = _reusableData.UsedMemoryMB,
-                        TotalMemoryMB = _reusableData.TotalMemoryMB,
-                        CpuTemperature = _reusableData.CpuTemperature,
-                        GpuTemperature = _reusableData.GpuTemperature
-                    };
+                    _lastData.CpuFrequency = _reusableData.CpuFrequency;
+                    _lastData.GpuFrequency = _reusableData.GpuFrequency;
+                    _lastData.MemoryUsagePercent = _reusableData.MemoryUsagePercent;
+                    _lastData.UsedMemoryMB = _reusableData.UsedMemoryMB;
+                    _lastData.TotalMemoryMB = _reusableData.TotalMemoryMB;
+                    _lastData.CpuTemperature = _reusableData.CpuTemperature;
+                    _lastData.GpuTemperature = _reusableData.GpuTemperature;
                 }
                 catch (Exception ex)
                 {
@@ -279,13 +276,9 @@ namespace DellFanManagement.App
                 }
                 else
                 {
-                    // 如果性能计数器不可用，使用系统信息作为最后备选
-                    var computerInfo = new Microsoft.VisualBasic.Devices.ComputerInfo();
-                    ulong totalMemoryBytes = computerInfo.TotalPhysicalMemory;
-                    long totalMemoryMB = (long)(totalMemoryBytes / (1024 * 1024));
-                    
-                    data.TotalMemoryMB = totalMemoryMB;
-                    data.UsedMemoryMB = totalMemoryMB;
+                    // 如果性能计数器不可用，使用缓存的总内存作为最后备选
+                    data.TotalMemoryMB = _cachedTotalMemoryMB;
+                    data.UsedMemoryMB = _cachedTotalMemoryMB;
                     data.MemoryUsagePercent = 100.0f;
                 }
             }
