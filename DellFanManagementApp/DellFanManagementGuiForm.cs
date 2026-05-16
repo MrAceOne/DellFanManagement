@@ -128,10 +128,6 @@ namespace DellFanManagement.App
             turboBoostCheckBox.CheckedChanged += new EventHandler(TurboBoostCheckBoxChangedEventHandler);
             autoStartCheckBox.CheckedChanged += new EventHandler(AutoStartCheckBoxChangedEventHandler);
 
-            // Empty out pre-populated temperature label text fields.
-            temperatureLabel1.Text = string.Empty;
-            temperatureLabel2.Text = string.Empty;
-
             // Initial update of the tray icon (required for it to appear for display).
             UpdateTrayIcon(false);
 
@@ -216,43 +212,43 @@ namespace DellFanManagement.App
                 fan2RpmLabel.Enabled = false;
             }
 
-            // Temperatures.
-            int labelIndex = 0;
-            foreach (TemperatureComponent component in _state.Temperatures.Keys)
+            // 构建 CPU 综合信息：温度 (最小-最大) 频率
+            string cpuTempStr = "--";
+            string cpuMinMax = "";
+            if (_state.Temperatures.ContainsKey(TemperatureComponent.CPU) && _state.Temperatures[TemperatureComponent.CPU].ContainsKey("CPU"))
             {
-                foreach (string key in _state.Temperatures[component].Keys)
+                int temp = _state.Temperatures[TemperatureComponent.CPU]["CPU"];
+                cpuTempStr = temp != 0 ? temp.ToString() : "--";
+                if (_state.MinimumTemperatures.ContainsKey(TemperatureComponent.CPU) && _state.MinimumTemperatures[TemperatureComponent.CPU].ContainsKey("CPU")
+                    && _state.MaximumTemperatures.ContainsKey(TemperatureComponent.CPU) && _state.MaximumTemperatures[TemperatureComponent.CPU].ContainsKey("CPU"))
                 {
-                    string temperature = _state.Temperatures[component][key] != 0 ? _state.Temperatures[component][key].ToString() : "--";
-
-                    string labelValue;
-                    if (_state.MinimumTemperatures[component].ContainsKey(key) && _state.MaximumTemperatures[component].ContainsKey(key))
-                    {
-                        labelValue = string.Format("{0}: {1} ({2}-{3})", key, temperature, _state.MinimumTemperatures[component][key], _state.MaximumTemperatures[component][key]);
-                    }
-                    else
-                    {
-                        labelValue = string.Format("{0}: {1}", key, temperature);
-                    }
-
-                    switch (labelIndex)
-                    {
-                        case 0: temperatureLabel1.Text = labelValue; break;
-                        case 1: temperatureLabel2.Text = labelValue; break;
-                    }
-
-                    labelIndex++;
+                    cpuMinMax = string.Format(" ({0}-{1})", _state.MinimumTemperatures[TemperatureComponent.CPU]["CPU"], _state.MaximumTemperatures[TemperatureComponent.CPU]["CPU"]);
                 }
             }
+            string cpuFreqStr = _state.CpuFrequency.HasValue
+                ? string.Format(" {0:F1}GHz", _state.CpuFrequency.Value / 1000.0)
+                : " --";
+            cpuFrequencyLabel.Text = string.Format("CPU: {0}{1}{2}", cpuTempStr, cpuMinMax, cpuFreqStr);
 
-            // System monitor data
-            cpuFrequencyLabel.Text = _state.CpuFrequency.HasValue
-                ? string.Format("CPU 频率: {0:F1} GHz", _state.CpuFrequency.Value / 1000.0)
-                : "CPU 频率: --";
+            // 构建 GPU 综合信息：温度 (最小-最大) 频率
+            string gpuTempStr = "--";
+            string gpuMinMax = "";
+            if (_state.Temperatures.ContainsKey(TemperatureComponent.GPU) && _state.Temperatures[TemperatureComponent.GPU].ContainsKey("GPU"))
+            {
+                int temp = _state.Temperatures[TemperatureComponent.GPU]["GPU"];
+                gpuTempStr = temp != 0 ? temp.ToString() : "--";
+                if (_state.MinimumTemperatures.ContainsKey(TemperatureComponent.GPU) && _state.MinimumTemperatures[TemperatureComponent.GPU].ContainsKey("GPU")
+                    && _state.MaximumTemperatures.ContainsKey(TemperatureComponent.GPU) && _state.MaximumTemperatures[TemperatureComponent.GPU].ContainsKey("GPU"))
+                {
+                    gpuMinMax = string.Format(" ({0}-{1})", _state.MinimumTemperatures[TemperatureComponent.GPU]["GPU"], _state.MaximumTemperatures[TemperatureComponent.GPU]["GPU"]);
+                }
+            }
+            string gpuFreqStr = _state.GpuFrequency.HasValue
+                ? string.Format(" {0:F1}GHz", _state.GpuFrequency.Value / 1000.0)
+                : " --";
+            gpuFrequencyLabel.Text = string.Format("GPU: {0}{1}{2}", gpuTempStr, gpuMinMax, gpuFreqStr);
 
-            gpuFrequencyLabel.Text = _state.GpuFrequency.HasValue
-                ? string.Format("GPU 频率: {0:F1} GHz", _state.GpuFrequency.Value / 1000.0)
-                : "GPU 频率: --";
-
+            // 内存信息（恢复百分比）
             if (_state.UsedMemoryMB.HasValue && _state.TotalMemoryMB.HasValue)
             {
                 float usedGB = _state.UsedMemoryMB.Value / 1024.0f;

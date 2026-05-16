@@ -40,9 +40,6 @@ namespace DellFanManagement.App
             thermalSettingRadioButtonQuiet = new System.Windows.Forms.RadioButton();
             thermalSettingRadioButtonCool = new System.Windows.Forms.RadioButton();
             thermalSettingRadioButtonOptimized = new System.Windows.Forms.RadioButton();
-            temperatureGroupBox = new System.Windows.Forms.GroupBox();
-            temperatureLabel2 = new System.Windows.Forms.Label();
-            temperatureLabel1 = new System.Windows.Forms.Label();
             systemMonitorGroupBox = new System.Windows.Forms.GroupBox();
             cpuFrequencyLabel = new System.Windows.Forms.Label();
             gpuFrequencyLabel = new System.Windows.Forms.Label();
@@ -53,13 +50,12 @@ namespace DellFanManagement.App
             trayMenuItemShow = new System.Windows.Forms.ToolStripMenuItem();
             trayMenuItemExit = new System.Windows.Forms.ToolStripMenuItem();
             fanControlGroupBox = new System.Windows.Forms.GroupBox();
+            autoStartCheckBox = new System.Windows.Forms.CheckBox();
+            turboBoostCheckBox = new System.Windows.Forms.CheckBox();
             manuButton = new System.Windows.Forms.RadioButton();
             autoButton = new System.Windows.Forms.RadioButton();
-            turboBoostCheckBox = new System.Windows.Forms.CheckBox();
-            autoStartCheckBox = new System.Windows.Forms.CheckBox();
             fansGroupBox.SuspendLayout();
             thermalSettingGroupBox.SuspendLayout();
-            temperatureGroupBox.SuspendLayout();
             systemMonitorGroupBox.SuspendLayout();
             trayContextMenu.SuspendLayout();
             fanControlGroupBox.SuspendLayout();
@@ -71,7 +67,7 @@ namespace DellFanManagement.App
             fansGroupBox.Controls.Add(fan1RpmLabel);
             fansGroupBox.Location = new System.Drawing.Point(12, 12);
             fansGroupBox.Name = "fansGroupBox";
-            fansGroupBox.Size = new System.Drawing.Size(175, 64);
+            fansGroupBox.Size = new System.Drawing.Size(175, 74);
             fansGroupBox.TabIndex = 1;
             fansGroupBox.TabStop = false;
             fansGroupBox.Text = "风扇:";
@@ -79,20 +75,20 @@ namespace DellFanManagement.App
             // fan2RpmLabel
             // 
             fan2RpmLabel.AutoSize = true;
-            fan2RpmLabel.Location = new System.Drawing.Point(6, 38);
+            fan2RpmLabel.Location = new System.Drawing.Point(6, 47);
             fan2RpmLabel.Name = "fan2RpmLabel";
-            fan2RpmLabel.Size = new System.Drawing.Size(130, 17);
+            fan2RpmLabel.Size = new System.Drawing.Size(87, 17);
             fan2RpmLabel.TabIndex = 2;
-            fan2RpmLabel.Text = "Fan 2 RPM: (no data)";
+            fan2RpmLabel.Text = "Fan 2 RPM: --";
             // 
             // fan1RpmLabel
             // 
             fan1RpmLabel.AutoSize = true;
-            fan1RpmLabel.Location = new System.Drawing.Point(6, 19);
+            fan1RpmLabel.Location = new System.Drawing.Point(6, 23);
             fan1RpmLabel.Name = "fan1RpmLabel";
-            fan1RpmLabel.Size = new System.Drawing.Size(130, 17);
+            fan1RpmLabel.Size = new System.Drawing.Size(87, 17);
             fan1RpmLabel.TabIndex = 1;
-            fan1RpmLabel.Text = "Fan 1 RPM: (no data)";
+            fan1RpmLabel.Text = "Fan 1 RPM: --";
             // 
             // thermalSettingGroupBox
             // 
@@ -100,9 +96,9 @@ namespace DellFanManagement.App
             thermalSettingGroupBox.Controls.Add(thermalSettingRadioButtonQuiet);
             thermalSettingGroupBox.Controls.Add(thermalSettingRadioButtonCool);
             thermalSettingGroupBox.Controls.Add(thermalSettingRadioButtonOptimized);
-            thermalSettingGroupBox.Location = new System.Drawing.Point(193, 12);
+            thermalSettingGroupBox.Location = new System.Drawing.Point(193, 92);
             thermalSettingGroupBox.Name = "thermalSettingGroupBox";
-            thermalSettingGroupBox.Size = new System.Drawing.Size(122, 134);
+            thermalSettingGroupBox.Size = new System.Drawing.Size(129, 84);
             thermalSettingGroupBox.TabIndex = 6;
             thermalSettingGroupBox.TabStop = false;
             thermalSettingGroupBox.Text = "散热管理:";
@@ -111,7 +107,7 @@ namespace DellFanManagement.App
             // 
             thermalSettingRadioButtonPerformance.AutoSize = true;
             thermalSettingRadioButtonPerformance.Font = new System.Drawing.Font("Microsoft YaHei UI", 8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-            thermalSettingRadioButtonPerformance.Location = new System.Drawing.Point(6, 99);
+            thermalSettingRadioButtonPerformance.Location = new System.Drawing.Point(69, 48);
             thermalSettingRadioButtonPerformance.Name = "thermalSettingRadioButtonPerformance";
             thermalSettingRadioButtonPerformance.Size = new System.Drawing.Size(47, 20);
             thermalSettingRadioButtonPerformance.TabIndex = 3;
@@ -123,7 +119,7 @@ namespace DellFanManagement.App
             // 
             thermalSettingRadioButtonQuiet.AutoSize = true;
             thermalSettingRadioButtonQuiet.Font = new System.Drawing.Font("Microsoft YaHei UI", 8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-            thermalSettingRadioButtonQuiet.Location = new System.Drawing.Point(6, 73);
+            thermalSettingRadioButtonQuiet.Location = new System.Drawing.Point(69, 22);
             thermalSettingRadioButtonQuiet.Name = "thermalSettingRadioButtonQuiet";
             thermalSettingRadioButtonQuiet.Size = new System.Drawing.Size(47, 20);
             thermalSettingRadioButtonQuiet.TabIndex = 2;
@@ -155,42 +151,13 @@ namespace DellFanManagement.App
             thermalSettingRadioButtonOptimized.Text = "优化";
             thermalSettingRadioButtonOptimized.UseVisualStyleBackColor = true;
             // 
-            // temperatureGroupBox
-            // 
-            temperatureGroupBox.Controls.Add(temperatureLabel2);
-            temperatureGroupBox.Controls.Add(temperatureLabel1);
-            temperatureGroupBox.Location = new System.Drawing.Point(12, 80);
-            temperatureGroupBox.Name = "temperatureGroupBox";
-            temperatureGroupBox.Size = new System.Drawing.Size(175, 66);
-            temperatureGroupBox.TabIndex = 4;
-            temperatureGroupBox.TabStop = false;
-            temperatureGroupBox.Text = "温度:";
-            // 
-            // temperatureLabel2
-            // 
-            temperatureLabel2.AutoSize = true;
-            temperatureLabel2.Location = new System.Drawing.Point(6, 42);
-            temperatureLabel2.Name = "temperatureLabel2";
-            temperatureLabel2.Size = new System.Drawing.Size(106, 17);
-            temperatureLabel2.TabIndex = 1;
-            temperatureLabel2.Text = "GPU: 50 (50-100)";
-            // 
-            // temperatureLabel1
-            // 
-            temperatureLabel1.AutoSize = true;
-            temperatureLabel1.Location = new System.Drawing.Point(6, 23);
-            temperatureLabel1.Name = "temperatureLabel1";
-            temperatureLabel1.Size = new System.Drawing.Size(105, 17);
-            temperatureLabel1.TabIndex = 0;
-            temperatureLabel1.Text = "CPU: 50 (50-100)";
-            // 
             // systemMonitorGroupBox
             // 
             systemMonitorGroupBox.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left;
             systemMonitorGroupBox.Controls.Add(cpuFrequencyLabel);
             systemMonitorGroupBox.Controls.Add(gpuFrequencyLabel);
             systemMonitorGroupBox.Controls.Add(memoryLabel);
-            systemMonitorGroupBox.Location = new System.Drawing.Point(12, 152);
+            systemMonitorGroupBox.Location = new System.Drawing.Point(12, 92);
             systemMonitorGroupBox.Name = "systemMonitorGroupBox";
             systemMonitorGroupBox.Size = new System.Drawing.Size(175, 84);
             systemMonitorGroupBox.TabIndex = 15;
@@ -202,18 +169,18 @@ namespace DellFanManagement.App
             cpuFrequencyLabel.AutoSize = true;
             cpuFrequencyLabel.Location = new System.Drawing.Point(6, 23);
             cpuFrequencyLabel.Name = "cpuFrequencyLabel";
-            cpuFrequencyLabel.Size = new System.Drawing.Size(77, 17);
+            cpuFrequencyLabel.Size = new System.Drawing.Size(49, 17);
             cpuFrequencyLabel.TabIndex = 0;
-            cpuFrequencyLabel.Text = "CPU 频率: --";
+            cpuFrequencyLabel.Text = "CPU: --";
             // 
             // gpuFrequencyLabel
             // 
             gpuFrequencyLabel.AutoSize = true;
             gpuFrequencyLabel.Location = new System.Drawing.Point(6, 42);
             gpuFrequencyLabel.Name = "gpuFrequencyLabel";
-            gpuFrequencyLabel.Size = new System.Drawing.Size(78, 17);
+            gpuFrequencyLabel.Size = new System.Drawing.Size(50, 17);
             gpuFrequencyLabel.TabIndex = 1;
-            gpuFrequencyLabel.Text = "GPU 频率: --";
+            gpuFrequencyLabel.Text = "GPU: --";
             // 
             // memoryLabel
             // 
@@ -225,11 +192,11 @@ namespace DellFanManagement.App
             memoryLabel.Text = "内存: --";
             // 
             // statusStrip
-            //
+            // 
             statusStrip.ImageScalingSize = new System.Drawing.Size(32, 32);
-            statusStrip.Location = new System.Drawing.Point(0, 249);
+            statusStrip.Location = new System.Drawing.Point(0, 188);
             statusStrip.Name = "statusStrip";
-            statusStrip.Size = new System.Drawing.Size(329, 22);
+            statusStrip.Size = new System.Drawing.Size(334, 22);
             statusStrip.TabIndex = 13;
             // 
             // trayIcon
@@ -258,17 +225,41 @@ namespace DellFanManagement.App
             trayMenuItemExit.Text = "退出";
             // 
             // fanControlGroupBox
-            //
+            // 
             fanControlGroupBox.Controls.Add(autoStartCheckBox);
             fanControlGroupBox.Controls.Add(turboBoostCheckBox);
             fanControlGroupBox.Controls.Add(manuButton);
             fanControlGroupBox.Controls.Add(autoButton);
-            fanControlGroupBox.Location = new System.Drawing.Point(193, 152);
+            fanControlGroupBox.Location = new System.Drawing.Point(193, 12);
             fanControlGroupBox.Name = "fanControlGroupBox";
-            fanControlGroupBox.Size = new System.Drawing.Size(122, 84);
+            fanControlGroupBox.Size = new System.Drawing.Size(129, 74);
             fanControlGroupBox.TabIndex = 16;
             fanControlGroupBox.TabStop = false;
             fanControlGroupBox.Text = "风扇控制:";
+            // 
+            // autoStartCheckBox
+            // 
+            autoStartCheckBox.AutoSize = true;
+            autoStartCheckBox.Font = new System.Drawing.Font("Microsoft YaHei UI", 8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            autoStartCheckBox.Location = new System.Drawing.Point(52, 23);
+            autoStartCheckBox.Name = "autoStartCheckBox";
+            autoStartCheckBox.Size = new System.Drawing.Size(70, 20);
+            autoStartCheckBox.TabIndex = 18;
+            autoStartCheckBox.Text = "开机启动";
+            autoStartCheckBox.UseVisualStyleBackColor = true;
+            // 
+            // turboBoostCheckBox
+            // 
+            turboBoostCheckBox.AutoSize = true;
+            turboBoostCheckBox.Checked = true;
+            turboBoostCheckBox.CheckState = System.Windows.Forms.CheckState.Checked;
+            turboBoostCheckBox.Font = new System.Drawing.Font("Microsoft YaHei UI", 8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            turboBoostCheckBox.Location = new System.Drawing.Point(52, 47);
+            turboBoostCheckBox.Name = "turboBoostCheckBox";
+            turboBoostCheckBox.Size = new System.Drawing.Size(70, 20);
+            turboBoostCheckBox.TabIndex = 17;
+            turboBoostCheckBox.Text = "睿频保护";
+            turboBoostCheckBox.UseVisualStyleBackColor = true;
             // 
             // manuButton
             // 
@@ -283,7 +274,7 @@ namespace DellFanManagement.App
             manuButton.UseVisualStyleBackColor = true;
             // 
             // autoButton
-            //
+            // 
             autoButton.AutoSize = true;
             autoButton.Checked = true;
             autoButton.Font = new System.Drawing.Font("Microsoft YaHei UI", 8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
@@ -295,57 +286,30 @@ namespace DellFanManagement.App
             autoButton.Text = "自动";
             autoButton.UseVisualStyleBackColor = true;
             // 
-            // turboBoostCheckBox
-            //
-            turboBoostCheckBox.AutoSize = true;
-            turboBoostCheckBox.Checked = true;
-            turboBoostCheckBox.CheckState = System.Windows.Forms.CheckState.Checked;
-            turboBoostCheckBox.Font = new System.Drawing.Font("Microsoft YaHei UI", 8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-            turboBoostCheckBox.Location = new System.Drawing.Point(55, 47);
-            turboBoostCheckBox.Name = "turboBoostCheckBox";
-            turboBoostCheckBox.Size = new System.Drawing.Size(75, 20);
-            turboBoostCheckBox.TabIndex = 17;
-            turboBoostCheckBox.Text = "睿频保护";
-            turboBoostCheckBox.UseVisualStyleBackColor = true;
-            //
-            // autoStartCheckBox
-            //
-            autoStartCheckBox.AutoSize = true;
-            autoStartCheckBox.Font = new System.Drawing.Font("Microsoft YaHei UI", 8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-            autoStartCheckBox.Location = new System.Drawing.Point(55, 22);
-            autoStartCheckBox.Name = "autoStartCheckBox";
-            autoStartCheckBox.Size = new System.Drawing.Size(75, 20);
-            autoStartCheckBox.TabIndex = 18;
-            autoStartCheckBox.Text = "开机启动";
-            autoStartCheckBox.UseVisualStyleBackColor = true;
-            //
             // DellFanManagementGuiForm
-            //
+            // 
             AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
             AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
             BackColor = System.Drawing.Color.White;
             BackgroundImageLayout = System.Windows.Forms.ImageLayout.None;
-            ClientSize = new System.Drawing.Size(329, 271);
+            ClientSize = new System.Drawing.Size(334, 210);
             Controls.Add(fanControlGroupBox);
             Controls.Add(systemMonitorGroupBox);
             Controls.Add(statusStrip);
-            Controls.Add(temperatureGroupBox);
             Controls.Add(thermalSettingGroupBox);
             Controls.Add(fansGroupBox);
             ForeColor = System.Drawing.SystemColors.ControlText;
             Icon = (System.Drawing.Icon)resources.GetObject("$this.Icon");
             MaximizeBox = false;
-            MaximumSize = new System.Drawing.Size(345, 310);
+            MaximumSize = new System.Drawing.Size(350, 249);
             MinimizeBox = false;
-            MinimumSize = new System.Drawing.Size(345, 310);
+            MinimumSize = new System.Drawing.Size(350, 249);
             Name = "DellFanManagementGuiForm";
             Text = "Dell 风扇管理";
             fansGroupBox.ResumeLayout(false);
             fansGroupBox.PerformLayout();
             thermalSettingGroupBox.ResumeLayout(false);
             thermalSettingGroupBox.PerformLayout();
-            temperatureGroupBox.ResumeLayout(false);
-            temperatureGroupBox.PerformLayout();
             systemMonitorGroupBox.ResumeLayout(false);
             systemMonitorGroupBox.PerformLayout();
             trayContextMenu.ResumeLayout(false);
@@ -366,9 +330,6 @@ namespace DellFanManagement.App
         private System.Windows.Forms.RadioButton thermalSettingRadioButtonQuiet;
         private System.Windows.Forms.RadioButton thermalSettingRadioButtonCool;
         private System.Windows.Forms.RadioButton thermalSettingRadioButtonOptimized;
-        private System.Windows.Forms.GroupBox temperatureGroupBox;
-        private System.Windows.Forms.Label temperatureLabel2;
-        private System.Windows.Forms.Label temperatureLabel1;
         private System.Windows.Forms.GroupBox systemMonitorGroupBox;
         private System.Windows.Forms.Label cpuFrequencyLabel;
         private System.Windows.Forms.Label gpuFrequencyLabel;

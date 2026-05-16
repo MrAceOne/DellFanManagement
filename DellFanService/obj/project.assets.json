@@ -2322,11 +2322,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "d:\\work\\net\\DellFanManagement\\DellFanService\\DellFanService.csproj",
+      "projectUniqueName": "D:\\work\\net\\DellFanManagement\\DellFanService\\DellFanService.csproj",
       "projectName": "DellFanService",
-      "projectPath": "d:\\work\\net\\DellFanManagement\\DellFanService\\DellFanService.csproj",
+      "projectPath": "D:\\work\\net\\DellFanManagement\\DellFanService\\DellFanService.csproj",
       "packagesPath": "C:\\Users\\lidon\\.nuget\\packages\\",
-      "outputPath": "d:\\work\\net\\DellFanManagement\\DellFanService\\obj\\",
+      "outputPath": "D:\\work\\net\\DellFanManagement\\DellFanService\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "C:\\Users\\lidon\\AppData\\Roaming\\NuGet\\NuGet.Config",
@@ -2341,13 +2341,14 @@
       },
       "frameworks": {
         "net6.0-windows7.0": {
+          "framework": "net6.0-windows7.0",
           "targetAlias": "net6.0-windows",
           "projectReferences": {
-            "d:\\work\\net\\DellFanManagement\\DellSmbiosBzhLib\\DellSmbiosBzhLib.csproj": {
-              "projectPath": "d:\\work\\net\\DellFanManagement\\DellSmbiosBzhLib\\DellSmbiosBzhLib.csproj"
+            "D:\\work\\net\\DellFanManagement\\DellSmbiosBzhLib\\DellSmbiosBzhLib.csproj": {
+              "projectPath": "D:\\work\\net\\DellFanManagement\\DellSmbiosBzhLib\\DellSmbiosBzhLib.csproj"
             },
-            "d:\\work\\net\\DellFanManagement\\DellSmbiosSmiLib\\DellSmbiosSmiLib.csproj": {
-              "projectPath": "d:\\work\\net\\DellFanManagement\\DellSmbiosSmiLib\\DellSmbiosSmiLib.csproj"
+            "D:\\work\\net\\DellFanManagement\\DellSmbiosSmiLib\\DellSmbiosSmiLib.csproj": {
+              "projectPath": "D:\\work\\net\\DellFanManagement\\DellSmbiosSmiLib\\DellSmbiosSmiLib.csproj"
             }
           }
         }
@@ -2366,6 +2367,7 @@
     },
     "frameworks": {
       "net6.0-windows7.0": {
+        "framework": "net6.0-windows7.0",
         "targetAlias": "net6.0-windows",
         "dependencies": {
           "Microsoft.Extensions.Hosting": {
