@@ -156,20 +156,22 @@ namespace DellFanManagement.App
             AccessCheck();
 
             UpdateFanRpms();
-            UpdateTemperatures();
+
+            // Single call to SystemMonitor — shared for both temperatures and monitor data.
+            SystemMonitorData monitorData = _systemMonitor.GetMonitorData();
+            UpdateTemperatures(monitorData);
             UpdatePowerProfile();
-            UpdateSystemMonitorData();
+            UpdateSystemMonitorData(monitorData);
         }
 
         /// <summary>
         /// Update system monitor data (CPU frequency, GPU frequency, memory usage).
         /// </summary>
-        private void UpdateSystemMonitorData()
+        /// <param name="monitorData">Pre-fetched monitor data to avoid duplicate hardware enumeration.</param>
+        private void UpdateSystemMonitorData(SystemMonitorData monitorData)
         {
             try
             {
-                SystemMonitorData monitorData = _systemMonitor.GetMonitorData();
-                
                 CpuFrequency = monitorData.CpuFrequency;
                 GpuFrequency = monitorData.GpuFrequency;
                 MemoryUsagePercent = monitorData.MemoryUsagePercent;
@@ -235,12 +237,11 @@ namespace DellFanManagement.App
         }
 
         /// <summary>
-        /// Update temperatures from SystemMonitor.
+        /// Update temperatures from pre-fetched SystemMonitor data.
         /// </summary>
-        private void UpdateTemperatures()
+        /// <param name="monitorData">Monitor data already obtained from SystemMonitor.</param>
+        private void UpdateTemperatures(SystemMonitorData monitorData)
         {
-            SystemMonitorData monitorData = _systemMonitor.GetMonitorData();
-
             // Update CPU temperature.
             if (monitorData.CpuTemperature.HasValue)
             {

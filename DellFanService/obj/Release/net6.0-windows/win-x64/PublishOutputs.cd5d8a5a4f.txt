@@ -1,0 +1,4 @@
+d:\work\net\DellFanManagement\DellFanService\publish\DellFanService.pdb
+d:\work\net\DellFanManagement\DellFanService\publish\DellSmbiosBzhLib.pdb
+d:\work\net\DellFanManagement\DellFanService\publish\DellSmbiosSmiLib.pdb
+d:\work\net\DellFanManagement\DellFanService\publish\DellFanService.exe

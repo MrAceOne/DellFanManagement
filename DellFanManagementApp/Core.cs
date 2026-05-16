@@ -168,12 +168,8 @@ namespace DellFanManagement.App
 
             TrayIconColor = TrayIconColor.Gray;
 
-            // Load configuration values.
+            // Load configuration values (including saved fan mode).
             LoadConfiguration();
-
-            // 强制启动为自动模式，忽略之前保存的配置
-            _fanMode = FanMode.Automatic;
-            _configurationStore.SetOption(ConfigurationOption.FanControlMode, (int)FanMode.Automatic);
 
             // 同步风扇模式到 State，确保启动时 UI 状态一致
             _state.WaitOne();
@@ -202,6 +198,19 @@ namespace DellFanManagement.App
             if (checkInterval.HasValue && checkInterval.Value > 0)
             {
                 CheckIntervalSeconds = checkInterval.Value;
+            }
+
+            // 加载上次保存的风扇控制模式
+            int? savedFanMode = _configurationStore.GetIntOption(ConfigurationOption.FanControlMode);
+            if (savedFanMode.HasValue && Enum.IsDefined(typeof(FanMode), savedFanMode.Value))
+            {
+                _fanMode = (FanMode)savedFanMode.Value;
+                Log.Write($"Loaded saved fan mode from registry: {_fanMode} (value={savedFanMode.Value})");
+            }
+            else
+            {
+                _fanMode = FanMode.Automatic;
+                Log.Write($"No saved fan mode found in registry, defaulting to Automatic (saved={savedFanMode})");
             }
         }
 
@@ -277,10 +286,13 @@ namespace DellFanManagement.App
 
             try
             {
-                // 启动时：强制启用EC自动控制
-                if (IsAutomaticFanControlDisableSupported)
+                // 启动时：根据上次保存的模式恢复状态
+                if (_fanMode == FanMode.Automatic)
                 {
-                    _fanController.EnableAutomaticFanControl();
+                    if (IsAutomaticFanControlDisableSupported)
+                    {
+                        _fanController.EnableAutomaticFanControl();
+                    }
                     _state.WaitOne();
                     _state.EcFanControlEnabled = true;
                     _state.FanMode = FanMode.Automatic;
@@ -289,13 +301,25 @@ namespace DellFanManagement.App
                 }
                 else
                 {
+                    if (IsAutomaticFanControlDisableSupported)
+                    {
+                        _fanController.DisableAutomaticFanControl();
+                    }
                     _state.WaitOne();
-                    _state.FanMode = FanMode.Automatic;
+                    _state.EcFanControlEnabled = false;
+                    _state.FanMode = FanMode.Manual;
+
+                    // 手动模式启动后立即应用一次温度控制
+                    if (IsAutomaticFanControlDisableSupported && IsSpecificFanControlSupported)
+                    {
+                        _temperatureCheckCounter = 0;
+                        ApplyTemperatureBasedFanControl();
+                    }
+
                     _state.Release();
+                    Log.Write("Started in manual mode – disabled EC fan control");
                 }
-                // 同步 _fanMode 字段，防止循环中因保存的旧配置而切回手动模式
-                _fanMode = FanMode.Automatic;
-                // 强制同步UI，确保启动后立即显示自动模式
+                // 强制同步UI，确保启动后立即显示正确模式
                 UpdateForm();
 
                 while (_state.BackgroundThreadRunning)
@@ -503,8 +527,6 @@ namespace DellFanManagement.App
             _state.WaitOne();
             _state.BackgroundThreadRunning = false;
             _state.Release();
-
-            UpdateForm();
         }
 
         /// <summary>
@@ -603,18 +625,20 @@ namespace DellFanManagement.App
         /// </summary>
         private void UpdateForm()
         {
+            if (_state.FormClosed || _form.IsDisposed)
+            {
+                return;
+            }
+
             MethodInvoker updateInvoker = new(_form.UpdateForm);
 
-            if (!_state.FormClosed)
+            try
             {
-                try
-                {
-                    _form.BeginInvoke(updateInvoker);
-                }
-                catch (Exception)
-                {
-                    // Take no action.
-                }
+                _form.BeginInvoke(updateInvoker);
+            }
+            catch (Exception)
+            {
+                // Take no action.
             }
         }
 

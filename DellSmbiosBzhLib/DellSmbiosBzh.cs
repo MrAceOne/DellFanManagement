@@ -98,6 +98,12 @@ namespace DellFanManagement.DellSmbiozBzhLib
         /// <returns>False if the driver failed to load.</returns>
         public static bool Initialize()
         {
+            // Already initialized and handle is valid — skip redundant work.
+            if (IsInitialized && DriverHandle != IntPtr.Zero && DriverHandle != ServiceMethods.InvalidHandleValue)
+            {
+                return true;
+            }
+
             bool result;
 
             // Check to see if the driver has already been loaded, and if so, just grab a handle to that.

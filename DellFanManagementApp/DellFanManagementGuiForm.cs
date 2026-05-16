@@ -77,6 +77,13 @@ namespace DellFanManagement.App
             _core = new Core(_state, this);
             _formClosed = false;
 
+            // 根据保存的风扇模式初始化 radio button（在事件订阅前，避免触发事件）
+            if (_state.FanMode == FanMode.Manual)
+            {
+                autoButton.Checked = false;
+                manuButton.Checked = true;
+            }
+
             _trayIcons = new Icon[16];
             _trayIconIndex = 0;
             _currentTrayIconColor = TrayIconColor.Gray;
@@ -245,14 +252,7 @@ namespace DellFanManagement.App
 
 
             // Tray icon hover text.
-            if (_state.Fan2Present)
-            {
-                trayIcon.Text = string.Format("Dell Fan Management\n{0}\n{1}", fan1RpmLabel.Text, fan2RpmLabel.Text);
-            }
-            else
-            {
-                trayIcon.Text = string.Format("Dell Fan Management\n{0}", fan1RpmLabel.Text);
-            }
+            trayIcon.Text = "Dell Fan Management";
 
             UpdateTrayIcon(false);
 
