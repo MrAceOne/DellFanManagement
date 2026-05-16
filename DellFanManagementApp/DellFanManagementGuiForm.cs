@@ -379,14 +379,6 @@ namespace DellFanManagement.App
 
                 // 自动模式下禁用睿频保护复选框
                 turboBoostCheckBox.Enabled = false;
-
-                // 直接读取UI上保留的散热模式并恢复
-                ThermalSetting? savedThermalSetting = GetCurrentThermalSettingFromUi();
-                if (savedThermalSetting.HasValue)
-                {
-                    _core.RequestThermalSetting(savedThermalSetting.Value);
-                }
-
             }
             else if (manuButton.Checked)
             {
