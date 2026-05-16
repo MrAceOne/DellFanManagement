@@ -129,6 +129,7 @@ namespace DellFanManagement.App
             autoStartCheckBox.CheckedChanged += new EventHandler(AutoStartCheckBoxChangedEventHandler);
 
             // Initial update of the tray icon (required for it to appear for display).
+            trayIcon.Text = "Dell Fan Management";
             UpdateTrayIcon(false);
 
             // Update form with default state values.
@@ -192,6 +193,35 @@ namespace DellFanManagement.App
         }
 
         /// <summary>
+        /// Build temperature and frequency display string for CPU or GPU.
+        /// </summary>
+        private string BuildTempFreqString(TemperatureComponent component, int? frequency, string prefix)
+        {
+            string tempStr = "--";
+            string minMax = "";
+
+            if (_state.Temperatures.ContainsKey(component) && _state.Temperatures[component].ContainsKey(component.ToString()))
+            {
+                int temp = _state.Temperatures[component][component.ToString()];
+                tempStr = temp != 0 ? temp.ToString() : "--";
+
+                var mins = _state.MinimumTemperatures;
+                var maxs = _state.MaximumTemperatures;
+                if (mins.ContainsKey(component) && mins[component].ContainsKey(component.ToString())
+                    && maxs.ContainsKey(component) && maxs[component].ContainsKey(component.ToString()))
+                {
+                    minMax = string.Format(" ({0}-{1})", mins[component][component.ToString()], maxs[component][component.ToString()]);
+                }
+            }
+
+            string freqStr = frequency.HasValue
+                ? string.Format(" {0:F1} GHz", frequency.Value / 1000.0)
+                : " --";
+
+            return string.Format("{0}: {1}{2}{3}", prefix, tempStr, minMax, freqStr);
+        }
+
+        /// <summary>
         /// Update the form based on the current state.
         /// </summary>
         public void UpdateForm()
@@ -208,62 +238,26 @@ namespace DellFanManagement.App
             }
             else
             {
-                fan2RpmLabel.Text = string.Format("Fan 2 not present");
+                fan2RpmLabel.Text = "Fan 2 not present";
                 fan2RpmLabel.Enabled = false;
             }
 
-            // 构建 CPU 综合信息：温度 (最小-最大) 频率
-            string cpuTempStr = "--";
-            string cpuMinMax = "";
-            if (_state.Temperatures.ContainsKey(TemperatureComponent.CPU) && _state.Temperatures[TemperatureComponent.CPU].ContainsKey("CPU"))
-            {
-                int temp = _state.Temperatures[TemperatureComponent.CPU]["CPU"];
-                cpuTempStr = temp != 0 ? temp.ToString() : "--";
-                if (_state.MinimumTemperatures.ContainsKey(TemperatureComponent.CPU) && _state.MinimumTemperatures[TemperatureComponent.CPU].ContainsKey("CPU")
-                    && _state.MaximumTemperatures.ContainsKey(TemperatureComponent.CPU) && _state.MaximumTemperatures[TemperatureComponent.CPU].ContainsKey("CPU"))
-                {
-                    cpuMinMax = string.Format(" ({0}-{1})", _state.MinimumTemperatures[TemperatureComponent.CPU]["CPU"], _state.MaximumTemperatures[TemperatureComponent.CPU]["CPU"]);
-                }
-            }
-            string cpuFreqStr = _state.CpuFrequency.HasValue
-                ? string.Format(" {0:F1} GHz", _state.CpuFrequency.Value / 1000.0)
-                : " --";
-            cpuFrequencyLabel.Text = string.Format("CPU: {0}{1}{2}", cpuTempStr, cpuMinMax, cpuFreqStr);
+            // CPU / GPU info.
+            cpuFrequencyLabel.Text = BuildTempFreqString(TemperatureComponent.CPU, _state.CpuFrequency, "CPU");
+            gpuFrequencyLabel.Text = BuildTempFreqString(TemperatureComponent.GPU, _state.GpuFrequency, "GPU");
 
-            // 构建 GPU 综合信息：温度 (最小-最大) 频率
-            string gpuTempStr = "--";
-            string gpuMinMax = "";
-            if (_state.Temperatures.ContainsKey(TemperatureComponent.GPU) && _state.Temperatures[TemperatureComponent.GPU].ContainsKey("GPU"))
-            {
-                int temp = _state.Temperatures[TemperatureComponent.GPU]["GPU"];
-                gpuTempStr = temp != 0 ? temp.ToString() : "--";
-                if (_state.MinimumTemperatures.ContainsKey(TemperatureComponent.GPU) && _state.MinimumTemperatures[TemperatureComponent.GPU].ContainsKey("GPU")
-                    && _state.MaximumTemperatures.ContainsKey(TemperatureComponent.GPU) && _state.MaximumTemperatures[TemperatureComponent.GPU].ContainsKey("GPU"))
-                {
-                    gpuMinMax = string.Format(" ({0}-{1})", _state.MinimumTemperatures[TemperatureComponent.GPU]["GPU"], _state.MaximumTemperatures[TemperatureComponent.GPU]["GPU"]);
-                }
-            }
-            string gpuFreqStr = _state.GpuFrequency.HasValue
-                ? string.Format(" {0:F1} GHz", _state.GpuFrequency.Value / 1000.0)
-                : " --";
-            gpuFrequencyLabel.Text = string.Format("GPU: {0}{1}{2}", gpuTempStr, gpuMinMax, gpuFreqStr);
-
-            // 内存信息（恢复百分比）
+            // Memory info.
             if (_state.UsedMemoryMB.HasValue && _state.TotalMemoryMB.HasValue)
             {
-                float usedGB = _state.UsedMemoryMB.Value / 1024.0f;
-                float totalGB = _state.TotalMemoryMB.Value / 1024.0f;
-                float usagePercent = (usedGB / totalGB) * 100;
-                memoryLabel.Text = string.Format("内存: {0:F1}/{1:F1} GB ({2:F1}%)", usedGB, totalGB, usagePercent);
+                memoryLabel.Text = string.Format("内存: {0:F1}/{1:F1} GB ({2:F1}%)",
+                    _state.UsedMemoryMB.Value / 1024.0f,
+                    _state.TotalMemoryMB.Value / 1024.0f,
+                    (_state.UsedMemoryMB.Value / (float)_state.TotalMemoryMB.Value) * 100);
             }
             else
             {
                 memoryLabel.Text = "内存: --";
             }
-
-
-            // Tray icon hover text.
-            trayIcon.Text = "Dell Fan Management";
 
             UpdateTrayIcon(false);
 
@@ -275,45 +269,39 @@ namespace DellFanManagement.App
             }
 
             // Power profiles management.
-            if (_state.ActivePowerProfile != null)
+            if (_state.ActivePowerProfile != null && _state.ActivePowerProfile != _registeredPowerProfile)
             {
-                if (_state.ActivePowerProfile != _registeredPowerProfile)
+                if (_registeredPowerProfile == null)
                 {
-                    if (_registeredPowerProfile == null)
-                    {
-                        Log.Write(string.Format("The active power profile is {0}", _state.ActivePowerProfile));
-                    }
-                    else
-                    {
-                        Log.Write(string.Format("Power profile changed from {0} to {1}", _registeredPowerProfile, _state.ActivePowerProfile));
-
-                        ThermalSetting? thermalSettingOverride = _configurationStore.GetThermalSettingOverride((Guid)_state.ActivePowerProfile);
-                        if (thermalSettingOverride != null)
-                        {
-                            _core.RequestThermalSetting((ThermalSetting)thermalSettingOverride);
-                            Log.Write(string.Format("Thermal setting override: {0}", thermalSettingOverride));
-                        }
-
-                        Guid? powerMode = _configurationStore.GetPowerModeOverride((Guid)_state.ActivePowerProfile);
-                        if (powerMode != null)
-                        {
-                            Utility.PowerSetActiveOverlayScheme((Guid)powerMode);
-                            Log.Write(string.Format("Power mode overrode: {0}", powerMode));
-                        }
-
-                        int? nvPstate = _configurationStore.GetNvPstateOverride((Guid)_state.ActivePowerProfile);
-                        if (nvPstate != null)
-                        {
-                            string nvInspectorPath = _configurationStore.GetStringOption(ConfigurationOption.NVPStateApplicationPath);
-                            if (nvInspectorPath != null)
-                            {
-                                Utility.SetNvidiaGpuPstate(nvInspectorPath, (int)nvPstate);
-                                Log.Write(string.Format("NVIDIA P-state override: {0}", nvPstate));
-                            }
-                        }
-                    }
-                    _registeredPowerProfile = _state.ActivePowerProfile;
+                    Log.Write(string.Format("The active power profile is {0}", _state.ActivePowerProfile));
                 }
+                else
+                {
+                    Log.Write(string.Format("Power profile changed from {0} to {1}", _registeredPowerProfile, _state.ActivePowerProfile));
+
+                    if (_configurationStore.GetThermalSettingOverride((Guid)_state.ActivePowerProfile) is ThermalSetting ts)
+                    {
+                        _core.RequestThermalSetting(ts);
+                        Log.Write(string.Format("Thermal setting override: {0}", ts));
+                    }
+
+                    if (_configurationStore.GetPowerModeOverride((Guid)_state.ActivePowerProfile) is Guid pm)
+                    {
+                        Utility.PowerSetActiveOverlayScheme(pm);
+                        Log.Write(string.Format("Power mode overrode: {0}", pm));
+                    }
+
+                    if (_configurationStore.GetNvPstateOverride((Guid)_state.ActivePowerProfile) is int pstate)
+                    {
+                        string nvPath = _configurationStore.GetStringOption(ConfigurationOption.NVPStateApplicationPath);
+                        if (nvPath != null)
+                        {
+                            Utility.SetNvidiaGpuPstate(nvPath, pstate);
+                            Log.Write(string.Format("NVIDIA P-state override: {0}", pstate));
+                        }
+                    }
+                }
+                _registeredPowerProfile = _state.ActivePowerProfile;
             }
 
             _state.Release();
