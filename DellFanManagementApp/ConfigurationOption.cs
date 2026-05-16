@@ -36,6 +36,16 @@
         public static readonly ConfigurationOption ManualModeCheckIntervalSeconds = new(ConfigurationOptionType.Integer, "ManualModeCheckIntervalSeconds");
 
         /// <summary>
+        /// Whether turbo boost should be disabled on high temperature (default 1 = enabled).
+        /// </summary>
+        public static readonly ConfigurationOption TurboBoostEnabled = new(ConfigurationOptionType.Integer, "TurboBoostEnabled");
+
+        /// <summary>
+        /// Whether the application should start automatically on Windows boot (default 0 = disabled).
+        /// </summary>
+        public static readonly ConfigurationOption AutoStartOnBoot = new(ConfigurationOptionType.Integer, "AutoStartOnBoot");
+
+        /// <summary>
         /// Indicates whether this configuration option is for a "number" or a "string".
         /// </summary>
         public ConfigurationOptionType Type { get; private set; }

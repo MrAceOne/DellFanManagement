@@ -84,6 +84,17 @@ namespace DellFanManagement.App
                 manuButton.Checked = true;
             }
 
+            // 初始化睿频保护复选框（默认选中）
+            int? turboBoostSaved = _configurationStore.GetIntOption(ConfigurationOption.TurboBoostEnabled);
+            turboBoostCheckBox.Checked = turboBoostSaved != 0; // 默认选中（null 或 1 都视为选中）
+
+            // 初始化开机启动复选框（默认不选中）
+            int? autoStartSaved = _configurationStore.GetIntOption(ConfigurationOption.AutoStartOnBoot);
+            autoStartCheckBox.Checked = autoStartSaved == 1;
+
+            // 根据初始风扇模式设置睿频保护可用性
+            turboBoostCheckBox.Enabled = _state.FanMode == FanMode.Manual;
+
             _trayIcons = new Icon[16];
             _trayIconIndex = 0;
             _currentTrayIconColor = TrayIconColor.Gray;
@@ -112,6 +123,10 @@ namespace DellFanManagement.App
             // ...Fan control radio buttons...
             autoButton.CheckedChanged += new EventHandler(FanModeChangedEventHandler);
             manuButton.CheckedChanged += new EventHandler(FanModeChangedEventHandler);
+
+            // ...Check boxes...
+            turboBoostCheckBox.CheckedChanged += new EventHandler(TurboBoostCheckBoxChangedEventHandler);
+            autoStartCheckBox.CheckedChanged += new EventHandler(AutoStartCheckBoxChangedEventHandler);
 
             // Empty out pre-populated temperature label text fields.
             temperatureLabel1.Text = string.Empty;
@@ -366,6 +381,9 @@ namespace DellFanManagement.App
                 // 恢复散热管理可用状态
                 SetThermalSettingAvaiability(true);
 
+                // 自动模式下禁用睿频保护复选框
+                turboBoostCheckBox.Enabled = false;
+
                 // 直接读取UI上保留的散热模式并恢复
                 ThermalSetting? savedThermalSetting = GetCurrentThermalSettingFromUi();
                 if (savedThermalSetting.HasValue)
@@ -380,6 +398,9 @@ namespace DellFanManagement.App
 
                 // 禁用散热管理控件（UI上保留原选中状态）
                 SetThermalSettingAvaiability(false);
+
+                // 手动模式下启用睿频保护复选框
+                turboBoostCheckBox.Enabled = true;
             }
         }
 
@@ -397,6 +418,52 @@ namespace DellFanManagement.App
             if (thermalSettingRadioButtonPerformance.Checked)
                 return ThermalSetting.Performance;
             return null;
+        }
+
+        /// <summary>
+        /// Called when the turbo boost check box is changed.
+        /// </summary>
+        private void TurboBoostCheckBoxChangedEventHandler(Object sender, EventArgs e)
+        {
+            bool enabled = turboBoostCheckBox.Checked;
+            _configurationStore.SetOption(ConfigurationOption.TurboBoostEnabled, enabled ? 1 : 0);
+            _core.SetTurboBoostEnabled(enabled);
+            Log.Write($"Turbo boost protection {(enabled ? "enabled" : "disabled")}");
+        }
+
+        /// <summary>
+        /// Called when the auto start check box is changed.
+        /// </summary>
+        private void AutoStartCheckBoxChangedEventHandler(Object sender, EventArgs e)
+        {
+            bool enabled = autoStartCheckBox.Checked;
+            _configurationStore.SetOption(ConfigurationOption.AutoStartOnBoot, enabled ? 1 : 0);
+            SetAutoStartOnBoot(enabled);
+            Log.Write($"Auto start on boot {(enabled ? "enabled" : "disabled")}");
+        }
+
+        /// <summary>
+        /// Set or remove the application from Windows startup.
+        /// </summary>
+        private static void SetAutoStartOnBoot(bool enabled)
+        {
+            try
+            {
+                using Microsoft.Win32.RegistryKey key = Microsoft.Win32.Registry.CurrentUser.OpenSubKey("Software\\Microsoft\\Windows\\CurrentVersion\\Run", true);
+                if (enabled)
+                {
+                    string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
+                    key.SetValue("Dell Fan Management", exePath);
+                }
+                else
+                {
+                    key.DeleteValue("Dell Fan Management", false);
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.Write($"Error setting auto start on boot: {ex.Message}");
+            }
         }
 
         /// <summary>

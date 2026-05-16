@@ -55,6 +55,8 @@ namespace DellFanManagement.App
             fanControlGroupBox = new System.Windows.Forms.GroupBox();
             manuButton = new System.Windows.Forms.RadioButton();
             autoButton = new System.Windows.Forms.RadioButton();
+            turboBoostCheckBox = new System.Windows.Forms.CheckBox();
+            autoStartCheckBox = new System.Windows.Forms.CheckBox();
             fansGroupBox.SuspendLayout();
             thermalSettingGroupBox.SuspendLayout();
             temperatureGroupBox.SuspendLayout();
@@ -223,7 +225,7 @@ namespace DellFanManagement.App
             memoryLabel.Text = "内存: --";
             // 
             // statusStrip
-            // 
+            //
             statusStrip.ImageScalingSize = new System.Drawing.Size(32, 32);
             statusStrip.Location = new System.Drawing.Point(0, 249);
             statusStrip.Name = "statusStrip";
@@ -256,7 +258,9 @@ namespace DellFanManagement.App
             trayMenuItemExit.Text = "退出";
             // 
             // fanControlGroupBox
-            // 
+            //
+            fanControlGroupBox.Controls.Add(autoStartCheckBox);
+            fanControlGroupBox.Controls.Add(turboBoostCheckBox);
             fanControlGroupBox.Controls.Add(manuButton);
             fanControlGroupBox.Controls.Add(autoButton);
             fanControlGroupBox.Location = new System.Drawing.Point(193, 152);
@@ -291,8 +295,32 @@ namespace DellFanManagement.App
             autoButton.Text = "自动";
             autoButton.UseVisualStyleBackColor = true;
             // 
+            // turboBoostCheckBox
+            //
+            turboBoostCheckBox.AutoSize = true;
+            turboBoostCheckBox.Checked = true;
+            turboBoostCheckBox.CheckState = System.Windows.Forms.CheckState.Checked;
+            turboBoostCheckBox.Font = new System.Drawing.Font("Microsoft YaHei UI", 8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            turboBoostCheckBox.Location = new System.Drawing.Point(55, 47);
+            turboBoostCheckBox.Name = "turboBoostCheckBox";
+            turboBoostCheckBox.Size = new System.Drawing.Size(75, 20);
+            turboBoostCheckBox.TabIndex = 17;
+            turboBoostCheckBox.Text = "睿频保护";
+            turboBoostCheckBox.UseVisualStyleBackColor = true;
+            //
+            // autoStartCheckBox
+            //
+            autoStartCheckBox.AutoSize = true;
+            autoStartCheckBox.Font = new System.Drawing.Font("Microsoft YaHei UI", 8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            autoStartCheckBox.Location = new System.Drawing.Point(55, 22);
+            autoStartCheckBox.Name = "autoStartCheckBox";
+            autoStartCheckBox.Size = new System.Drawing.Size(75, 20);
+            autoStartCheckBox.TabIndex = 18;
+            autoStartCheckBox.Text = "开机启动";
+            autoStartCheckBox.UseVisualStyleBackColor = true;
+            //
             // DellFanManagementGuiForm
-            // 
+            //
             AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
             AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
             BackColor = System.Drawing.Color.White;
@@ -353,5 +381,7 @@ namespace DellFanManagement.App
         private System.Windows.Forms.GroupBox fanControlGroupBox;
         private System.Windows.Forms.RadioButton manuButton;
         private System.Windows.Forms.RadioButton autoButton;
+        private System.Windows.Forms.CheckBox turboBoostCheckBox;
+        private System.Windows.Forms.CheckBox autoStartCheckBox;
     }
 }

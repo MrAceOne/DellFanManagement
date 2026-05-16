@@ -148,6 +148,11 @@ namespace DellFanManagement.App
         private bool _overrideByTemperature;
 
         /// <summary>
+        /// 是否启用高温睿频保护（默认true）
+        /// </summary>
+        private bool _turboBoostEnabled = true;
+
+        /// <summary>
         /// Constructor.
         /// </summary>
         /// <param name="state">Shared state object</param>
@@ -165,6 +170,10 @@ namespace DellFanManagement.App
             _fan2LevelRequested = null;
 
             _overrideByTemperature = false;
+
+            // 加载睿频保护设置（默认启用）
+            int? turboBoostSaved = _configurationStore.GetIntOption(ConfigurationOption.TurboBoostEnabled);
+            _turboBoostEnabled = turboBoostSaved != 0;
 
             TrayIconColor = TrayIconColor.Gray;
 
@@ -265,6 +274,27 @@ namespace DellFanManagement.App
         }
 
         /// <summary>
+        /// 设置是否启用高温睿频保护
+        /// </summary>
+        /// <param name="enabled">true 表示启用，false 表示禁用</param>
+        public void SetTurboBoostEnabled(bool enabled)
+        {
+            _requestSemaphore.WaitOne();
+            _turboBoostEnabled = enabled;
+
+            // 如果禁用睿频保护且当前因为高温已禁用睿频，则恢复睿频
+            if (!enabled && _overrideByTemperature)
+            {
+                CpuPowerManager.SetGuid(CpuPowerManager.GUID_PROCESSOR_TURBOBOOST, 2);
+                _overrideByTemperature = false;
+                _recoveryCounter = 0;
+                Log.Write("Turbo boost protection disabled, restored turbo boost");
+            }
+
+            _requestSemaphore.Release();
+        }
+
+        /// <summary>
         /// Start up the application "background thread", which monitors the system state.
         /// </summary>
         public void StartBackgroundThread()
@@ -329,6 +359,8 @@ namespace DellFanManagement.App
                     releaseSemaphore = true;
 
                     bool windowVisible = _state.WindowVisible;
+                    int cpuTemp;
+                    int gpuTemp;
 
                     // 窗口隐藏到托盘时的处理逻辑
                     if (!windowVisible)
@@ -345,15 +377,15 @@ namespace DellFanManagement.App
                         else
                         {
                             // 手动模式：窗口隐藏时只保留温度控制，跳过其他逻辑和UI更新
-                            int cpuTemp = GetCpuTemperature();
-                            int gpuTemp = GetGpuTemperature();
+                            cpuTemp = GetCpuTemperature();
+                            gpuTemp = GetGpuTemperature();
 
                             // 仅应用基于温度的风扇控制（高温保护）
                             if (!_state.EcFanControlEnabled && IsAutomaticFanControlDisableSupported && IsSpecificFanControlSupported)
                             {
                                 bool cpuHot = cpuTemp >= TriggerCpuTemp;
                                 bool gpuHot = gpuTemp >= TriggerGpuTemp;
-                                if (cpuHot || gpuHot)
+                                if (_turboBoostEnabled && (cpuHot || gpuHot))
                                 {
                                     Log.Write($"High temperature detected (CPU: {cpuTemp}°C, GPU: {gpuTemp}°C), disabling turbo boost");
                                     CpuPowerManager.SetGuid(CpuPowerManager.GUID_PROCESSOR_TURBOBOOST, 0);
@@ -409,14 +441,21 @@ namespace DellFanManagement.App
                     _state.Update();
 
                     // 获取当前温度
-                    int cpuTemp = GetCpuTemperature();
-                    int gpuTemp = GetGpuTemperature();
+                    cpuTemp = GetCpuTemperature();
+                    gpuTemp = GetGpuTemperature();
 
                     // Handle turbo boost state changes.
                     if (_overrideByTemperature)
                     {
                         // 当前因为高温而禁用了睿频
-                        if (_fanMode == FanMode.Manual)
+                        if (!_turboBoostEnabled)
+                        {
+                            // 睿频保护已禁用，恢复睿频
+                            CpuPowerManager.SetGuid(CpuPowerManager.GUID_PROCESSOR_TURBOBOOST, 2);
+                            _overrideByTemperature = false;
+                            _recoveryCounter = 0;
+                        }
+                        else if (_fanMode == FanMode.Manual)
                         {
                             // 用户还是手动模式，检查温度是否降低
                             bool cpuCooled = cpuTemp < 0 || cpuTemp < RecoveryCpuTemp;
@@ -496,7 +535,7 @@ namespace DellFanManagement.App
                         // 检查是否需要因为高温而禁用睿频
                         bool cpuHot = cpuTemp >= TriggerCpuTemp;
                         bool gpuHot = gpuTemp >= TriggerGpuTemp;
-                        if (cpuHot || gpuHot)
+                        if (_turboBoostEnabled && (cpuHot || gpuHot))
                         {
                             Log.Write($"High temperature detected (CPU: {cpuTemp}°C, GPU: {gpuTemp}°C), disabling turbo boost");
                             CpuPowerManager.SetGuid(CpuPowerManager.GUID_PROCESSOR_TURBOBOOST, 0);
