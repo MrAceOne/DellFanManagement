@@ -328,6 +328,83 @@ namespace DellFanManagement.App
                     _requestSemaphore.WaitOne();
                     releaseSemaphore = true;
 
+                    bool windowVisible = _state.WindowVisible;
+
+                    // 窗口隐藏到托盘时的处理逻辑
+                    if (!windowVisible)
+                    {
+                        if (_fanMode == FanMode.Automatic)
+                        {
+                            // 自动模式：窗口隐藏时直接暂停，不做任何处理
+                            _requestSemaphore.Release();
+                            _state.Release();
+                            releaseSemaphore = false;
+                            Thread.Sleep(Core.RefreshInterval);
+                            continue;
+                        }
+                        else
+                        {
+                            // 手动模式：窗口隐藏时只保留温度控制，跳过其他逻辑和UI更新
+                            int cpuTemp = GetCpuTemperature();
+                            int gpuTemp = GetGpuTemperature();
+
+                            // 仅应用基于温度的风扇控制（高温保护）
+                            if (!_state.EcFanControlEnabled && IsAutomaticFanControlDisableSupported && IsSpecificFanControlSupported)
+                            {
+                                bool cpuHot = cpuTemp >= TriggerCpuTemp;
+                                bool gpuHot = gpuTemp >= TriggerGpuTemp;
+                                if (cpuHot || gpuHot)
+                                {
+                                    Log.Write($"High temperature detected (CPU: {cpuTemp}°C, GPU: {gpuTemp}°C), disabling turbo boost");
+                                    CpuPowerManager.SetGuid(CpuPowerManager.GUID_PROCESSOR_TURBOBOOST, 0);
+                                    _overrideByTemperature = true;
+                                    _recoveryCounter = 0;
+                                }
+                                else if (_overrideByTemperature)
+                                {
+                                    bool cpuCooled = cpuTemp < 0 || cpuTemp < RecoveryCpuTemp;
+                                    bool gpuCooled = gpuTemp < 0 || gpuTemp < RecoveryGpuTemp;
+                                    if (cpuCooled && gpuCooled)
+                                    {
+                                        _recoveryCounter++;
+                                        if (_recoveryCounter >= RecoveryDurationSeconds)
+                                        {
+                                            CpuPowerManager.SetGuid(CpuPowerManager.GUID_PROCESSOR_TURBOBOOST, 2);
+                                            _overrideByTemperature = false;
+                                            _recoveryCounter = 0;
+                                            _state.Fan1Level = null;
+                                            _state.Fan2Level = null;
+                                            ApplyTemperatureBasedFanControl();
+                                            Log.Write($"Temperature stayed below recovery thresholds for {RecoveryDurationSeconds}s, restored turbo boost");
+                                        }
+                                    }
+                                    else
+                                    {
+                                        if (_recoveryCounter > 0)
+                                        {
+                                            _recoveryCounter = 0;
+                                        }
+                                    }
+                                }
+                                else
+                                {
+                                    _temperatureCheckCounter++;
+                                    if (_temperatureCheckCounter >= CheckIntervalSeconds)
+                                    {
+                                        _temperatureCheckCounter = 0;
+                                        ApplyTemperatureBasedFanControl();
+                                    }
+                                }
+                            }
+
+                            _requestSemaphore.Release();
+                            _state.Release();
+                            releaseSemaphore = false;
+                            Thread.Sleep(Core.RefreshInterval);
+                            continue;
+                        }
+                    }
+
                     // Update state.
                     _state.Update();
 

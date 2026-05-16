@@ -327,6 +327,7 @@ namespace DellFanManagement.App
             _state.WaitOne();
             _state.BackgroundThreadRunning = false;
             _state.FormClosed = true;
+            _state.WindowVisible = false;
             _state.Release();
         }
 
@@ -415,6 +416,10 @@ namespace DellFanManagement.App
             {
                 ShowInTaskbar = false;
                 Visible = false;
+
+                _state.WaitOne();
+                _state.WindowVisible = false;
+                _state.Release();
             }
         }
 
@@ -544,6 +549,10 @@ namespace DellFanManagement.App
             Visible = true;
             ShowInTaskbar = true;
             WindowState = FormWindowState.Normal;
+
+            _state.WaitOne();
+            _state.WindowVisible = true;
+            _state.Release();
         }
 
         /// <summary>
@@ -567,6 +576,11 @@ namespace DellFanManagement.App
                 WindowState = FormWindowState.Minimized;
                 ShowInTaskbar = false;
                 Visible = false;
+
+                _state.WaitOne();
+                _state.WindowVisible = false;
+                _state.Release();
+
                 return;
             }
 

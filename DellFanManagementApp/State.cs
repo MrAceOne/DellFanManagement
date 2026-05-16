@@ -74,6 +74,11 @@ namespace DellFanManagement.App
         private bool _formClosed;
 
         /// <summary>
+        /// Whether or not the main window is currently visible (not minimized to tray).
+        /// </summary>
+        private bool _windowVisible;
+
+        /// <summary>
         /// Indicates whether or not EC fan control is enabled.
         /// </summary>
         private bool _ecFanControlEnabled;
@@ -117,6 +122,7 @@ namespace DellFanManagement.App
             _backgroundThreadRunning = false;
             _audioThreadRunning = false;
             _formClosed = false;
+            _windowVisible = true;
             _ecFanControlEnabled = true;
             _fanMode = FanMode.Automatic;
             _error = null;
@@ -381,6 +387,15 @@ namespace DellFanManagement.App
         {
             get { return _formClosed; }
             set { AccessCheck(); _formClosed = value; }
+        }
+
+        /// <summary>
+        /// Whether or not the main window is currently visible (not minimized to tray).
+        /// </summary>
+        public bool WindowVisible
+        {
+            get { return _windowVisible; }
+            set { AccessCheck(); _windowVisible = value; }
         }
 
         /// <summary>
