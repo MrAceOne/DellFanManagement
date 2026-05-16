@@ -448,8 +448,8 @@ namespace DellFanManagement.App
                 using Microsoft.Win32.RegistryKey key = Microsoft.Win32.Registry.CurrentUser.OpenSubKey("Software\\Microsoft\\Windows\\CurrentVersion\\Run", true);
                 if (enabled)
                 {
-                    string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
-                    key.SetValue("Dell Fan Management", exePath);
+                    string exePath = Application.ExecutablePath;
+                    key.SetValue("Dell Fan Management", $"\"{exePath}\"");
                 }
                 else
                 {

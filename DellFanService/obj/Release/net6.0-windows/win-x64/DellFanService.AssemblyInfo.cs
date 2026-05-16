@@ -15,7 +15,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Release")]
 [assembly: System.Reflection.AssemblyCopyrightAttribute("GPLv3")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+0e269ee3c20fc04e5647a1b6739414439fe03dfd")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+46c080830baea84ebda217e2e12a1cf54f325b56")]
 [assembly: System.Reflection.AssemblyProductAttribute("Dell Fan Service")]
 [assembly: System.Reflection.AssemblyTitleAttribute("DellFanService")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
